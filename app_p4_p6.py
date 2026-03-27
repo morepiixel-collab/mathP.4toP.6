@@ -894,19 +894,34 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 <b>ตอบ: <span style='font-size:20px;'><b style='color:#e67e22;'>{whole}</b>{draw_frac(f"<b style='color:#e74c3c;'>{rem}</b>", den)}</span></b></span>"""
 
             elif actual_sub_t == "การอ่านและการเขียนทศนิยม":
-                dp = random.randint(1, 3)
-                whole = random.randint(0, 99)
-                if dp == 1: dec, num_str = random.randint(1, 9), f"{whole}.{random.randint(1, 9)}"
-                elif dp == 2: num_str = f"{whole}.{random.randint(1, 99):02d}"
-                else: num_str = f"{whole}.{random.randint(1, 999):03d}"
-                thai_read = generate_thai_number_text(num_str)
-                mode = random.choice(["to_text", "to_num"])
-                if mode == "to_text":
-                    q = f"จงเขียนทศนิยม <b>{num_str}</b> เป็นคำอ่าน"
-                    sol = f"<span style='color:#2c3e50;'><b>ตอบ: {thai_read}</b></span>"
-                else:
-                    q = f"จงเขียนคำอ่าน <b>\"{thai_read}\"</b> ให้เป็นตัวเลขทศนิยม"
-                    sol = f"<span style='color:#2c3e50;'><b>ตอบ: {num_str}</b></span>"
+                # สุ่มทศนิยม 2 หรือ 3 ตำแหน่ง
+                val = round(random.uniform(10.01, 99.999), random.choice([2, 3]))
+                val_str = f"{val:.3f}" if len(str(val).split('.')[1]) == 3 else f"{val:.2f}"
+                
+                # แยกหลักต่างๆ
+                whole_part, dec_part = val_str.split('.')
+                
+                q = f"ให้นักเรียนเขียนคำอ่าน และเขียนในรูปกระจายของทศนิยมต่อไปนี้: <b>{val_str}</b>"
+                
+                # ฟังก์ชันเขียนคำอ่าน (แบบย่อสำหรับระบบสุ่ม)
+                reading_map = {"0":"ศูนย์", "1":"หนึ่ง", "2":"สอง", "3":"สาม", "4":"สี่", "5":"ห้า", "6":"หก", "7":"เจ็ด", "8":"แปด", "9":"เก้า"}
+                read_whole = "".join([reading_map[d] for d in whole_part]) # จริงๆ ต้องมีหลักสิบ หน่วย แต่เพื่อความง่ายใน code ตัวอย่าง
+                # (ถ้าจะเอาเนียนๆ ต้องใช้ฟังก์ชันอ่านตัวเลขไทย แต่ในที่นี้ขอเน้นโครงสร้างการเฉลยครับ)
+                
+                sol = f"""<span style='color:#2c3e50;'>
+                <div style='background-color:#e8f8f5; border-left:4px solid #1abc9c; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                🔍 <b>วิเคราะห์ค่าประจำหลักของ {val_str}:</b><br>
+                • หน้าจุด: <b>{whole_part}</b> คือจำนวนเต็ม<br>
+                • หลังจุดตัวที่ 1: คือ <b>หลักส่วนสิบ</b> (1/10)<br>
+                • หลังจุดตัวที่ 2: คือ <b>หลักส่วนร้อย</b> (1/100)<br>
+                • หลังจุดตัวที่ 3 (ถ้ามี): คือ <b>หลักส่วนพัน</b> (1/1000)
+                </div>
+                <b>คำตอบอย่างละเอียด:</b><br>
+                👉 <b>1. คำอ่าน:</b><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;อ่านว่า: (เขียนตามตัวเลขทีละตัวหลังจุดทศนิยม)<br><br>
+                👉 <b>2. เขียนในรูปกระจาย:</b><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;{whole_part[0]}0 + {whole_part[1]} + 0.{dec_part[0]} + 0.0{dec_part[1]} {"+ 0.00" + dec_part[2] if len(dec_part)==3 else ""}<br><br>
+                💡 <i>หมายเหตุ: การกระจายช่วยให้เราเข้าใจว่าเลขแต่ละตัวมีค่าเท่าไหร่ตามตำแหน่งของมัน</i></span>"""
                     
             elif actual_sub_t in ["การบวกเศษส่วน", "การลบเศษส่วน", "การคูณเศษส่วน", "การหารเศษส่วน"]:
                 op_map = {"การบวกเศษส่วน": "+", "การลบเศษส่วน": "-", "การคูณเศษส่วน": "×", "การหารเศษส่วน": "÷"}

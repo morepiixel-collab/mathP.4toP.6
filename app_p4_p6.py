@@ -985,36 +985,105 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
             elif actual_sub_t == "สมการและตัวไม่ทราบค่าจากชีวิตประจำวัน":
                 scenario_type = random.choice(["shopping", "saving", "sharing", "comparing"])
                 var = random.choice(["x", "y", "ก", "n"])
+                
+                # ฟังก์ชันช่วยวาดการตัดทอนแบบใหม่ (ขยับเลขแดงไปข้างๆ)
                 def frac_cancel_left(num, variable):
                     top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:super; margin-left:2px;'>1</span></span>{variable}"
                     bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+                
                 def frac_cancel_right(top_val, bot_val, result_val):
                     top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{top_val}</span><span style='font-size:14px; color:#e74c3c; font-weight:bold; vertical-align:super; margin-left:2px;'>{result_val}</span></span>"
                     bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{bot_val}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
-                
+
                 if scenario_type == "shopping":
-                    item, p_u, cnt = random.choice(["ขนม", "สมุด", "ตุ๊กตา"]), random.randint(15, 50), random.randint(3, 10)
+                    item, p_u, cnt = random.choice([("ขนม", 22, 8), ("สมุด", 15, 6), ("ตุ๊กตา", 45, 4)]), random.randint(12, 35), random.randint(3, 9)
                     total = p_u * cnt
-                    q = f"แม่ซื้อ {item} {cnt} ชิ้น จ่ายเงิน {total} บาท ราคาชิ้นละกี่บาท (ให้ {var} แทนราคา)"
-                    sol = f"<b>สมการ:</b> {cnt}{var} = {total}<br><br><span style='color:#2c3e50;'>👉 ใช้สูตรคูณ<b>แม่ {cnt}</b> ตัดทอน:<br>{frac_cancel_left(cnt, var)} = {frac_cancel_right(total, cnt, p_u)}<br>👉 <b>{var} = {p_u}</b></span>"
+                    q = f"แม่ซื้อ <b>{item}</b> จำนวน <b>{cnt}</b> ชิ้น จ่ายเงินไปทั้งหมด <b>{total}</b> บาท ราคาชิ้นละกี่บาท (ให้ <b>{var}</b> แทนราคาต่อชิ้น)"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:10px;'>
+                    🔍 <b>วิเคราะห์โจทย์เพื่อสร้างสมการ:</b><br>
+                    • ราคาสินค้าทั้งหมด เกิดจาก (จำนวนชิ้น <b style='color:#2980b9;'>{cnt}</b>) คูณกับ (ราคาต่อชิ้น <b style='color:#e67e22;'>{var}</b>)<br>
+                    • จะได้ความสัมพันธ์คือ: <b style='color:#2980b9;'>{cnt}</b> × <b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{total}</b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>1. เขียนเป็นสมการ:</b> {cnt}{var} = {total}<br><br>
+                    <b>2. แก้สมการโดยใช้สมบัติการเท่ากัน:</b><br>
+                    👉 นำ <b style='color:#e74c3c;'>{cnt}</b> มาหารออกทั้งสองข้าง (ใช้สูตรคูณ <b>แม่ {cnt}</b> ตัดทอน):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(cnt, var)} = {frac_cancel_right(total, cnt, p_u)}<br><br>
+                    👉 <b>{var} = {p_u}</b><br>
+                    <b>ตอบ: {item}ราคาชิ้นละ {p_u} บาท</b></span>"""
+
                 elif scenario_type == "saving":
-                    init, d_s, days = random.randint(100, 500), random.randint(10, 40), random.randint(5, 20)
+                    init, d_s, days = random.randint(100, 400), random.randint(10, 30), random.randint(5, 12)
                     total = init + (d_s * days)
-                    q = f"เดิมมีเงิน {init} บาท ออมเพิ่ม {days} วัน มีเงินรวม {total} บาท ออมวันละกี่บาท (ให้ {var} แทนเงินออม)"
-                    sol = f"<b>สมการ:</b> {init} + {days}{var} = {total}<br><br><span style='color:#2c3e50;'>👉 <b>ขั้นที่ 1:</b> ลบ {init} ออก ➔ {days}{var} = {total-init}<br>👉 <b>ขั้นที่ 2 (แม่ {days} ตัด):</b> {frac_cancel_left(days, var)} = {frac_cancel_right(total-init, days, d_s)}<br>👉 <b>{var} = {d_s}</b></span>"
+                    q = f"เดิมมีเงิน <b>{init}</b> บาท ออมเพิ่มวันละเท่าๆ กัน <b>{days}</b> วัน ทำให้มีเงินรวม <b>{total}</b> บาท ออมวันละกี่บาท (ให้ <b>{var}</b> แทนเงินออมต่อวัน)"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:10px;'>
+                    🔍 <b>วิเคราะห์โจทย์เพื่อสร้างสมการ:</b><br>
+                    • เงินรวม เกิดจาก (เงินเดิม <b style='color:#9b59b6;'>{init}</b>) บวกกับ (เงินที่ออมเพิ่มทั้งหมด)<br>
+                    • เงินที่ออมเพิ่มทั้งหมด คือ (จำนวนวัน <b style='color:#2980b9;'>{days}</b>) คูณกับ (เงินต่อวัน <b style='color:#e67e22;'>{var}</b>)<br>
+                    • จะได้สมการคือ: <b style='color:#9b59b6;'>{init}</b> + <b style='color:#2980b9;'>{days}</b><b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{total}</b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>1. เขียนเป็นสมการ:</b> {init} + {days}{var} = {total}<br><br>
+                    <b>2. แก้สมการ (กำจัดตัวที่อยู่ไกลตัวแปร หรือ วงนอกก่อน):</b><br>
+                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{init}</b> มาลบออกทั้งสองข้าง<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{init} - <b style='color:#e74c3c;'>{init}</b> + {days}{var} = {total} - <b style='color:#e74c3c;'>{init}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้: {days}{var} = {total-init}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{days}</b> มาหารออกทั้งสองข้าง (ใช้แม่ {days} ตัด):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(days, var)} = {frac_cancel_right(total-init, days, d_s)}<br><br>
+                    👉 <b>{var} = {d_s}</b><br>
+                    <b>ตอบ: ออมเงินวันละ {d_s} บาท</b></span>"""
+
                 elif scenario_type == "sharing":
-                    total, eat, fnds = random.randint(50, 150), random.randint(5, 20), random.randint(2, 5)
-                    per = (total - eat) // fnds
-                    total = (per * fnds) + eat
-                    q = f"มีขนม {total} ชิ้น กินเองไป {eat} ชิ้น แบ่งเพื่อน {fnds} คน ได้กี่ชิ้น (ให้ {var} แทนจำนวนที่ได้รับ)"
-                    sol = f"<b>สมการ:</b> {fnds}{var} + {eat} = {total}<br><br><span style='color:#2c3e50;'>👉 <b>ขั้นที่ 1:</b> ลบ {eat} ออก ➔ {fnds}{var} = {total-eat}<br>👉 <b>ขั้นที่ 2 (แม่ {fnds} ตัด):</b> {frac_cancel_left(fnds, var)} = {frac_cancel_right(total-eat, fnds, per)}<br>👉 <b>{var} = {per}</b></span>"
-                else:
-                    s_v, diff = random.randint(100, 300), random.randint(50, 150)
+                    total_c, eat, fnds = random.randint(60, 150), random.randint(10, 30), random.randint(2, 6)
+                    per = (total_c - eat) // fnds
+                    total_c = (per * fnds) + eat
+                    q = f"มีขนม <b>{total_c}</b> ชิ้น กินเองไป <b>{eat}</b> ชิ้น ที่เหลือแบ่งให้เพื่อน <b>{fnds}</b> คน คนละเท่าๆ กัน เพื่อนได้รับกี่ชิ้น (ให้ <b>{var}</b> แทนจำนวนที่เพื่อนได้รับ)"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:10px;'>
+                    🔍 <b>วิเคราะห์โจทย์เพื่อสร้างสมการ:</b><br>
+                    • ขนมทั้งหมด เกิดจาก (จำนวนเพื่อน <b style='color:#2980b9;'>{fnds}</b> × ขนมที่เพื่อนได้ <b style='color:#e67e22;'>{var}</b>) บวกกับ (ที่กินเอง <b style='color:#c0392b;'>{eat}</b>)<br>
+                    • จะได้สมการคือ: <b style='color:#2980b9;'>{fnds}</b><b style='color:#e67e22;'>{var}</b> + <b style='color:#c0392b;'>{eat}</b> = <b style='color:#27ae60;'>{total_c}</b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>1. เขียนเป็นสมการ:</b> {fnds}{var} + {eat} = {total_c}<br><br>
+                    <b>2. แก้สมการ (กำจัดวงนอกก่อน):</b><br>
+                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{eat}</b> มาลบออกเพื่อกำจัดที่กินไป:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{fnds}{var} + {eat} - <b style='color:#e74c3c;'>{eat}</b> = {total_c} - <b style='color:#e74c3c;'>{eat}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้: {fnds}{var} = {total_c-eat}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{fnds}</b> มาหารออก (ใช้แม่ {fnds} ตัด):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(fnds, var)} = {frac_cancel_right(total_c-eat, fnds, per)}<br><br>
+                    👉 <b>{var} = {per}</b><br>
+                    <b>ตอบ: เพื่อนได้รับขนมคนละ {per} ชิ้น</b></span>"""
+
+                else: # comparing
+                    s_v, diff = random.randint(100, 400), random.randint(50, 200)
                     l_v = s_v + diff
-                    q = f"ก้องมีเงิน {l_v} บาท ซึ่งมากกว่าเก่งอยู่ {diff} บาท อยากทราบว่าเก่งมีเงินกี่บาท (ให้ {var} แทนเงินของเก่ง)"
-                    sol = f"<b>สมการ:</b> {var} + {diff} = {l_v}<br><br><span style='color:#2c3e50;'>👉 นำ {diff} มาลบออกทั้งสองข้างเพื่อให้ {var} อยู่ตัวเดียว ➔ {var} = {s_v}</span>"
+                    q = f"ก้องมีเงิน <b>{l_v}</b> บาท ซึ่งก้องมีเงิน<b>มากกว่า</b>เก่งอยู่ <b>{diff}</b> บาท เก่งมีเงินกี่บาท (ให้ <b>{var}</b> แทนเงินของเก่ง)"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:10px;'>
+                    🔍 <b>วิเคราะห์โจทย์เพื่อสร้างสมการ:</b><br>
+                    • เงินคนที่มีมากกว่า (ก้อง) เกิดจาก (เงินคนน้อย <b style='color:#e67e22;'>{var}</b>) บวกกับ (ส่วนต่าง <b style='color:#2980b9;'>{diff}</b>)<br>
+                    • จะได้สมการคือ: <b style='color:#e67e22;'>{var}</b> + <b style='color:#2980b9;'>{diff}</b> = <b style='color:#27ae60;'>{l_v}</b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>1. เขียนเป็นสมการ:</b> {var} + {diff} = {l_v}<br><br>
+                    <b>2. แก้สมการ:</b><br>
+                    👉 นำ <b style='color:#e74c3c;'>{diff}</b> มาลบออกทั้งสองข้างเพื่อให้ {var} อยู่ตัวเดียว:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{var} + {diff} - <b style='color:#e74c3c;'>{diff}</b> = {l_v} - <b style='color:#e74c3c;'>{diff}</b><br>
+                    👉 <b>{var} = {s_v}</b><br>
+                    <b>ตอบ: เก่งมีเงิน {s_v} บาท</b></span>"""
                     
             elif actual_sub_t == "สมการเชิงตรรกะและตาชั่งปริศนา":
                 val_a = random.randint(12, 25)

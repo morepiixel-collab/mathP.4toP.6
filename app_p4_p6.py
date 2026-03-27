@@ -1130,12 +1130,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     ("🍎", "🍌", "🍇", "ผลไม้"),
                     ("🐶", "🐱", "🐰", "สัตว์เลี้ยง"),
                     ("🍔", "🍟", "🥤", "อาหาร"),
-                    ("⚽", "🏀", "🏈", "กีฬา"),
+                    ("⚽", "🏀", "⚾", "กีฬา"),
                     ("🚀", "🛸", "🌍", "อวกาศ")
                 ]
                 i1, i2, i3, theme = random.choice(icon_sets)
                 
-                # สุ่มประเภทของโจทย์: 1=พื้นฐาน, 2=แข่งขัน(มีคูณ), 3=ตาชั่งปริศนา
+                # สุ่มประเภทของโจทย์: 1=พื้นฐาน, 2=แข่งขัน(มีคูณ), 3=ตาชั่งปริศนา (3 ตาชั่ง)
                 puzzle_type = random.choice([1, 2, 3])
                 
                 if puzzle_type == 1:
@@ -1148,7 +1148,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     eq3_res = val2 + val3
                     ans = val1 + val2 + val3
                     
-                    # จัด Layout แบบสมมาตรโดยใช้ Table ให้เครื่องหมาย = ตรงกัน
                     q_html = f"""
                     <div style='background-color: #fcfcfc; padding: 20px; border-radius: 8px; border: 2px dashed #95a5a6; width: 85%; margin: 15px auto; box-shadow: 2px 2px 5px rgba(0,0,0,0.05);'>
                         <table style='margin: 0 auto; font-size: 28px; border-collapse: collapse; background-color: transparent;'>
@@ -1186,7 +1185,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {ans}</b></span>"""
 
                 elif puzzle_type == 2:
-                    # Type 2: ข้อสอบแข่งขัน (มีของ 3 ชิ้น และมีการคูณตอนท้าย)
                     val1 = random.randint(3, 10)
                     val2 = random.randint(2, 8)
                     val3 = random.randint(2, 6)
@@ -1194,7 +1192,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     eq1_res = val1 * 3
                     eq2_res = val1 + (val2 * 2)
                     eq3_res = val2 + (val3 * 2)
-                    ans = val1 + (val2 * val3) # ต้องทำคูณก่อนบวก
+                    ans = val1 + (val2 * val3) 
                     
                     q_html = f"""
                     <div style='background-color: #fdfefe; padding: 20px; border-radius: 8px; border: 2px solid #d0d3d4; width: 90%; margin: 15px auto; box-shadow: 3px 3px 10px rgba(0,0,0,0.08);'>
@@ -1211,90 +1209,90 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
                     🔍 <b>วิเคราะห์ปริศนา (แนวข้อสอบแข่งขัน):</b><br>
-                    หาค่าจากบรรทัดที่มีรูปซ้ำกันก่อน และระวัง <b>"ลำดับการคำนวณ (Order of Operations)"</b> ในบรรทัดสุดท้าย (ต้องทำ <b>คูณ</b> ก่อน <b>บวก</b> เสมอ!)
+                    ระวัง <b>"ลำดับการคำนวณ (Order of Operations)"</b> ในบรรทัดสุดท้าย (ต้องทำ <b>คูณ</b> ก่อน <b>บวก</b> เสมอ!)
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>บรรทัดที่ 1:</b> {i1} + {i1} + {i1} = {eq1_res}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;ของ 3 สิ่งเหมือนกันรวมได้ {eq1_res} แสดงว่า 1 สิ่งคือ {eq1_res} ÷ 3 = <b>{val1}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i1} = {val1}</b><br><br>
-                    
-                    👉 <b>บรรทัดที่ 2:</b> {i1} + {i2} + {i2} = {eq2_res}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่า {i1} = {val1} จะได้: {val1} + {i2} + {i2} = {eq2_res}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;กำจัดวงนอก (นำ {val1} ลบออก): {i2} + {i2} = {eq2_res} - {val1} = {eq2_res - val1}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;มี {i2} สองอัน เท่ากับ {eq2_res - val1} ดังนั้น <b>{i2}</b> = {eq2_res - val1} ÷ 2 = <b>{val2}</b><br><br>
-                    
-                    👉 <b>บรรทัดที่ 3:</b> {i2} + {i3} + {i3} = {eq3_res}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่า {i2} = {val2} จะได้: {val2} + {i3} + {i3} = {eq3_res}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;กำจัดวงนอก (นำ {val2} ลบออก): {i3} + {i3} = {eq3_res} - {val2} = {eq3_res - val2}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;มี {i3} สองอัน เท่ากับ {eq3_res - val2} ดังนั้น <b>{i3}</b> = {eq3_res - val2} ÷ 2 = <b>{val3}</b><br><br>
-                    
+                    👉 <b>บรรทัดที่ 1:</b> {i1} + {i1} + {i1} = {eq1_res}  ➔  <b>{i1} = {val1}</b><br>
+                    👉 <b>บรรทัดที่ 2:</b> {val1} + {i2} + {i2} = {eq2_res}  ➔  2 × {i2} = {eq2_res - val1}  ➔  <b>{i2} = {val2}</b><br>
+                    👉 <b>บรรทัดที่ 3:</b> {val2} + {i3} + {i3} = {eq3_res}  ➔  2 × {i3} = {eq3_res - val2}  ➔  <b>{i3} = {val3}</b><br><br>
                     👉 <b>คำถาม:</b> {i1} + {i2} <b style='color:#e74c3c;'>×</b> {i3} = ?<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;แทนค่ารูปภาพ: {val1} + {val2} <b style='color:#e74c3c;'>×</b> {val3}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<i>(🚨 กฎคณิตศาสตร์: ต้องคำนวณคู่ที่คูณกันก่อนเสมอ!)</i><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>({val2} × {val3})</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>{val2*val3}</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;= <b>{ans}</b><br>
                     <b>ตอบ: {ans}</b></span>"""
 
                 else:
-                    # Type 3: ตาชั่งปริศนา (Balance Scale Puzzle)
-                    w_a = random.randint(15, 45) # น้ำหนักของชิ้นเล็ก
-                    mult = random.randint(2, 4)  # อัตราส่วน (ของชิ้นใหญ่ 1 ชิ้น = ของชิ้นเล็ก mult ชิ้น)
-                    w_b = w_a * mult             # น้ำหนักของชิ้นใหญ่
-                    total_w = w_b + w_a          # น้ำหนักรวมบนตาชั่งที่ 2
+                    # Type 3: ตาชั่งปริศนา 3 ตาชั่ง (Level up)
+                    w_c = random.randint(3, 8)     # น้ำหนักของชิ้นเล็กสุด (i3)
+                    mult_bc = random.randint(2, 4) # อัตราส่วน i2 = ? i3
+                    w_b = w_c * mult_bc            # น้ำหนัก i2
+                    mult_ab = random.randint(2, 3) # อัตราส่วน i1 = ? i2
+                    w_a = w_b * mult_ab            # น้ำหนัก i1
                     
-                    # รูปแบบตาชั่งฝั่งซ้าย-ขวา
-                    scale1_left = " ".join([i1] * mult)
-                    scale1_right = i2
+                    total_w = w_a + w_b + w_c      # น้ำหนักรวมบนตาชั่งที่ 3
+                    total_c_parts = (mult_ab * mult_bc) + mult_bc + 1 # จำนวนชิ้น i3 ทั้งหมดถ้ารวมกัน
                     
-                    scale2_left = f"{i1} {i2}"
-                    scale2_right = f"<span style='font-size:20px; font-weight:bold; color:#d35400;'>{total_w} กรัม</span>"
+                    # รูปแบบตาชั่ง
+                    s1_l = i1
+                    s1_r = " ".join([i2] * mult_ab)
+                    
+                    s2_l = i2
+                    s2_r = " ".join([i3] * mult_bc)
+                    
+                    s3_l = f"{i1} {i2} {i3}"
+                    s3_r = f"<span style='font-size:24px; font-weight:bold; color:#d35400;'>{total_w} กรัม</span>"
+                    
+                    def draw_scale(title, color, left, right):
+                        return f"""
+                        <div style='margin-bottom: 25px;'>
+                            <b style='color:{color}; font-size:18px;'>{title}</b><br>
+                            <div style='display:flex; justify-content:center; align-items:flex-end; gap:10px; margin-top:5px;'>
+                                <div style='border-bottom:4px solid #34495e; padding:5px 15px; min-width:80px; font-size:26px;'>{left}</div>
+                                <div style='font-size:40px; margin-bottom:-20px;'>⚖️</div>
+                                <div style='border-bottom:4px solid #34495e; padding:5px 15px; min-width:80px; font-size:26px;'>{right}</div>
+                            </div>
+                        </div>"""
                     
                     q_html = f"""
-                    <div style='background-color: #fcfcfc; padding: 20px; border-radius: 8px; border: 2px solid #bdc3c7; width: 90%; margin: 15px auto; box-shadow: 3px 3px 10px rgba(0,0,0,0.08); text-align:center;'>
-                        <div style='margin-bottom: 30px;'>
-                            <b style='color:#2980b9; font-size:18px;'>ตาชั่งที่ 1 (สมดุล)</b><br>
-                            <div style='display:flex; justify-content:center; align-items:flex-end; gap:10px; margin-top:10px;'>
-                                <div style='border-bottom:4px solid #34495e; padding:5px 20px; min-width:80px; font-size:32px;'>{scale1_left}</div>
-                                <div style='font-size:45px; margin-bottom:-20px;'>⚖️</div>
-                                <div style='border-bottom:4px solid #34495e; padding:5px 20px; min-width:80px; font-size:32px;'>{scale1_right}</div>
-                            </div>
-                        </div>
-                        <div>
-                            <b style='color:#27ae60; font-size:18px;'>ตาชั่งที่ 2 (สมดุล)</b><br>
-                            <div style='display:flex; justify-content:center; align-items:flex-end; gap:10px; margin-top:10px;'>
-                                <div style='border-bottom:4px solid #34495e; padding:5px 20px; min-width:80px; font-size:32px;'>{scale2_left}</div>
-                                <div style='font-size:45px; margin-bottom:-20px;'>⚖️</div>
-                                <div style='border-bottom:4px solid #34495e; padding:5px 20px; min-width:80px; font-size:32px;'>{scale2_right}</div>
-                            </div>
-                        </div>
+                    <div style='background-color: #fcfcfc; padding: 20px 10px; border-radius: 8px; border: 2px solid #bdc3c7; width: 95%; margin: 15px auto; box-shadow: 3px 3px 10px rgba(0,0,0,0.08); text-align:center;'>
+                        {draw_scale("ตาชั่งที่ 1 (สมดุล)", "#2980b9", s1_l, s1_r)}
+                        {draw_scale("ตาชั่งที่ 2 (สมดุล)", "#8e44ad", s2_l, s2_r)}
+                        {draw_scale("ตาชั่งที่ 3 (สมดุล)", "#27ae60", s3_l, s3_r)}
                     </div>
                     """
-                    q = f"จากภาพตาชั่งปริศนาที่อยู่ในสภาวะสมดุล (น้ำหนักซ้ายเท่ากับขวา)<br>จงหาว่า <b>{i1} และ {i2} มีน้ำหนักชิ้นละกี่กรัม ?</b><br>{q_html}"
+                    q = f"จากภาพตาชั่งปริศนาทั้ง 3 เครื่องที่อยู่ในสภาวะสมดุล<br>จงหาว่า <b>{i1}, {i2} และ {i3} มีน้ำหนักชิ้นละกี่กรัม ?</b><br>{q_html}"
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
                     🔍 <b>วิเคราะห์ปริศนาตาชั่ง (การแทนค่า):</b><br>
-                    ตาชั่งสมดุล หมายถึง <b>ของทางซ้าย = ของทางขวา</b> (เปรียบเหมือนเครื่องหมาย <b>=</b> ในสมการ)<br>
-                    <b>เทคนิคคือ:</b> "แทนที่ของชิ้นใหญ่ ด้วยของชิ้นเล็ก" เพื่อให้ตาชั่งฝั่งนั้นมีแต่ของชิ้นเล็กเหมือนกันทั้งหมด!
+                    ตาชั่งสมดุล หมายถึง <b>ซ้าย = ขวา</b><br>
+                    หลักการคือ <b>"เปลี่ยนของชิ้นใหญ่ ให้กลายเป็นของชิ้นเล็กที่สุด"</b> ({i3})<br>
+                    เพื่อให้ตาชั่งที่ 3 มีแต่ {i3} ล้วนๆ จะได้คำนวณง่ายขึ้นครับ!
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>จากตาชั่งที่ 1:</b> {scale1_left} มีน้ำหนักเท่ากับ {scale1_right}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;แปลว่า ถ้าเจอ {i2} 1 ชิ้น ที่ไหน... เราสามารถเอา <b style='color:#e74c3c;'>{i1} จำนวน {mult} ชิ้น</b> ไปวางแทนได้เลย!<br><br>
+                    👉 <b>ขั้นที่ 1: เปลี่ยน {i2} เป็น {i3} (จากตาชั่ง 2)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่ง 2 บอกว่า <b>1 {i2} = {mult_bc} {i3}</b><br><br>
                     
-                    👉 <b>จากตาชั่งที่ 2:</b> มี {i1} และ {i2} วางรวมกัน หนัก {total_w} กรัม<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;เราทำการ <b>แทนที่</b> {i2} ด้วยของชิ้นเล็ก (ตามที่รู้จากตาชั่งที่ 1)<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่งฝั่งซ้ายจะกลายเป็น: {i1} รวมกับ {scale1_left}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นับรวมกันได้: <b style='color:#2980b9;'>มี {i1} ทั้งหมด {mult + 1} ชิ้น</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;ตั้งเป็นสมการใหม่ได้คือ: <b style='color:#2980b9;'>{mult + 1} × {i1} = {total_w}</b><br><br>
+                    👉 <b>ขั้นที่ 2: เปลี่ยน {i1} เป็น {i3} (จากตาชั่ง 1)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่ง 1 บอกว่า <b>1 {i1} = {mult_ab} {i2}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เราแทนค่า {i2} ด้วย {i3} จะได้: {mult_ab} × {mult_bc} = <b style='color:#e67e22;'>{mult_ab * mult_bc} {i3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุปคือ <b>1 {i1} = <span style='color:#e67e22;'>{mult_ab * mult_bc} {i3}</span></b><br><br>
                     
-                    👉 <b>หาค่า {i1}:</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {mult + 1} ไปหารออก: {total_w} ÷ {mult + 1} = <b>{w_a} กรัม</b><br><br>
+                    👉 <b>ขั้นที่ 3: รวมน้ำหนักในตาชั่งที่ 3</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่ง 3 มี: {i1} + {i2} + {i3} = {total_w} กรัม<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เปลี่ยนทุกอย่างให้เป็น {i3}:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {i1} เปลี่ยนเป็น {mult_ab * mult_bc} {i3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {i2} เปลี่ยนเป็น {mult_bc} {i3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {i3} มีอยู่แล้ว 1 {i3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นับรวมทั้งหมดจะมี {i3} อยู่: {mult_ab * mult_bc} + {mult_bc} + 1 = <b style='color:#e74c3c;'>{total_c_parts} ชิ้น</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการ: <b style='color:#e74c3c;'>{total_c_parts}</b> × {i3} = {total_w} กรัม<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i3}</b> = {total_w} ÷ {total_c_parts} = <b style='color:#27ae60;'>{w_c} กรัม</b><br><br>
                     
-                    👉 <b>หาค่า {i2}:</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;จากตาชั่ง 1: {i2} เกิดจาก {i1} จำนวน {mult} ชิ้น<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นำน้ำหนักมาคูณ: {w_a} × {mult} = <b>{w_b} กรัม</b><br><br>
-                    <b>ตอบ: {i1} หนัก {w_a} กรัม และ {i2} หนัก {w_b} กรัม</b></span>"""
+                    👉 <b>ขั้นที่ 4: หาค่าที่เหลือ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>{i2}</b> น้ำหนัก: {w_c} × {mult_bc} = <b style='color:#27ae60;'>{w_b} กรัม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>{i1}</b> น้ำหนัก: {w_b} × {mult_ab} = <b style='color:#27ae60;'>{w_a} กรัม</b><br><br>
+                    <b>ตอบ: {i1} = {w_a} ก., {i2} = {w_b} ก., {i3} = {w_c} ก.</b></span>"""
 
             elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":
                 val_1, val_2 = random.randint(30, 80), random.randint(10, 20)

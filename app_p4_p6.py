@@ -1806,6 +1806,198 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: คุณแม่ต้องจ่ายเงินทั้งหมด {total:.2f} บาท</b></span>"""
 
 
+            elif actual_sub_t == "การลบทศนิยม":
+                # สุ่มรูปแบบโจทย์ (1: ตารางร้อย (Visual), 2: กล่องสมมาตรต่างหลัก, 3: ป้ายราคาเปรียบเทียบ)
+                prob_style = random.choice([1, 2, 3])
+                
+                # ฟังก์ชันวาดตารางร้อย แสดงทศนิยม
+                def draw_svg_decimal_grid(val, color="#3498db", is_sub=False):
+                    squares = round(val * 100)
+                    svg = '<svg width="100" height="100" viewBox="0 0 100 100" style="border: 2px solid #2c3e50; background-color: #ecf0f1;">'
+                    count = 0
+                    for row in range(10):
+                        for col in range(10):
+                            if count < squares:
+                                if is_sub:
+                                    # ถ้าเป็นตัวลบ ให้ระบายสีแดงอ่อนและกากบาททับ
+                                    svg += f'<rect x="{col*10}" y="{row*10}" width="10" height="10" fill="#fadbd8" stroke="#bdc3c7" stroke-width="0.5"/>'
+                                    svg += f'<line x1="{col*10+2}" y1="{row*10+2}" x2="{col*10+8}" y2="{row*10+8}" stroke="#e74c3c" stroke-width="1.5"/>'
+                                    svg += f'<line x1="{col*10+8}" y1="{row*10+2}" x2="{col*10+2}" y2="{row*10+8}" stroke="#e74c3c" stroke-width="1.5"/>'
+                                else:
+                                    svg += f'<rect x="{col*10}" y="{row*10}" width="10" height="10" fill="{color}" stroke="#bdc3c7" stroke-width="0.5"/>'
+                            else:
+                                svg += f'<rect x="{col*10}" y="{row*10}" width="10" height="10" fill="none" stroke="#bdc3c7" stroke-width="0.5"/>'
+                            count += 1
+                    svg += '</svg>'
+                    return svg
+
+                if prob_style == 1:
+                    # แบบที่ 1: ตารางร้อย (Visual Math)
+                    v1 = round(random.uniform(0.50, 0.95), 2)
+                    v2 = round(random.uniform(0.10, v1 - 0.10), 2)
+                    ans = round(v1 - v2, 2)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        <div style="text-align:center;">{draw_svg_decimal_grid(v1, "#3498db")}<br><b style="color:#3498db;">รูปที่ 1 (ตัวตั้ง)</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">-</div>
+                        <div style="text-align:center;">{draw_svg_decimal_grid(v2, "#e74c3c", is_sub=True)}<br><b style="color:#e74c3c;">รูปที่ 2 (ตัวหักออก)</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
+                    </div>
+                    """
+                    q = f"จากภาพ ตารางร้อย 1 ตารางมีค่าเท่ากับ 1 หน่วย ถ้านำพื้นที่ระบายสีในรูปที่ 1 มาหักออกด้วยรูปที่ 2 จะเหลือทศนิยมเท่าใด?<br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    • <b style="color:#3498db;">รูปที่ 1</b> ระบายสี {round(v1*100)} ช่อง เขียนเป็นทศนิยมได้ <b>{v1:.2f}</b><br>
+                    • <b style="color:#e74c3c;">รูปที่ 2</b> ถูกกากบาทหักออกไป {round(v2*100)} ช่อง เขียนเป็นทศนิยมได้ <b>{v2:.2f}</b>
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: ตั้งลบทศนิยม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>หลักสำคัญที่สุด: ต้องตั้ง "จุดทศนิยม" ให้ตรงกัน!</i><br>
+                    <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px;">{v1:.2f}</td>
+                            <td style="width: 30px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{v2:.2f}</td>
+                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{ans:.2f}</b></td>
+                            <td></td>
+                        </tr>
+                    </table><br>
+                    👉 <b>สรุปผลลัพธ์:</b> จะเหลือช่องที่ระบายสีอยู่ {round(ans*100)} ช่อง หรือเขียนได้เป็น <b>{ans:.2f}</b><br><br>
+                    <b>ตอบ: {ans:.2f}</b></span>"""
+
+                elif prob_style == 2:
+                    # แบบที่ 2: กล่องสมมาตร (จำนวนตำแหน่งทศนิยมไม่เท่ากัน)
+                    # บังคับให้ ตัวตั้งเป็น 1 ตำแหน่ง และ ตัวลบเป็น 2 ตำแหน่ง เพื่อให้เด็กต้อง "เติม 0 แล้วยืมเลข"
+                    v1 = round(random.uniform(10.5, 25.9), 1)   
+                    v2 = round(random.uniform(1.15, v1 - 2.0), 2)
+                    # ทำให้หลักร้อยส่วนของ v2 มากกว่า 0 เสมอ เพื่อให้ต้องเกิดการยืมจากหลักส่วนสิบของ v1
+                    while int(str(v2).split('.')[1][-1]) == 0:
+                        v2 = round(random.uniform(1.15, v1 - 2.0), 2)
+                        
+                    ans = round(v1 - v2, 2)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
+                        <div style="flex: 1; border: 3px solid #2980b9; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #2980b9; font-size: 18px;">กล่อง A</b><hr style="border-top: 2px dashed #2980b9;">
+                            <div style="font-size: 32px; font-weight:bold; margin-top:15px; margin-bottom:5px;">{v1}</div>
+                        </div>
+                        <div style="flex: 1; border: 3px solid #e74c3c; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #e74c3c; font-size: 18px;">กล่อง B</b><hr style="border-top: 2px dashed #e74c3c;">
+                            <div style="font-size: 32px; font-weight:bold; margin-top:15px; margin-bottom:5px;">{v2}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; background: #fdedec; padding: 15px; border-radius: 8px; border: 2px solid #c0392b; font-size: 22px;">
+                        จงหาผลลัพธ์ของ &nbsp; <b>A <span style="color:#e74c3c;">-</span> B</b>
+                    </div>
+                    """
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br><span style='font-size:14px; color:#e74c3c;'>(⭐ ระวัง: จำนวนตำแหน่งทศนิยมไม่เท่ากัน)</span><br>{q_html}"
+                    
+                    v1_str = f"{v1:.2f}" 
+                    v2_str = f"{v2:.2f}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#fcf3cf; border-left:4px solid #f1c40f; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    💡 <b>เทคนิคสำคัญ (การลบทศนิยม):</b><br>
+                    เมื่อจำนวนตำแหน่งทศนิยมไม่เท่ากัน ให้ <b>"เติม 0"</b> ต่อท้ายเลขที่มีตำแหน่งน้อยกว่า เพื่อให้ตั้งลบและยืมเลขได้ง่ายขึ้น!
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: เติม 0 ให้ตำแหน่งเท่ากัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>กล่อง A:</b> {v1} เติมศูนย์ปรับเป็น <b>{v1_str}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>กล่อง B:</b> {v2} มี 2 ตำแหน่งอยู่แล้วคือ <b>{v2_str}</b><br><br>
+                    👉 <b>ขั้นที่ 2: ตั้งลบให้จุดตรงกัน</b><br>
+                    <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px;">{v1_str}</td>
+                            <td style="width: 30px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{v2_str}</td>
+                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{ans:.2f}</b></td>
+                            <td></td>
+                        </tr>
+                    </table><br>
+                    <b>ตอบ: {ans:.2f}</b></span>"""
+
+                else:
+                    # แบบที่ 3: ป้ายราคา (หาผลต่าง)
+                    items = [("สมุดโน้ต", 15.5, 30.5), ("ปากกาสี", 8.25, 12.75), ("แฟ้มเอกสาร", 20.5, 45.5), ("สีไม้", 35.25, 50.75)]
+                    item1 = random.choice(items)
+                    items.remove(item1)
+                    item2 = random.choice(items)
+                    
+                    p1 = round(random.uniform(item1[1], item1[2]), 2)
+                    p1 = round(p1 * 4) / 4 
+                    if p1.is_integer(): p1 += 0.5
+                    
+                    p2 = round(random.uniform(item2[1], item2[2]), 2)
+                    p2 = round(p2 * 4) / 4
+                    if p2.is_integer(): p2 += 0.25
+
+                    # หาว่าอะไรแพงกว่าเพื่อตั้งเป็นตัวตั้ง
+                    if p2 > p1:
+                        p1, p2 = p2, p1
+                        item1, item2 = item2, item1
+                        
+                    ans = round(p1 - p2, 2)
+                    p1_str = f"{p1:.2f}"
+                    p2_str = f"{p2:.2f}"
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
+                        <div style="background: #2980b9; color: white; padding: 15px 25px; border-radius: 8px; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
+                            <div style="font-size: 16px;">{item1[0]}</div>
+                            <div style="font-size: 24px; font-weight: bold;">฿ {p1_str}</div>
+                            <div style="position: absolute; left: -10px; top: 20px; width: 20px; height: 20px; background: white; border-radius: 50%;"></div>
+                        </div>
+                        <div style="font-size: 30px; font-weight: bold; color: #7f8c8d; display:flex; align-items:center;">เทียบกับ</div>
+                        <div style="background: #e67e22; color: white; padding: 15px 25px; border-radius: 8px; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
+                            <div style="font-size: 16px;">{item2[0]}</div>
+                            <div style="font-size: 24px; font-weight: bold;">฿ {p2_str}</div>
+                            <div style="position: absolute; left: -10px; top: 20px; width: 20px; height: 20px; background: white; border-radius: 50%;"></div>
+                        </div>
+                    </div>
+                    """
+                    q = f"จากป้ายราคาสินค้า <b>{item1[0]}</b> มีราคาแพงกว่า <b>{item2[0]}</b> อยู่กี่บาท?<br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์โจทย์:</b><br>
+                    • การหาว่าของชิ้นหนึ่ง <b>"แพงกว่า"</b> อีกชิ้นหนึ่งอยู่เท่าไหร่ คือการหา <b>"ผลต่าง"</b><br>
+                    • หาผลต่างต้องนำของที่ราคาแพงกว่าตั้ง แล้ว <b>ลบ</b> ด้วยราคาที่ถูกกว่า<br>
+                    • ประโยคสัญลักษณ์: {p1_str} - {p2_str} = ?
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ตั้งลบทศนิยม:</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ตั้งหลักและจุดทศนิยมให้ตรงกัน จากนั้นลบเหมือนการลบเลขปกติ (ถ้าน้อยกว่าให้ยืมตัวหน้า)</i><br>
+                    <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px;">{p1_str}</td>
+                            <td style="width: 30px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{p2_str}</td>
+                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">-</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{ans:.2f}</b></td>
+                            <td></td>
+                        </tr>
+                    </table><br>
+                    <b>ตอบ: {item1[0]} แพงกว่าอยู่ {ans:.2f} บาท</b></span>"""
+
+
             elif actual_sub_t in ["การบวกเศษส่วน", "การลบเศษส่วน", "การคูณเศษส่วน", "การหารเศษส่วน"]:
                 op_map = {"การบวกเศษส่วน": "+", "การลบเศษส่วน": "-", "การคูณเศษส่วน": "×", "การหารเศษส่วน": "÷"}
                 op_sign = op_map[actual_sub_t]

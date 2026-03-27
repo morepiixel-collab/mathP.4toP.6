@@ -703,17 +703,23 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
             elif actual_sub_t == "การวัดขนาดของมุม (ไม้โปรแทรกเตอร์)":
                 l_pool = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
                 p1, v, p2 = random.sample(l_pool, 3)
+                
+                # 🎨 สร้างสัญลักษณ์มุม (หมวกสีแดง) ไว้บนอักษรตัวกลาง
+                hat_v = f"<span style='position:relative; display:inline-block;'>{v}<span style='position:absolute; top:-12px; left:50%; transform:translateX(-50%); color:#e74c3c; font-weight:normal; font-size:22px;'>^</span></span>"
+                angle_name_display = f"{p1}{hat_v}{p2}"
+                
                 mode = random.choice(["read_protractor", "calc_angle"])
                 if mode == "read_protractor":
                     base_deg = random.choice([0, 180, 20, 160])
                     angle = random.randint(30, 120)
                     end_deg = base_deg + angle if base_deg < 90 else base_deg - angle
-                    q = f"จากรูปการวัดขนาดของมุมด้วยไม้โปรแทรกเตอร์ มุม <b>{p1}{v}{p2}</b> มีขนาดกี่องศา?<br>{draw_protractor_svg(base_deg, end_deg, p1, v, p2)}"
+                    
+                    q = f"จากรูปการวัดขนาดของมุมด้วยไม้โปรแทรกเตอร์ มุม <b>{angle_name_display}</b> มีขนาดกี่องศา?<br>{draw_protractor_svg(base_deg, end_deg, p1, v, p2)}"
                     sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> ผลต่างคือ |{base_deg} - {end_deg}| = <b>{abs(end_deg-base_deg)}°</b></span>"
                 else:
                     ans = random.randint(30, 150)
-                    svg = draw_parallel_svg("dir1", "TL_int", 180-ans, "BL_int", "x") # reuse drawing technique or simple straight line
-                    # Simplified for space:
+                    svg = draw_parallel_svg("dir1", "TL_int", 180-ans, "BL_int", "x") 
+                    
                     q = f"มุมบนเส้นตรงรวมกันได้ 180 องศา ถ้ามุมหนึ่งกาง <b>{180-ans}°</b> จงหาขนาดของมุม <b>x</b> ที่เหลือ?"
                     sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans}°</b></span>"
 

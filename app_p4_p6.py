@@ -1374,6 +1374,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;2{var} + {diff} <b style='color:#e74c3c;'>- {diff}</b> = {total} <b style='color:#e74c3c;'>- {diff}</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> 2{var} = {total - diff}<br><br>
                     👉 <b>ขั้นที่ 3: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข 2 เขียนติดกับ {var} แปลว่า "คูณอยู่" จึงต้องนำ <b>2</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ 2 ตัดทอน)<br>
                     {explain_box_cancel}
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(2, var)} = {frac_cancel_right(total - diff, 2, smaller)}<br><br>
                     👉 <b>{var} = {smaller}</b><br>
@@ -1421,6 +1422,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;ให้นำตัวเลขข้างหน้ามาบวกกัน (1 + {mult} = {mult+1}) จะรวมกันได้เป็น <b>{mult+1}{var}</b></i><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;เมื่อยุบรวมแล้ว จะได้สมการใหม่คือ: <b>{mult+1}{var} = {total}</b><br><br>
                     👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข {mult+1} คูณอยู่กับ {var} จึงต้องนำ <b style='color:#e74c3c;'>{mult+1}</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ {mult+1} ตัดทอน)<br>
                     {explain_box_cancel}
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult+1, var)} = {frac_cancel_right(total, mult+1, smaller)}<br><br>
                     👉 <b>{var} = {smaller}</b><br>
@@ -1467,6 +1469,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: มีอยู่ <b style='color:#2980b9;'>{mult}{var}</b> นำไปลบออก <b style='color:#e67e22;'>1{var}</b> (เอาเลขข้างหน้ามาลบกันคือ {mult} - 1 = {mult-1}) จะเหลือ <b>{mult-1}{var}</b></i><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;เมื่อลบกันแล้ว จะได้สมการใหม่คือ: <b>{mult-1}{var} = {diff}</b><br><br>
                     👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข {mult-1} คูณอยู่ จึงต้องนำ <b style='color:#e74c3c;'>{mult-1}</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ {mult-1} ตัดทอน)<br>
                     {explain_box_cancel}
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult-1, var)} = {frac_cancel_right(diff, mult-1, smaller)}<br><br>
                     👉 <b>{var} = {smaller}</b><br>
@@ -1517,28 +1520,30 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;เมื่อยุบรวมตัวแปรแล้ว จะได้สมการใหม่คือ: <b>2{var} + {diff} = {total}</b><br><br>
                     👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่อยู่ไกลตัวแปร (วงนอก)</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;นำ <b style='color:#e74c3c;'>{diff}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;2{var} + {diff} <b style='color:#e74c3c;'>- {diff}</b> = {total} <b style='color:#e74c3c;'>- {diff}</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> 2{var} = {total - diff}<br><br>
                     👉 <b>ขั้นที่ 3: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ <b>2</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ 2 ตัดทอน)<br>
                     {explain_box_cancel}
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(2, var)} = {frac_cancel_right(total - diff, 2, smaller)}<br><br>
                     👉 <b>{var} = {smaller}</b><br>
                     <b>ตอบ: {item2} ราคาชิ้นละ {smaller} บาท</b></span>"""
                 
                 else:
-                    # Level 5: ระบบสมการ 2 ตัวแปรแบบซ่อนรูป (โจทย์ออริจินัลของคุณครู) -> แก้เป็นวิธีแทนค่า Substitution Method
+                    # Level 5: ระบบสมการ 2 ตัวแปรแบบซ่อนรูป (แก้สมการแบบแทนค่า ห้ามข้ามบรรทัด!)
                     items = [("สมุด", "เล่ม", "ปากกา", "ด้าม"), ("เสื้อ", "ตัว", "กางเกง", "ตัว"), ("ขนม", "ห่อ", "น้ำผลไม้", "กล่อง")]
                     item1, unit1, item2, unit2 = random.choice(items) 
                     var1, var2 = "x", "y" # บังคับใช้ x และ y เพื่อให้เหมือนกระดาษทด
                     
                     while True:
-                        mult = random.randint(2, 4)      # จำนวนเท่าของ item2
-                        price2 = random.randint(5, 20)   # ราคา item2 (y)
-                        price1 = random.randint(10, 40)  # ราคา item1 (x)
-                        if price1 - price2 > 5: # ให้ราคา x มากกว่า y เสมอ เพื่อให้เป็น x - (เลข) = y แบบในภาพทด
+                        mult = random.randint(2, 4)      
+                        price2 = random.randint(5, 20)   # y
+                        price1 = random.randint(10, 40)  # x
+                        if price1 - price2 > 5: 
                             break
                             
-                    total = price1 + price2          # ราคารวมกัน (x + y)
-                    diff = price1 - price2           # ความต่างของราคา (x - diff = y)
+                    total = price1 + price2          # x + y
+                    diff = price1 - price2           # x - diff = y
                     
                     q = f"ซื้อ <b>{item1} 1 {unit1}</b> รวมกับ <b>{item2} 1 {unit2}</b> ราคารวมกัน <b>{total}</b> บาท <br>ถ้า <b>{item1}</b> ราคาแพงกว่า <b>{item2}</b> อยู่ <b>{diff}</b> บาท <br>อยากทราบว่า <b>{item1} ราคา{unit1}ละกี่บาท?</b> <br><span style='font-size:14px; color:#e74c3c;'>(🏆 โจทย์ปราบเซียน: ให้ใช้ความรู้เรื่องการแทนค่าสมการ)</span>"
                     
@@ -1566,17 +1571,21 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;จาก <b>สมการ ②</b> เรารู้ว่า <b>{var2}</b> มีค่าเท่ากับ <b>({var1} - {diff})</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น ในสมการ ① ตรงไหนที่เป็น <b>{var2}</b> ให้เปลี่ยนเป็น <b>({var1} - {diff})</b> แทน<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{var1} + <b>({var1} - {diff})</b> = {total}<br><br>
+                    
                     👉 <b>ขั้นที่ 2: รวมตัวแปร {var1} เข้าด้วยกัน</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;นำ {var1} บวกกับ {var1} จะได้ 2{var1}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;2{var1} - {diff} = {total}<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการ: <b>2{var1} - {diff} = {total}</b><br><br>
+                    
                     👉 <b>ขั้นที่ 3: กำจัดตัวเลข (แก้สมการหา {var1})</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ {diff} มาบวกเข้าทั้งสองข้าง:<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2{var1} = {total} + {diff}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2{var1} = {total+diff}<br><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ 2 มาหารออกทั้งสองข้าง:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ <b style='color:#27ae60;'>{diff}</b> มา <b>บวกเข้า</b> ทั้งสองข้างของสมการ เพื่อกำจัดส่วนที่ลบออก:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2{var1} - {diff} <b style='color:#27ae60;'>+ {diff}</b> = {total} <b style='color:#27ae60;'>+ {diff}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> 2{var1} = {total+diff}<br><br>
+                    
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ <b style='color:#e74c3c;'>2</b> มา <b>หารออก</b> ทั้งสองข้าง (เพื่อทำให้ {var1} เหลือตัวเดียว):<br>
                     {explain_box_cancel}
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(2, var1)} = {frac_cancel_right(total+diff, 2, price1)}<br><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;จะได้ <b>{var1} = {price1}</b><br><br>
+                    
                     <b>ตอบ: {item1} ราคา{unit1}ละ {price1} บาท</b> (ส่วน {item2} ราคา {price2} บาท)</span>"""
 
             elif actual_sub_t == "การบวกและการลบทศนิยม":

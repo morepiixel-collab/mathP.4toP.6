@@ -1314,12 +1314,122 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {i1} = {w_a} ก., {i2} = {w_b} ก., {i3} = {w_c} ก.</b></span>"""
 
             elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":
-                val_1, val_2 = random.randint(30, 80), random.randint(10, 20)
-                val_A, val_B = val_1, val_2
-                diff_val = val_A - val_B
-                sum_val = val_A + val_B
-                q = f"<b>สมุด</b> 1 เล่ม รวมกับ <b>ปากกา</b> 1 ด้าม ราคารวมกัน <b>{sum_val}</b> บาท<br>ถ้า <b>สมุด</b> 1 เล่ม ราคา<b>แพงกว่า</b> <b>ปากกา</b> 1 ด้าม อยู่ <b>{diff_val}</b> บาท<br>อยากทราบว่า <b>สมุด</b> ราคาเล่มละกี่บาท?"
-                sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> ให้ปากกา = y บาท ➔ สมุด = y + {diff_val} บาท<br>➔ (y + {diff_val}) + y = {sum_val} ➔ 2y = {sum_val - diff_val} ➔ y = {val_B} ➔ สมุด = {val_B} + {diff_val} = <b>{val_A} บาท</b></span>"
+                prob_type = random.choice([1, 2, 3]) # 1: รวม+ต่าง, 2: รวม+เท่า, 3: ต่าง+เท่า
+                var = random.choice(["x", "y", "a", "ก"])
+                
+                def frac_cancel_left(num, variable):
+                    top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:super; margin-left:2px;'>1</span></span>{variable}"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+                
+                def frac_cancel_right(top_val, bot_val, result_val):
+                    top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{top_val}</span><span style='font-size:14px; color:#e74c3c; font-weight:bold; vertical-align:super; margin-left:2px;'>{result_val}</span></span>"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{bot_val}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+
+                if prob_type == 1:
+                    # Level 1: ผลรวม + ผลต่าง
+                    themes = [
+                        ("ฟาร์มแห่งหนึ่ง", "ไก่ 🐔", "เป็ด 🦆", "ตัว"),
+                        ("สองพี่น้อง", "พี่ 👦", "น้อง 👧", "บาท"),
+                        ("ร้านเบเกอรี่", "โดนัท 🍩", "เค้ก 🍰", "ชิ้น")
+                    ]
+                    place, item1, item2, unit = random.choice(themes)
+                    smaller = random.randint(30, 150)
+                    diff = random.randint(15, 60)
+                    larger = smaller + diff
+                    total = smaller + larger
+                    
+                    q = f"ที่{place} มี{item1}และ{item2}รวมกันทั้งหมด <b>{total}</b> {unit} <br>ถ้ามี{item1}มากกว่า{item2}อยู่ <b>{diff}</b> {unit} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#7f8c8d;'>(กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์โจทย์ (ผลรวม + ผลต่าง):</b><br>
+                    • ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit}<br>
+                    • {item1} มีมากกว่าอยู่ {diff} แสดงว่ามี = <b style='color:#2980b9;'>{var} + {diff}</b> {unit}<br>
+                    • ทั้งสองอย่าง <b>รวมกัน</b> เท่ากับ {total} ➔ นำมาบวกกันจะได้สมการ<br>
+                    🎯 <b>สมการ:</b> (<b style='color:#e67e22;'>{var}</b>) + (<b style='color:#2980b9;'>{var} + {diff}</b>) = <b style='color:#27ae60;'>{total}</b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการ:</b><br>
+                    👉 <b>ขั้นที่ 1:</b> รวมตัวแปร {var} เข้าด้วยกัน ({var} + {var} = 2{var})<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<b>2{var} + {diff} = {total}</b><br><br>
+                    👉 <b>ขั้นที่ 2:</b> กำจัด {diff} (วงนอก) โดยนำมา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้าง<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;2{var} + {diff} <b style='color:#e74c3c;'>- {diff}</b> = {total} <b style='color:#e74c3c;'>- {diff}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;2{var} = {total - diff}<br><br>
+                    👉 <b>ขั้นที่ 3:</b> กำจัด 2 โดยนำมา <b style='color:#e74c3c;'>หารออก</b> (ใช้แม่ 2 ตัดทอน)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(2, var)} = {frac_cancel_right(total - diff, 2, smaller)}<br><br>
+                    👉 <b>{var} = {smaller}</b><br>
+                    <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
+
+                elif prob_type == 2:
+                    # Level 2: ผลรวม + จำนวนเท่า (ข้อสอบแข่งขัน)
+                    themes = [
+                        ("สวนสัตว์", "ลิง 🐒", "ช้าง 🐘", "ตัว"),
+                        ("ลานจอดรถ", "รถยนต์ 🚗", "จักรยานยนต์ 🏍️", "คัน"),
+                        ("กระปุกออมสิน", "เหรียญสิบ 🪙", "เหรียญห้า", "เหรียญ")
+                    ]
+                    place, item1, item2, unit = random.choice(themes)
+                    mult = random.randint(3, 6) # จำนวนเท่า
+                    smaller = random.randint(15, 50)
+                    larger = smaller * mult
+                    total = smaller + larger
+                    
+                    q = f"ใน{place} มี{item1}และ{item2}รวมกันทั้งหมด <b>{total}</b> {unit} <br>ถ้าจำนวน{item1} <b>เป็น {mult} เท่า</b> ของจำนวน{item2} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#e74c3c;'>(⭐ ระดับแข่งขัน: กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์โจทย์ (ผลรวม + จำนวนเท่า):</b><br>
+                    • ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit} (คิดเป็น 1 ส่วน)<br>
+                    • {item1} เป็น {mult} เท่า แสดงว่าต้องเอาไป <b>คูณ</b> = <b style='color:#2980b9;'>{mult}{var}</b> {unit} (คิดเป็น {mult} ส่วน)<br>
+                    • นำทั้งสองสิ่งมา <b>รวมกัน</b> ต้องเท่ากับ {total}<br>
+                    🎯 <b>สมการ:</b> <b style='color:#e67e22;'>{var}</b> + <b style='color:#2980b9;'>{mult}{var}</b> = <b style='color:#27ae60;'>{total}</b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการ:</b><br>
+                    👉 <b>ขั้นที่ 1:</b> รวมตัวแปร {var} เข้าด้วยกัน<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เทคนิค: {var} ตัวเดียว มีค่าเท่ากับ 1{var} เมื่อนำมารวมกับ {mult}{var} จะได้ (1 + {mult}){var} = {mult+1}{var}</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการใหม่: <b>{mult+1}{var} = {total}</b><br><br>
+                    👉 <b>ขั้นที่ 2:</b> กำจัด {mult+1} โดยนำมา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง (ใช้แม่ {mult+1} ตัดทอน)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult+1, var)} = {frac_cancel_right(total, mult+1, smaller)}<br><br>
+                    👉 <b>{var} = {smaller}</b><br>
+                    <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
+
+                else:
+                    # Level 3: ผลต่าง + จำนวนเท่า (ข้อสอบแข่งขันขั้นสูง)
+                    themes = [
+                        ("สะสมแสตมป์", "ก้อง 👦", "เก่ง 👨", "ดวง"),
+                        ("คะแนนสอบ", "ปุ๊ก 👧", "ป๊อป 👱‍♀️", "คะแนน"),
+                        ("โรงงานผลิต", "เสื้อยืด 👕", "กางเกง 👖", "ตัว")
+                    ]
+                    place, item1, item2, unit = random.choice(themes)
+                    mult = random.randint(3, 5) # จำนวนเท่า
+                    smaller = random.randint(25, 80)
+                    larger = smaller * mult
+                    diff = larger - smaller
+                    
+                    q = f"เรื่อง{place} พบว่า {item1} มีจำนวน <b>เป็น {mult} เท่า</b> ของ{item2} <br>และ {item1} มี<b>มากกว่า</b>{item2}อยู่ <b>{diff}</b> {unit} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#e74c3c;'>(🔥 ระดับแข่งขันขั้นสูง: กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์โจทย์ (ผลต่าง + จำนวนเท่า):</b><br>
+                    • ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit}<br>
+                    • {item1} เป็น {mult} เท่า แสดงว่ามี = <b style='color:#2980b9;'>{mult}{var}</b> {unit}<br>
+                    • คำว่า <b>"มากกว่าอยู่"</b> คือการหา <b>"ผลต่าง"</b> จึงต้องนำสิ่งที่มีมากกว่าตั้ง แล้ว <b>ลบ (-)</b> ด้วยสิ่งที่มีน้อยกว่า<br>
+                    🎯 <b>สมการ:</b> <b style='color:#2980b9;'>{mult}{var}</b> - <b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{diff}</b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการ:</b><br>
+                    👉 <b>ขั้นที่ 1:</b> ลบตัวแปร {var} ออกจากกัน<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เทคนิค: มีอยู่ {mult}{var} ลบออกไป 1{var} จะเหลือ ({mult} - 1){var} = {mult-1}{var}</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการใหม่: <b>{mult-1}{var} = {diff}</b><br><br>
+                    👉 <b>ขั้นที่ 2:</b> กำจัด {mult-1} โดยนำมา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง (ใช้แม่ {mult-1} ตัดทอน)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult-1, var)} = {frac_cancel_right(diff, mult-1, smaller)}<br><br>
+                    👉 <b>{var} = {smaller}</b><br>
+                    <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
 
             elif actual_sub_t == "การบวกและการลบทศนิยม":
                 op = random.choice(["+", "-"])

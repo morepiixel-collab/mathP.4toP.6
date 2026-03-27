@@ -680,7 +680,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
             elif actual_sub_t == "การบอกชนิดของมุม":
                 l_pool = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
                 p1, v, p2 = random.sample(l_pool, 3)
-                angle_name = f"{p1}{v}{p2}"
+                
+                # 🎨 สร้างสัญลักษณ์มุม (หมวกสีแดง) ไว้บนอักษรตัวกลาง
+                hat_v = f"<span style='position:relative; display:inline-block;'>{v}<span style='position:absolute; top:-12px; left:50%; transform:translateX(-50%); color:#e74c3c; font-weight:normal; font-size:22px;'>^</span></span>"
+                angle_name_display = f"{p1}{hat_v}{p2}"
+                
                 angle = random.randint(15, 345) 
                 roll = random.random()
                 if roll < 0.15: angle = 90
@@ -693,7 +697,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 else: angle_type = "มุมกลับ"
                     
                 svg_html = draw_basic_angle(angle, p1, v, p2)
-                q = f"จากรูป มุม <b>{angle_name}</b> ที่มีขนาด <b>{angle}°</b> คือมุมชนิดใด?<br>{svg_html}<span style='font-size:18px; color:#7f8c8d;'>(มุมแหลม, มุมฉาก, มุมป้าน, มุมตรง, มุมกลับ)</span>"
+                q = f"จากรูป มุม <b>{angle_name_display}</b> ที่มีขนาด <b>{angle}°</b> คือมุมชนิดใด?<br>{svg_html}<span style='font-size:18px; color:#7f8c8d;'>(มุมแหลม, มุมฉาก, มุมป้าน, มุมตรง, มุมกลับ)</span>"
                 sol = f"<span style='color:#2c3e50;'><b>ตอบ: {angle_type}</b></span>"
 
             elif actual_sub_t == "การวัดขนาดของมุม (ไม้โปรแทรกเตอร์)":

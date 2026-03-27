@@ -923,7 +923,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 &nbsp;&nbsp;&nbsp;&nbsp;{whole_part[0]}0 + {whole_part[1]} + 0.{dec_part[0]} + 0.0{dec_part[1]} {"+ 0.00" + dec_part[2] if len(dec_part)==3 else ""}<br><br>
                 💡 <i>หมายเหตุ: การกระจายช่วยให้เราเข้าใจว่าเลขแต่ละตัวมีค่าเท่าไหร่ตามตำแหน่งของมัน</i></span>"""
 
-            elif actual_sub_t == "การบวก ลบ คูณ หาร เศษส่วน":
+            elif actual_sub_t == "การบวกเศษส่วน":
                 import math
                 # สุ่มรูปแบบโจทย์ (1: ตารางความสัมพันธ์, 2: แผนภาพเศษส่วน)
                 prob_style = random.choice([1, 2])

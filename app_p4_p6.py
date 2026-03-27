@@ -666,13 +666,22 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 q = f"จงหาผลลัพธ์ของ <b>{a:,} {op} {b:,}</b><br>{table_html}"
                 sol = f"<span style='color:#2c3e50;'>{table_key}</span>"
 
-            elif actual_sub_t == "การหารยาว":
+            elif actual_sub_t in ["การหารยาวแบบลงตัว", "การหารยาวแบบไม่ลงตัว"]:
                 divisor = random.randint(2, 9) if not is_challenge else random.randint(11, 99)
-                quotient, remainder = random.randint(1000, 9999), random.randint(0, divisor - 1)
+                quotient = random.randint(1000, 9999)
+                
+                # 💡 กำหนดเงื่อนไขเศษให้ตรงกับหัวข้อ
+                if actual_sub_t == "การหารยาวแบบลงตัว":
+                    remainder = 0
+                else:
+                    remainder = random.randint(1, divisor - 1)
+                    
                 dividend = (divisor * quotient) + remainder
+                
                 eq_html = f"<div style='font-size: 24px; margin-bottom: 10px;'><b>{dividend:,} ÷ {divisor:,} = ?</b></div>"
                 table_html = generate_long_division_step_by_step_html(divisor, dividend, eq_html, is_key=False)
                 table_key = generate_long_division_step_by_step_html(divisor, dividend, eq_html, is_key=True)
+                
                 q = f"จงหาผลหารโดยวิธีหารยาว<br>{table_html}"
                 ans_txt = f"{quotient:,}" if remainder == 0 else f"{quotient:,} เศษ {remainder:,}"
                 sol = f"<span style='color:#2c3e50;'>{table_key}<br><b>ตอบ: {ans_txt}</b></span>"

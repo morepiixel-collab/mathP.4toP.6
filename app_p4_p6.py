@@ -2205,9 +2205,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     v1 = squares / 100
                     ans = ans_raw / 100
                     
+                    # เอาสปอยล์ทศนิยมในวงเล็บออกแล้วครับ!
                     q_html = f"""
                     <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
-                        <div style="text-align:center;">{draw_svg_decimal_grid_div(v1, parts)}<br><b style="color:#1abc9c; font-size:18px;">พื้นที่ทั้งหมด ({v1:.2f})</b></div>
+                        <div style="text-align:center;">{draw_svg_decimal_grid_div(v1, parts)}<br><b style="color:#1abc9c; font-size:18px;">พื้นที่ทั้งหมด</b></div>
                         <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">÷</div>
                         <div style="text-align:center;"><div style="font-size: 60px; font-weight: bold; color: #e67e22; padding: 0 20px;">{parts}</div><b style="color:#e67e22; font-size:18px;">กลุ่มเท่าๆ กัน</b></div>
                         <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
@@ -2235,21 +2236,20 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {ans:.2f}</b></span>"""
 
                 elif prob_style == 2:
-                    # แบบที่ 2: กล่องสมมาตร (ทศนิยมหารทศนิยม) -> อธิบายว่าทำไมไม่ต้องเลื่อนจุดคืน
+                    # แบบที่ 2: กล่องสมมาตร (ทศนิยมหารทศนิยม)
                     ans_raw = random.randint(4, 15)
                     v2_raw = random.choice([2, 3, 4, 5, 6, 8])
                     v1_raw = ans_raw * v2_raw
                     
-                    # สุ่มว่าจะเป็น 1 ตำแหน่ง หรือ 2 ตำแหน่ง
                     if random.choice([True, False]):
-                        v1 = v1_raw / 10 # เช่น 4.8
-                        v2 = v2_raw / 10 # เช่น 0.6
-                        ans = v1 / v2    # ตอบ 8
+                        v1 = v1_raw / 10 
+                        v2 = v2_raw / 10 
+                        ans = v1 / v2    
                         move_step = 10
                     else:
-                        v1 = v1_raw / 100 # เช่น 1.44
-                        v2 = v2_raw / 100 # เช่น 0.12
-                        ans = v1 / v2     # ตอบ 12
+                        v1 = v1_raw / 100 
+                        v2 = v2_raw / 100 
+                        ans = v1 / v2     
                         move_step = 100
                     
                     q_html = f"""

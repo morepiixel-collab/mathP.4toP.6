@@ -922,7 +922,91 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 👉 <b>2. เขียนในรูปกระจาย:</b><br>
                 &nbsp;&nbsp;&nbsp;&nbsp;{whole_part[0]}0 + {whole_part[1]} + 0.{dec_part[0]} + 0.0{dec_part[1]} {"+ 0.00" + dec_part[2] if len(dec_part)==3 else ""}<br><br>
                 💡 <i>หมายเหตุ: การกระจายช่วยให้เราเข้าใจว่าเลขแต่ละตัวมีค่าเท่าไหร่ตามตำแหน่งของมัน</i></span>"""
+
+            elif actual_sub_t == "การบวก ลบ คูณ หาร เศษส่วน":
+                import math
+                # สุ่มรูปแบบโจทย์ (1: ตารางความสัมพันธ์, 2: แผนภาพเศษส่วน)
+                prob_style = random.choice([1, 2])
+                
+                def draw_frac(n, d):
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
+
+                if prob_style == 1:
+                    # แบบที่ 1: ตารางสมมาตร หาค่า A และ B แล้วดำเนินการ
+                    d1 = random.choice([4, 6, 8, 10])
+                    n1 = random.randint(1, d1-1)
+                    n2 = random.randint(1, d1-1)
                     
+                    # กล่อง A: การบวก/ลบ พื้นฐาน
+                    val_A_n = n1 + n2
+                    val_A_d = d1
+                    
+                    # กล่อง B: เศษส่วนที่ต้องทำส่วนให้เท่ากัน
+                    d_base = random.choice([2, 3, 5])
+                    m = random.choice([2, 3, 4])
+                    d_big = d_base * m
+                    n_small = random.randint(1, d_base-1)
+                    n_big = random.randint(1, d_big-1)
+                    val_B_n = (n_small * m) + n_big
+                    val_B_d = d_big
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: space-around; gap: 10px; margin: 20px 0;">
+                        <div style="flex: 1; border: 3px solid #3498db; border-radius: 10px; padding: 15px; background: white; text-align: center;">
+                            <b style="color: #3498db; font-size: 18px;">กำหนดให้ A</b><hr>
+                            <div style="font-size: 22px; margin-top:10px;">{draw_frac(n1, d1)} + {draw_frac(n2, d1)}</div>
+                        </div>
+                        <div style="flex: 1; border: 3px solid #9b59b6; border-radius: 10px; padding: 15px; background: white; text-align: center;">
+                            <b style="color: #9b59b6; font-size: 18px;">กำหนดให้ B</b><hr>
+                            <div style="font-size: 22px; margin-top:10px;">{draw_frac(n_small, d_base)} + {draw_frac(n_big, d_big)}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; background: #fdf2e9; padding: 15px; border-radius: 8px; border: 2px solid #e67e22; font-size: 20px;">
+                        จงหาค่าของ &nbsp; <b>(A + B)</b>
+                    </div>
+                    """
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br>{q_html}"
+                    
+                    # คำนวณคำตอบ
+                    common_d = (val_A_d * val_B_d) // math.gcd(val_A_d, val_B_d)
+                    final_n = (val_A_n * (common_d // val_A_d)) + (val_B_n * (common_d // val_B_d))
+                    gcd_final = math.gcd(final_n, common_d)
+                    ans_n, ans_d = final_n // gcd_final, common_d // gcd_final
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+
+                    sol = f"👉 <b>หาค่า A:</b> {draw_frac(n1, d1)} + {draw_frac(n2, d1)} = {draw_frac(val_A_n, val_A_d)}<br>"
+                    sol += f"👉 <b>หาค่า B:</b> ทำส่วนให้เท่ากันเป็น {d_big} จะได้ {draw_frac(n_small*m, d_big)} + {draw_frac(n_big, d_big)} = {draw_frac(val_B_n, val_B_d)}<br>"
+                    sol += f"👉 <b>คำตอบ (A+B):</b> {ans_text}"
+
+                else:
+                    # แบบที่ 2: โจทย์รูปภาพ (Visual) - การเปรียบเทียบพื้นที่ระบายสี
+                    parts = random.choice([4, 6, 8])
+                    filled1 = random.randint(1, parts-1)
+                    filled2 = random.randint(1, parts-1)
+                    
+                    # สร้างวงกลมจำลองด้วย CSS
+                    def make_circle(f, p):
+                        degree = (f/p)*360
+                        return f"<div style='width:80px; height:80px; border-radius:50%; background: conic-gradient(#2ecc71 {degree}deg, #ecf0f1 0deg); border:2px solid #34495e; margin:auto;'></div>"
+
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 20px; background: #f4f6f7; border-radius: 15px;">
+                        <div style="text-align:center;">{make_circle(filled1, parts)}<br>รูปที่ 1</div>
+                        <div style="font-size: 30px; font-weight: bold;">+</div>
+                        <div style="text-align:center;">{make_circle(filled2, parts)}<br>รูปที่ 2</div>
+                        <div style="font-size: 30px; font-weight: bold;">= ?</div>
+                    </div>
+                    """
+                    q = f"จากรูปภาพพื้นที่ที่ระบายสี ถ้านำมารวมกันจะเขียนเป็นเศษส่วนได้อย่างไร<br>{q_html}"
+                    
+                    sum_n = filled1 + filled2
+                    gcd_v = math.gcd(sum_n, parts)
+                    ans_text = draw_frac(sum_n // gcd_v, parts // gcd_v)
+                    
+                    sol = f"รูปที่ 1 แทนด้วย {draw_frac(filled1, parts)}<br>รูปที่ 2 แทนด้วย {draw_frac(filled2, parts)}<br>รวมกันได้ {draw_frac(sum_n, parts)} หรือ {ans_text}"
+
+
+
             elif actual_sub_t in ["การบวกเศษส่วน", "การลบเศษส่วน", "การคูณเศษส่วน", "การหารเศษส่วน"]:
                 op_map = {"การบวกเศษส่วน": "+", "การลบเศษส่วน": "-", "การคูณเศษส่วน": "×", "การหารเศษส่วน": "÷"}
                 op_sign = op_map[actual_sub_t]

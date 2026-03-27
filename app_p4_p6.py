@@ -1021,11 +1021,101 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {ans}</b></span>"""
 
             elif actual_sub_t == "สมการและตัวไม่ทราบค่าจากชีวิตประจำวัน":
-                person = random.choice(NAMES)
-                price, qty, extra = random.randint(15, 40), random.randint(3, 8), random.randint(20, 60)
-                total = (price * qty) + extra
-                q = f"<b>{person}</b> ซื้อสมุดจำนวน <b>{qty}</b> เล่ม และซื้อน้ำหวานเพิ่มอีก <b>{extra}</b> บาท ทำให้ต้องจ่ายเงินทั้งหมด <b>{total}</b> บาท<br>อยากทราบว่า สมุด <b>ราคาเล่มละกี่บาท?</b> (ให้ x แทนราคาต่อเล่ม)"
-                sol = f'''<span style="color:#2c3e50;"><b>วิธีทำ:</b> สร้างสมการ ({qty} × x) + {extra} = {total} ➔ ย้ายไปลบ ➔ {qty}x = {total - extra} ➔ ย้ายไปหาร ➔ x = <b>{price} บาท</b></span>'''
+                # สุ่มประเภทโจทย์เพื่อความหลากหลาย
+                scenario_type = random.choice(["shopping", "saving", "sharing", "comparing"])
+                var = random.choice(["x", "y", "A", "ก", "n"])
+                
+                if scenario_type == "shopping":
+                    item = random.choice(["สมุด", "ตุ๊กตา", "กระเป๋า", "ขนม"])
+                    price_per_unit = random.randint(15, 50)
+                    count = random.randint(3, 10)
+                    total = price_per_unit * count
+                    q = f"แม่ซื้อ<b>{item}</b>มาจำนวน {count} ชิ้น จ่ายเงินไปทั้งหมด {total:,} บาท <br>จงเขียนสมการและหาว่า <b>{item}ราคาชิ้นละกี่บาท (ให้ {var} แทนราคาต่อชิ้น)</b>"
+                    equation = f"{count}{var} = {total}"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> เราตั้งสมการได้ว่า <b>{count} × {var} = {total}</b><br>
+                    เราต้องการหาค่า <b>{var}</b> จึงต้องกำจัด <b>{count}</b> ที่คูณอยู่ทิ้งไป<br>
+                    โดยใช้การดำเนินการตรงข้าม คือนำ <b>{count}</b> มา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง
+                    </div>"""
+                    
+                    sol = f"<b>สมการ:</b> {equation}<br><br>" + f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
+                    {explain_box}
+                    👉 {count}{var} <b style='color:#e74c3c;'>÷ {count}</b> = {total} <b style='color:#e74c3c;'>÷ {count}</b><br>
+                    👉 {var} = <b>{price_per_unit}</b><br>
+                    <b>ตอบ: {item}ราคาชิ้นละ {price_per_unit} บาท</b></span>"""
+
+                elif scenario_type == "saving":
+                    initial_money = random.randint(100, 500)
+                    daily_save = random.randint(10, 40)
+                    days = random.randint(5, 20)
+                    total = initial_money + (daily_save * days)
+                    q = f"เดิมแดงมีเงินอยู่ {initial_money:,} บาท ออมเงินเพิ่มวันละเท่าๆ กันเป็นเวลา {days} วัน ทำให้มีเงินรวมทั้งหมด {total:,} บาท <br>จงหาว่า<b>แดงออมเงินวันละกี่บาท (ให้ {var} แทนเงินที่ออมต่อวัน)</b>"
+                    equation = f"{initial_money} + {days}{var} = {total}"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>ทำไมต้องกำจัด {initial_money} ก่อนกำจัด {days} ?</b><br>
+                    เราต้อง <b>กำจัดตัวที่อยู่ไกลตัวแปร หรือ ตัวที่อยู่วงนอกก่อนเสมอ</b><br>
+                    • <b>{days}</b> คูณติดกับ <b>{var}</b> (ถือเป็นวงใน)<br>
+                    • <b>{initial_money}</b> บวกอยู่ห่างออกไป (ถือเป็นวงนอก)<br>
+                    เราจึงต้องกำจัด <b>{initial_money}</b> ออกก่อนด้วยการ <b style='color:#e74c3c;'>ลบออก</b> ครับ
+                    </div>"""
+                    
+                    sol = f"<b>สมการ:</b> {equation}<br><br>" + f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
+                    {explain_box}
+                    👉 <b>ขั้นที่ 1:</b> นำ <b>{initial_money}</b> มา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้าง<br>
+                    👉 {initial_money} - <b style='color:#e74c3c;'>{initial_money}</b> + {days}{var} = {total} - <b style='color:#e74c3c;'>{initial_money}</b><br>
+                    👉 {days}{var} = {total-initial_money}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b>{days}</b> มา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง<br>
+                    👉 {days}{var} <b style='color:#e74c3c;'>÷ {days}</b> = {total-initial_money} <b style='color:#e74c3c;'>÷ {days}</b><br>
+                    👉 {var} = <b>{daily_save}</b><br>
+                    <b>ตอบ: แดงออมเงินวันละ {daily_save} บาท</b></span>"""
+
+                elif scenario_type == "sharing":
+                    total_candies = random.randint(50, 150)
+                    eaten = random.randint(5, 20)
+                    friends = random.randint(2, 5)
+                    per_friend = (total_candies - eaten) // friends
+                    # ปรับตัวเลขให้ลงตัว
+                    total_candies = (per_friend * friends) + eaten
+                    
+                    q = f"ส้มมีลูกอม {total_candies} เม็ด กินเองไป {eaten} เม็ด ที่เหลือแบ่งให้เพื่อน {friends} คน คนละเท่าๆ กัน จนหมดพอดี <br>จงหาว่า<b>เพื่อนได้รับลูกอมคนละกี่เม็ด (ให้ {var} แทนจำนวนลูกอมที่เพื่อนแต่ละคนได้รับ)</b>"
+                    equation = f"{friends}{var} + {eaten} = {total_candies}"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> (จำนวนเพื่อน × ลูกอมที่ได้) + ที่กินไป = ลูกอมทั้งหมด<br>
+                    เรากำจัด <b>+{eaten}</b> (ตัวที่อยู่ไกลตัวแปร) ก่อนเป็นอันดับแรกด้วยการ <b style='color:#e74c3c;'>ลบออก</b>
+                    </div>"""
+                    
+                    sol = f"<b>สมการ:</b> {equation}<br><br>" + f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
+                    {explain_box}
+                    👉 <b>ขั้นที่ 1:</b> นำ <b>{eaten}</b> มา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้าง<br>
+                    👉 {friends}{var} + {eaten} <b style='color:#e74c3c;'>- {eaten}</b> = {total_candies} <b style='color:#e74c3c;'>- {eaten}</b><br>
+                    👉 {friends}{var} = {total_candies-eaten}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b>{friends}</b> มา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง<br>
+                    👉 {friends}{var} <b style='color:#e74c3c;'>÷ {friends}</b> = {total_candies-eaten} <b style='color:#e74c3c;'>÷ {friends}</b><br>
+                    👉 {var} = <b>{per_friend}</b><br>
+                    <b>ตอบ: เพื่อนได้รับลูกอมคนละ {per_friend} เม็ด</b></span>"""
+
+                else: # comparing
+                    smaller_value = random.randint(100, 300)
+                    diff = random.randint(50, 150)
+                    larger_value = smaller_value + diff
+                    name1, name2 = random.choice([("ก้อง", "เก่ง"), ("จอย", "แจ๋ว"), ("พ่อ", "ลูก")])
+                    q = f"{name1} มีเงิน {larger_value:,} บาท ซึ่ง <b>{name1} มีเงินมากกว่า {name2} อยู่ {diff} บาท</b> <br>จงเขียนสมการและหาว่า <b>{name2} มีเงินกี่บาท (ให้ {var} แทนเงินของ {name2})</b>"
+                    equation = f"{var} + {diff} = {larger_value}"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> เงินของ{name2} + ส่วนต่าง = เงินของ{name1}<br>
+                    เราต้องการหาค่า <b>{var}</b> จึงต้องกำจัด <b>+{diff}</b> ทิ้งไป<br>
+                    โดยใช้การดำเนินการตรงข้าม คือนำ <b>{diff}</b> มา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้าง
+                    </div>"""
+                    
+                    sol = f"<b>สมการ:</b> {equation}<br><br>" + f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
+                    {explain_box}
+                    👉 {var} + {diff} <b style='color:#e74c3c;'>- {diff}</b> = {larger_value} <b style='color:#e74c3c;'>- {diff}</b><br>
+                    👉 {var} = <b>{smaller_value}</b><br>
+                    <b>ตอบ: {name2} มีเงิน {smaller_value:,} บาท</b></span>"""
 
             elif actual_sub_t == "สมการเชิงตรรกะและตาชั่งปริศนา":
                 val_a = random.randint(12, 25)

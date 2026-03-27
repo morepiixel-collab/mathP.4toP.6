@@ -2174,6 +2174,154 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;นำ {ans_raw} มาใส่จุด 2 ตำแหน่ง จะได้ <b>{ans:.2f}</b><br><br>
                     <b>ตอบ: คุณครูต้องจ่ายเงินทั้งหมด {ans:.2f} บาท</b></span>"""
 
+            elif actual_sub_t == "การหารทศนิยม":
+                # สุ่มรูปแบบโจทย์ (1: ตารางร้อยแบ่งกลุ่ม, 2: กล่องสมมาตร (ทศนิยมหารทศนิยม), 3: บิลค่าอาหาร)
+                prob_style = random.choice([1, 2, 3])
+                
+                # ฟังก์ชันวาดตารางร้อย และไฮไลต์กลุ่มที่ถูกแบ่ง
+                def draw_svg_decimal_grid_div(val, parts, color_base="#a9dfbf", color_hl="#1abc9c"):
+                    squares = round(val * 100)
+                    sq_per_part = squares // parts
+                    svg = '<svg width="100" height="100" viewBox="0 0 100 100" style="border: 2px solid #2c3e50; background-color: #ecf0f1;">'
+                    count = 0
+                    for row in range(10):
+                        for col in range(10):
+                            if count < sq_per_part:
+                                fill = color_hl # กลุ่มที่ 1 (คำตอบ) สีเข้ม
+                            elif count < squares:
+                                fill = color_base # กลุ่มอื่นๆ สีอ่อน
+                            else:
+                                fill = "none"
+                            svg += f'<rect x="{col*10}" y="{row*10}" width="10" height="10" fill="{fill}" stroke="#bdc3c7" stroke-width="0.5"/>'
+                            count += 1
+                    svg += '</svg>'
+                    return svg
+
+                if prob_style == 1:
+                    # แบบที่ 1: ตารางร้อย (Visual Math) ทศนิยม ÷ จำนวนเต็ม
+                    ans_raw = random.randint(12, 24)
+                    parts = random.choice([2, 3, 4])
+                    squares = ans_raw * parts
+                    v1 = squares / 100
+                    ans = ans_raw / 100
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        <div style="text-align:center;">{draw_svg_decimal_grid_div(v1, parts)}<br><b style="color:#1abc9c;">พื้นที่ทั้งหมด ({v1:.2f})</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">÷</div>
+                        <div style="text-align:center;"><div style="font-size: 60px; font-weight: bold; color: #e67e22; padding: 0 20px;">{parts}</div><b style="color:#e67e22;">กลุ่มเท่าๆ กัน</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
+                    </div>
+                    """
+                    q = f"จากภาพ ตารางร้อย 1 ตารางมีค่าเท่ากับ 1 หน่วย ถ้านำพื้นที่ระบายสีทั้งหมดมา <b>แบ่งออกเป็น {parts} กลุ่มเท่าๆ กัน</b><br>พื้นที่ 1 กลุ่ม (สีเขียวเข้ม) จะมีค่าเป็นทศนิยมเท่าใด?<br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    • พื้นที่ระบายสีทั้งหมดมี {squares} ช่อง เขียนเป็นทศนิยมได้ <b>{v1:.2f}</b><br>
+                    • การ <b>"แบ่งเป็นกลุ่มเท่าๆ กัน"</b> คือการนำไป <b>หาร (÷)</b> ด้วย {parts}<br>
+                    • ประโยคสัญลักษณ์: {v1:.2f} ÷ {parts} = ?
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: นำจุดออกแล้วตั้งหารปกติ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เทคนิค: มอง {v1:.2f} เป็นจำนวนเต็มคือ {squares} แล้วนำมาหารด้วย {parts}</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {squares} ÷ {parts} = <b>{ans_raw}</b> (หมายความว่ากลุ่มละ {ans_raw} ช่อง)<br><br>
+                    👉 <b>ขั้นที่ 2: ใส่จุดทศนิยมกลับคืนให้เท่ากับตัวตั้ง</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้ง ({v1:.2f}) มีทศนิยม <b>2 ตำแหน่ง</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำคำตอบ {ans_raw} มาใส่จุดทศนิยม 2 ตำแหน่ง จะได้ <b>{ans:.2f}</b><br><br>
+                    <b>ตอบ: {ans:.2f}</b></span>"""
+
+                elif prob_style == 2:
+                    # แบบที่ 2: กล่องสมมาตร (ทศนิยม ÷ ทศนิยม) -> โจทย์แข่งขัน!
+                    ans_raw = random.randint(4, 15)
+                    v2_raw = random.choice([2, 3, 4, 5, 6, 8])
+                    v1_raw = ans_raw * v2_raw
+                    
+                    # สุ่มว่าจะเป็น 1 ตำแหน่ง หรือ 2 ตำแหน่ง
+                    if random.choice([True, False]):
+                        v1 = v1_raw / 10 # เช่น 4.8
+                        v2 = v2_raw / 10 # เช่น 0.6
+                        ans = v1 / v2    # ตอบ 8
+                        move_step = 1
+                    else:
+                        v1 = v1_raw / 100 # เช่น 1.44
+                        v2 = v2_raw / 100 # เช่น 0.12
+                        ans = v1 / v2     # ตอบ 12
+                        move_step = 2
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
+                        <div style="flex: 1; border: 3px solid #2980b9; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #2980b9; font-size: 18px;">ตัวตั้ง (A)</b><hr style="border-top: 2px dashed #2980b9;">
+                            <div style="font-size: 32px; font-weight:bold; margin-top:15px; margin-bottom:5px;">{v1}</div>
+                        </div>
+                        <div style="flex: 1; border: 3px solid #e74c3c; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #e74c3c; font-size: 18px;">ตัวหาร (B)</b><hr style="border-top: 2px dashed #e74c3c;">
+                            <div style="font-size: 32px; font-weight:bold; margin-top:15px; margin-bottom:5px;">{v2}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; background: #fdedec; padding: 15px; border-radius: 8px; border: 2px solid #c0392b; font-size: 22px;">
+                        จงหาผลลัพธ์ของ &nbsp; <b>A <span style="color:#e74c3c;">÷</span> B</b>
+                    </div>
+                    """
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br><span style='font-size:14px; color:#e74c3c;'>(🏆 ระดับแข่งขัน: การหารทศนิยมด้วยทศนิยม)</span><br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#fcf3cf; border-left:4px solid #f1c40f; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    💡 <b>เทคนิคสำคัญ (การเลื่อนจุดทศนิยม):</b><br>
+                    เราไม่สามารถตั้งหารได้ถ้า "ตัวหาร" ยังติดจุดทศนิยมอยู่! <br>
+                    กฎคือ: <b>"ต้องเลื่อนจุดตัวหารให้เป็นจำนวนเต็ม และต้องเลื่อนจุดตัวตั้งตามไปเท่าๆ กัน"</b>
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: เลื่อนจุดทศนิยม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวหารคือ {v2} ต้องเลื่อนจุดไปทางขวา <b>{move_step} ตำแหน่ง</b> เพื่อให้กลายเป็น <b>{v2_raw}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้งคือ {v1} จึงต้องเลื่อนจุดไปทางขวา <b>{move_step} ตำแหน่ง</b> ด้วยเช่นกัน กลายเป็น <b>{v1_raw}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>(สมการใหม่คือ: <b>{v1_raw} ÷ {v2_raw}</b>)</i><br><br>
+                    👉 <b>ขั้นที่ 2: ตั้งหารปกติ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {v1_raw} ตั้ง แล้วหารด้วย {v2_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {v1_raw} ÷ {v2_raw} = <b>{int(ans)}</b><br><br>
+                    <b>ตอบ: {int(ans)}</b></span>"""
+
+                else:
+                    # แบบที่ 3: บิลใบเสร็จ (หารทศนิยมด้วยจำนวนเต็ม)
+                    people = random.randint(3, 6)
+                    price_per_person = round(random.uniform(25.25, 85.50), 2)
+                    price_per_person = round(price_per_person * 4) / 4 # ให้ลงท้าย .00, .25, .50, .75
+                    total_bill = round(price_per_person * people, 2)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; gap: 20px; margin: 20px 0; align-items:center;">
+                        <div style="background: #ecf0f1; border: 2px dashed #7f8c8d; padding: 15px 25px; border-radius: 8px; text-align:center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <div style="font-size: 16px; color:#34495e;">📄 บิลค่าอาหารรวม</div>
+                            <div style="font-size: 28px; font-weight: bold; color:#2c3e50;">฿ {total_bill:.2f}</div>
+                        </div>
+                        <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">÷</div>
+                        <div style="background: #3498db; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); text-align:center;">
+                            <div style="font-size: 16px;">แบ่งจ่ายเท่าๆ กัน</div>
+                            <div style="font-size: 28px; font-weight: bold;">{people} คน</div>
+                        </div>
+                    </div>
+                    """
+                    q = f"กลุ่มเพื่อนไปทานอาหารด้วยกัน ได้รับบิลค่าอาหารดังภาพ หากต้องการแชร์จ่ายเท่าๆ กัน จะต้องจ่ายคนละกี่บาท?<br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์โจทย์:</b><br>
+                    • ยอดรวมคือ <b>{total_bill:.2f}</b> บาท แบ่งจ่าย <b>{people}</b> คน<br>
+                    • การแชร์จ่ายเท่าๆ กัน ต้องใช้ <b>"การหาร"</b><br>
+                    • ประโยคสัญลักษณ์: {total_bill:.2f} ÷ {people} = ?
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: นำจุดออกแล้วตั้งหาร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {total_bill:.2f} เอาจุดออกเป็น <b>{int(total_bill*100)}</b> แล้วหารด้วย {people}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {int(total_bill*100)} ÷ {people} = <b>{int(price_per_person*100)}</b><br><br>
+                    👉 <b>ขั้นที่ 2: ใส่จุดทศนิยมกลับคืน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ในการหารด้วยจำนวนเต็ม ทศนิยมของคำตอบจะต้องเท่ากับทศนิยมของตัวตั้งเสมอ!</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้ง ({total_bill:.2f}) มีทศนิยม <b>2 ตำแหน่ง</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ {int(price_per_person*100)} มาใส่จุดทศนิยม 2 ตำแหน่ง จะได้ <b>{price_per_person:.2f}</b><br><br>
+                    <b>ตอบ: จะต้องจ่ายคนละ {price_per_person:.2f} บาท</b></span>"""
+
+
             elif actual_sub_t in ["การบวกเศษส่วน", "การลบเศษส่วน", "การคูณเศษส่วน", "การหารเศษส่วน"]:
                 op_map = {"การบวกเศษส่วน": "+", "การลบเศษส่วน": "-", "การคูณเศษส่วน": "×", "การหารเศษส่วน": "÷"}
                 op_sign = op_map[actual_sub_t]

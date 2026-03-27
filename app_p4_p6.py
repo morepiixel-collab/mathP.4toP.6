@@ -986,7 +986,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 scenario_type = random.choice(["shopping", "saving", "sharing", "comparing"])
                 var = random.choice(["x", "y", "ก", "n"])
                 
-                # ฟังก์ชันช่วยวาดการตัดทอนแบบใหม่ (ขยับเลขแดงไปข้างๆ)
+                # ฟังก์ชันช่วยวาดการตัดทอน
                 def frac_cancel_left(num, variable):
                     top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:super; margin-left:2px;'>1</span></span>{variable}"
                     bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
@@ -998,21 +998,26 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
 
                 if scenario_type == "shopping":
-                    item, p_u, cnt = random.choice([("ขนม", 22, 8), ("สมุด", 15, 6), ("ตุ๊กตา", 45, 4)]), random.randint(12, 35), random.randint(3, 9)
+                    item, p_u, cnt = random.choice(["ขนม", "สมุด", "ตุ๊กตา"]), random.randint(12, 35), random.randint(3, 9)
                     total = p_u * cnt
                     q = f"แม่ซื้อ <b>{item}</b> จำนวน <b>{cnt}</b> ชิ้น จ่ายเงินไปทั้งหมด <b>{total}</b> บาท ราคาชิ้นละกี่บาท (ให้ <b>{var}</b> แทนราคาต่อชิ้น)"
                     
-                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:10px;'>
-                    🔍 <b>วิเคราะห์โจทย์เพื่อสร้างสมการ:</b><br>
-                    • ราคาสินค้าทั้งหมด เกิดจาก (จำนวนชิ้น <b style='color:#2980b9;'>{cnt}</b>) คูณกับ (ราคาต่อชิ้น <b style='color:#e67e22;'>{var}</b>)<br>
-                    • จะได้ความสัมพันธ์คือ: <b style='color:#2980b9;'>{cnt}</b> × <b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{total}</b>
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    👉 <b>ทำไมต้องใช้เครื่องหมาย คูณ (×) ?</b><br>
+                    โจทย์บอกว่าซื้อ {item} หลายชิ้น ชิ้นละเท่าๆ กัน การเพิ่มขึ้นทีละเท่าๆ กันต้องใช้ <b>"การคูณ"</b><br>
+                    • (จำนวนชิ้น <b style='color:#2980b9;'>{cnt}</b>) × (ราคาต่อชิ้น <b style='color:#e67e22;'>{var}</b>) = ราคาสินค้าทั้งหมด<br>
+                    • เขียนในรูปพีชคณิตคือ <b style='color:#2980b9;'>{cnt}</b><b style='color:#e67e22;'>{var}</b><br><br>
+                    👉 <b>ทำไมต้องใช้เครื่องหมาย เท่ากับ (=) ?</b><br>
+                    เพราะราคาสินค้าทั้งหมดที่เราคำนวณได้ ต้อง <b>เท่ากับ</b> เงินที่จ่ายไปจริง คือ <b style='color:#27ae60;'>{total}</b> บาท<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#2980b9;'>{cnt}</b><b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{total}</b></span></b>
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     {analysis}
-                    <b>1. เขียนเป็นสมการ:</b> {cnt}{var} = {total}<br><br>
-                    <b>2. แก้สมการโดยใช้สมบัติการเท่ากัน:</b><br>
-                    👉 นำ <b style='color:#e74c3c;'>{cnt}</b> มาหารออกทั้งสองข้าง (ใช้สูตรคูณ <b>แม่ {cnt}</b> ตัดทอน):<br>
+                    <b>วิธีแก้สมการเพื่อหาค่า {var}:</b><br>
+                    👉 <b>เป้าหมาย:</b> ทำให้ <b style='color:#e67e22;'>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b style='color:#2980b9;'>{cnt}</b> ที่คูณอยู่ทิ้งไป<br>
+                    👉 นำ <b style='color:#e74c3c;'>{cnt}</b> มา <b>หารออก</b> ทั้งสองข้างของสมการ (ใช้สูตรคูณ <b>แม่ {cnt}</b> ตัดทอน):<br><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(cnt, var)} = {frac_cancel_right(total, cnt, p_u)}<br><br>
                     👉 <b>{var} = {p_u}</b><br>
                     <b>ตอบ: {item}ราคาชิ้นละ {p_u} บาท</b></span>"""
@@ -1022,21 +1027,23 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     total = init + (d_s * days)
                     q = f"เดิมมีเงิน <b>{init}</b> บาท ออมเพิ่มวันละเท่าๆ กัน <b>{days}</b> วัน ทำให้มีเงินรวม <b>{total}</b> บาท ออมวันละกี่บาท (ให้ <b>{var}</b> แทนเงินออมต่อวัน)"
                     
-                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:10px;'>
-                    🔍 <b>วิเคราะห์โจทย์เพื่อสร้างสมการ:</b><br>
-                    • เงินรวม เกิดจาก (เงินเดิม <b style='color:#9b59b6;'>{init}</b>) บวกกับ (เงินที่ออมเพิ่มทั้งหมด)<br>
-                    • เงินที่ออมเพิ่มทั้งหมด คือ (จำนวนวัน <b style='color:#2980b9;'>{days}</b>) คูณกับ (เงินต่อวัน <b style='color:#e67e22;'>{var}</b>)<br>
-                    • จะได้สมการคือ: <b style='color:#9b59b6;'>{init}</b> + <b style='color:#2980b9;'>{days}</b><b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{total}</b>
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    👉 <b>หาเงินที่ออมเพิ่ม (ทำไมใช้ คูณ ×):</b><br>
+                    ออมวันละ <b style='color:#e67e22;'>{var}</b> บาท ซ้ำๆ กัน <b style='color:#2980b9;'>{days}</b> วัน แปลว่ามีเงินเพิ่มขึ้น <b style='color:#2980b9;'>{days}</b> × <b style='color:#e67e22;'>{var}</b> = <b><b style='color:#2980b9;'>{days}</b><b style='color:#e67e22;'>{var}</b></b> บาท<br><br>
+                    👉 <b>หาเงินรวม (ทำไมใช้ บวก +):</b><br>
+                    คำว่า "ออมเพิ่ม" จากเงินเดิมที่มีอยู่ <b style='color:#9b59b6;'>{init}</b> บาท แปลว่าต้องเอามา <b>รวมกัน (+)</b><br>
+                    • (เงินเดิม <b style='color:#9b59b6;'>{init}</b>) + (เงินที่ออมเพิ่ม <b style='color:#2980b9;'>{days}</b><b style='color:#e67e22;'>{var}</b>) = (เงินรวม <b style='color:#27ae60;'>{total}</b>)<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#9b59b6;'>{init}</b> + <b style='color:#2980b9;'>{days}</b><b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{total}</b></span></b>
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     {analysis}
-                    <b>1. เขียนเป็นสมการ:</b> {init} + {days}{var} = {total}<br><br>
-                    <b>2. แก้สมการ (กำจัดตัวที่อยู่ไกลตัวแปร หรือ วงนอกก่อน):</b><br>
-                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{init}</b> มาลบออกทั้งสองข้าง<br>
+                    <b>วิธีแก้สมการแบบ 2 ขั้นตอน (กำจัดตัวที่อยู่วงนอกก่อนเสมอ):</b><br>
+                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{init}</b> มา <b>ลบออก</b> ทั้งสองข้าง เพื่อหักเงินเดิมออกไปก่อน<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{init} - <b style='color:#e74c3c;'>{init}</b> + {days}{var} = {total} - <b style='color:#e74c3c;'>{init}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้: {days}{var} = {total-init}<br><br>
-                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{days}</b> มาหารออกทั้งสองข้าง (ใช้แม่ {days} ตัด):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> &nbsp; {days}{var} = {total-init}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{days}</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้สูตรคูณ <b>แม่ {days}</b> ตัดทอน):<br><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(days, var)} = {frac_cancel_right(total-init, days, d_s)}<br><br>
                     👉 <b>{var} = {d_s}</b><br>
                     <b>ตอบ: ออมเงินวันละ {d_s} บาท</b></span>"""
@@ -1045,22 +1052,26 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     total_c, eat, fnds = random.randint(60, 150), random.randint(10, 30), random.randint(2, 6)
                     per = (total_c - eat) // fnds
                     total_c = (per * fnds) + eat
-                    q = f"มีขนม <b>{total_c}</b> ชิ้น กินเองไป <b>{eat}</b> ชิ้น ที่เหลือแบ่งให้เพื่อน <b>{fnds}</b> คน คนละเท่าๆ กัน เพื่อนได้รับกี่ชิ้น (ให้ <b>{var}</b> แทนจำนวนที่เพื่อนได้รับ)"
+                    q = f"มีขนมทั้งหมด <b>{total_c}</b> ชิ้น กินเองไป <b>{eat}</b> ชิ้น ที่เหลือแบ่งให้เพื่อน <b>{fnds}</b> คน คนละเท่าๆ กัน เพื่อนได้รับกี่ชิ้น (ให้ <b>{var}</b> แทนจำนวนที่เพื่อนได้รับ)"
                     
-                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:10px;'>
-                    🔍 <b>วิเคราะห์โจทย์เพื่อสร้างสมการ:</b><br>
-                    • ขนมทั้งหมด เกิดจาก (จำนวนเพื่อน <b style='color:#2980b9;'>{fnds}</b> × ขนมที่เพื่อนได้ <b style='color:#e67e22;'>{var}</b>) บวกกับ (ที่กินเอง <b style='color:#c0392b;'>{eat}</b>)<br>
-                    • จะได้สมการคือ: <b style='color:#2980b9;'>{fnds}</b><b style='color:#e67e22;'>{var}</b> + <b style='color:#c0392b;'>{eat}</b> = <b style='color:#27ae60;'>{total_c}</b>
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    โจทย์ข้อนี้ต้องมองย้อนกลับว่า <b>"ขนมทั้งหมดมาจากไหน?"</b><br><br>
+                    👉 <b>ส่วนที่ 1: ขนมที่อยู่กับเพื่อน (ทำไมใช้ คูณ ×):</b><br>
+                    เพื่อน <b style='color:#2980b9;'>{fnds}</b> คน ได้คนละ <b style='color:#e67e22;'>{var}</b> ชิ้น แปลว่าขนมอยู่กับเพื่อน <b style='color:#2980b9;'>{fnds}</b> × <b style='color:#e67e22;'>{var}</b> = <b><b style='color:#2980b9;'>{fnds}</b><b style='color:#e67e22;'>{var}</b></b> ชิ้น<br><br>
+                    👉 <b>ส่วนที่ 2: รวมกลับเป็นขนมทั้งหมด (ทำไมใช้ บวก +):</b><br>
+                    ถ้าเอาขนมของเพื่อน มารวมคืน <b>(+)</b> กับขนมที่กินเองไป <b style='color:#c0392b;'>{eat}</b> ชิ้น <br>
+                    จะต้อง <b>เท่ากับ (=)</b> ขนมทั้งหมดที่มีตอนแรกคือ <b style='color:#27ae60;'>{total_c}</b> ชิ้น<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#2980b9;'>{fnds}</b><b style='color:#e67e22;'>{var}</b> + <b style='color:#c0392b;'>{eat}</b> = <b style='color:#27ae60;'>{total_c}</b></span></b>
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     {analysis}
-                    <b>1. เขียนเป็นสมการ:</b> {fnds}{var} + {eat} = {total_c}<br><br>
-                    <b>2. แก้สมการ (กำจัดวงนอกก่อน):</b><br>
-                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{eat}</b> มาลบออกเพื่อกำจัดที่กินไป:<br>
+                    <b>วิธีแก้สมการแบบ 2 ขั้นตอน (กำจัดตัวที่อยู่วงนอกก่อนเสมอ):</b><br>
+                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{eat}</b> มา <b>ลบออก</b> ทั้งสองข้าง เพื่อหักส่วนที่กินไปออกก่อน<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{fnds}{var} + {eat} - <b style='color:#e74c3c;'>{eat}</b> = {total_c} - <b style='color:#e74c3c;'>{eat}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้: {fnds}{var} = {total_c-eat}<br><br>
-                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{fnds}</b> มาหารออก (ใช้แม่ {fnds} ตัด):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> &nbsp; {fnds}{var} = {total_c-eat}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{fnds}</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้สูตรคูณ <b>แม่ {fnds}</b> ตัดทอน):<br><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(fnds, var)} = {frac_cancel_right(total_c-eat, fnds, per)}<br><br>
                     👉 <b>{var} = {per}</b><br>
                     <b>ตอบ: เพื่อนได้รับขนมคนละ {per} ชิ้น</b></span>"""
@@ -1070,18 +1081,21 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     l_v = s_v + diff
                     q = f"ก้องมีเงิน <b>{l_v}</b> บาท ซึ่งก้องมีเงิน<b>มากกว่า</b>เก่งอยู่ <b>{diff}</b> บาท เก่งมีเงินกี่บาท (ให้ <b>{var}</b> แทนเงินของเก่ง)"
                     
-                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:10px;'>
-                    🔍 <b>วิเคราะห์โจทย์เพื่อสร้างสมการ:</b><br>
-                    • เงินคนที่มีมากกว่า (ก้อง) เกิดจาก (เงินคนน้อย <b style='color:#e67e22;'>{var}</b>) บวกกับ (ส่วนต่าง <b style='color:#2980b9;'>{diff}</b>)<br>
-                    • จะได้สมการคือ: <b style='color:#e67e22;'>{var}</b> + <b style='color:#2980b9;'>{diff}</b> = <b style='color:#27ae60;'>{l_v}</b>
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    โจทย์เปรียบเทียบระหว่าง ก้อง (คนมีเงินมาก) และ เก่ง (คนมีเงินน้อย)<br><br>
+                    👉 <b>ทำไมต้องใช้เครื่องหมาย บวก (+) ?</b><br>
+                    ถ้าเราอยากให้เงินของเก่ง (<b style='color:#e67e22;'>{var}</b>) มีปริมาณเท่ากับก้อง เราต้อง <b>บวกเพิ่ม</b> ส่วนต่าง (<b style='color:#2980b9;'>{diff}</b>) เข้าไป<br>
+                    • (เงินคนน้อย <b style='color:#e67e22;'>{var}</b>) + (ส่วนต่าง <b style='color:#2980b9;'>{diff}</b>) = (เงินคนมาก <b style='color:#27ae60;'>{l_v}</b>)<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#e67e22;'>{var}</b> + <b style='color:#2980b9;'>{diff}</b> = <b style='color:#27ae60;'>{l_v}</b></span></b>
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     {analysis}
-                    <b>1. เขียนเป็นสมการ:</b> {var} + {diff} = {l_v}<br><br>
-                    <b>2. แก้สมการ:</b><br>
-                    👉 นำ <b style='color:#e74c3c;'>{diff}</b> มาลบออกทั้งสองข้างเพื่อให้ {var} อยู่ตัวเดียว:<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;{var} + {diff} - <b style='color:#e74c3c;'>{diff}</b> = {l_v} - <b style='color:#e74c3c;'>{diff}</b><br>
+                    <b>วิธีแก้สมการ:</b><br>
+                    👉 <b>เป้าหมาย:</b> ทำให้ <b style='color:#e67e22;'>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b style='color:#2980b9;'>+{diff}</b> ทิ้งไป<br>
+                    👉 นำ <b style='color:#e74c3c;'>{diff}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ:<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{var} + {diff} - <b style='color:#e74c3c;'>{diff}</b> = {l_v} - <b style='color:#e74c3c;'>{diff}</b><br><br>
                     👉 <b>{var} = {s_v}</b><br>
                     <b>ตอบ: เก่งมีเงิน {s_v} บาท</b></span>"""
                     

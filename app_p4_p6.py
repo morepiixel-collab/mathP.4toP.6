@@ -937,8 +937,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     ans = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
                     c = ans + a
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{var} + {a:,} = {c:,}</b>"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>+{a:,}</b> ทิ้งไป<br>
+                    โดยใช้การดำเนินการตรงข้าม คือนำ <b>{a:,}</b> มา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้าง
+                    </div>"""
+                    
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
-                    👉 นำ <b style='color:#e74c3c;'>{a:,}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ<br>
+                    {explain_box}
                     👉 {var} + {a:,} <b style='color:#e74c3c;'>- {a:,}</b> = {c:,} <b style='color:#e74c3c;'>- {a:,}</b><br>
                     👉 {var} = <b>{ans:,}</b><br>
                     <b>ตอบ: {ans:,}</b></span>"""
@@ -946,8 +952,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     c = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
                     ans = c + a
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{var} - {a:,} = {c:,}</b>"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>-{a:,}</b> ทิ้งไป<br>
+                    โดยใช้การดำเนินการตรงข้าม คือนำ <b>{a:,}</b> มา <b style='color:#27ae60;'>บวกเข้า</b> ทั้งสองข้าง
+                    </div>"""
+                    
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
-                    👉 นำ <b style='color:#27ae60;'>{a:,}</b> มา <b>บวกเข้า</b> ทั้งสองข้างของสมการ<br>
+                    {explain_box}
                     👉 {var} - {a:,} <b style='color:#27ae60;'>+ {a:,}</b> = {c:,} <b style='color:#27ae60;'>+ {a:,}</b><br>
                     👉 {var} = <b>{ans:,}</b><br>
                     <b>ตอบ: {ans:,}</b></span>"""
@@ -959,8 +971,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     a, ans = random.randint(4, 15), random.randint(3, 12)
                     b = a * ans
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} = {b}</b>"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>{a}</b> (ที่คูณอยู่) ทิ้งไป<br>
+                    โดยใช้การดำเนินการตรงข้าม คือนำ <b>{a}</b> มา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง
+                    </div>"""
+                    
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
-                    👉 นำ <b style='color:#e74c3c;'>{a}</b> มา <b>หารออก</b> ทั้งสองข้างของสมการ<br>
+                    {explain_box}
                     👉 {a}{var} <b style='color:#e74c3c;'>÷ {a}</b> = {b} <b style='color:#e74c3c;'>÷ {a}</b><br>
                     👉 {var} = <b>{ans}</b><br>
                     <b>ตอบ: {ans}</b></span>"""
@@ -968,8 +986,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     a, ans = random.randint(3, 9), random.randint(5, 20)
                     c = a * ans
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{var} ÷ {a} = {ans}</b>"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>{a}</b> (ที่หารอยู่) ทิ้งไป<br>
+                    โดยใช้การดำเนินการตรงข้าม คือนำ <b>{a}</b> มา <b style='color:#27ae60;'>คูณเข้า</b> ทั้งสองข้าง
+                    </div>"""
+                    
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
-                    👉 นำ <b style='color:#27ae60;'>{a}</b> มา <b>คูณเข้า</b> ทั้งสองข้างของสมการ<br>
+                    {explain_box}
                     👉 ({var} ÷ {a}) <b style='color:#27ae60;'>× {a}</b> = {ans} <b style='color:#27ae60;'>× {a}</b><br>
                     👉 {var} = <b>{c}</b><br>
                     <b>ตอบ: {c}</b></span>"""
@@ -977,7 +1001,15 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     a, ans, b = random.randint(2, 6), random.randint(3, 10), random.randint(1, 15)
                     c = (a * ans) + b
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} + {b} = {c}</b>"
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน 2 ขั้นตอน):</b><br>
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด (มี 2 ขั้นตอน):</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว<br>
+                    1. ต้องกำจัดตัวที่บวกลบอยู่ไกลๆ ก่อน (กำจัด <b>+{b}</b> โดยนำไป <b style='color:#e74c3c;'>ลบออก</b>)<br>
+                    2. จากนั้นค่อยกำจัดตัวที่ติดกับตัวแปร (กำจัด <b>{a}</b> ที่คูณอยู่ โดยนำไป <b style='color:#e74c3c;'>หารออก</b>)
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
+                    {explain_box}
                     👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{b}</b> มา <b>ลบออก</b> ทั้งสองข้าง<br>
                     👉 {a}{var} + {b} <b style='color:#e74c3c;'>- {b}</b> = {c} <b style='color:#e74c3c;'>- {b}</b><br>
                     👉 {a}{var} = {c-b}<br><br>

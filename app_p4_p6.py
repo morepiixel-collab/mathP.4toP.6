@@ -2016,16 +2016,16 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return svg
 
                 if prob_style == 1:
-                    # แบบที่ 1: ตารางร้อย (ทศนิยม x จำนวนเต็ม) - เอาตัวเลขเฉลยใต้รูปออก
+                    # แบบที่ 1: ตารางร้อย (ทศนิยม x จำนวนเต็ม)
                     v1 = round(random.uniform(0.12, 0.25), 2)
                     m = random.randint(2, 4)
                     ans = round(v1 * m, 2)
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
-                        <div style="text-align:center;">{draw_svg_decimal_grid(v1, "#3498db")}<br><b style="color:#3498db;">รูปที่ 1</b></div>
+                        <div style="text-align:center;">{draw_svg_decimal_grid(v1, "#3498db")}<br><b style="color:#3498db; font-size:18px;">รูปที่ 1</b></div>
                         <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">×</div>
-                        <div style="text-align:center;"><div style="font-size: 60px; font-weight: bold; color: #e67e22; padding: 0 20px;">{m}</div><b style="color:#e67e22;">จำนวนเท่า</b></div>
+                        <div style="text-align:center;"><div style="font-size: 60px; font-weight: bold; color: #e67e22; padding: 0 20px;">{m}</div><b style="color:#e67e22; font-size:18px;">จำนวนเท่า</b></div>
                         <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
                     </div>
                     """
@@ -2035,11 +2035,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
                     🔍 <b>วิเคราะห์จากภาพ:</b><br>
                     • รูปที่ 1 ระบายสี {round(v1*100)} ช่อง เขียนเป็นทศนิยมได้ <b>{v1:.2f}</b><br>
-                    • การนำมาเพิ่มขึ้น <b>{m} เท่า</b> ก็คือการนำไป <b>คูณ (×)</b> ด้วย {m}
+                    • การนำมาเพิ่มขึ้น <b>{m} เท่า</b> ก็คือการนำไป <b>คูณ (×)</b> ด้วย {m}<br>
+                    • ประโยคสัญลักษณ์: {v1:.2f} × {m} = ?
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ขั้นที่ 1: ตั้งคูณทศนิยมด้วยจำนวนเต็ม</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เทคนิค: นำจุดออกก่อนแล้วคูณเหมือนเลขปกติ (นำ {round(v1*100)} × {m})</i><br>
+                    👉 <b>ขั้นที่ 1: แปลงตัวตั้งให้เป็นจำนวนเต็มเพื่อตั้งคูณ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เทคนิค: เราจะแอบนำ 100 มาคูณตัวตั้ง ({v1:.2f}) ให้กลายเป็นจำนวนเต็ม ({round(v1*100)}) เพื่อให้คูณเลขได้ง่ายขึ้น</i><br>
                     <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
                         <tr>
                             <td style="text-align: right; padding: 2px 10px;">{round(v1*100)}</td>
@@ -2054,11 +2055,9 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                             <td></td>
                         </tr>
                     </table><br>
-                    👉 <b>ขั้นที่ 2: ใส่จุดทศนิยมกลับคืน</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้ง ({v1:.2f}) มีทศนิยม 2 ตำแหน่ง<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวคูณ ({m}) ไม่มีทศนิยม (0 ตำแหน่ง)<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• ผลลัพธ์ต้องมีทศนิยมรวม = 2 + 0 = <b style='color:#e74c3c;'>2 ตำแหน่ง</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น นำ {round(v1*100) * m} มานับจากขวามาซ้ายแล้วใส่จุด 2 ตำแหน่ง จะได้ <b>{ans:.2f}</b><br><br>
+                    👉 <b>ขั้นที่ 2: ปรับค่ากลับคืน (เลื่อนจุดทศนิยม)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เนื่องจากขั้นแรกเราแอบ <b>"คูณ 100 ขยายค่า"</b> ไปที่ตัวตั้ง ผลลัพธ์ที่ได้จึงพองโตเกินจริงไป 100 เท่า! เราจึงต้อง <b>"หารด้วย 100 กลับคืน"</b> เพื่อให้ค่าถูกต้อง (การหาร 100 คือการใส่ทศนิยม 2 ตำแหน่งนั่นเอง)</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ {round(v1*100) * m} มาใส่จุดทศนิยม 2 ตำแหน่ง จะได้ <b>{ans:.2f}</b><br><br>
                     <b>ตอบ: {ans:.2f}</b></span>"""
 
                 elif prob_style == 2:
@@ -2072,11 +2071,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q_html = f"""
                     <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
                         <div style="flex: 1; border: 3px solid #2980b9; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                            <b style="color: #2980b9; font-size: 18px;">กล่อง A</b><hr style="border-top: 2px dashed #2980b9;">
+                            <b style="color: #2980b9; font-size: 18px;">ตัวตั้ง (A)</b><hr style="border-top: 2px dashed #2980b9;">
                             <div style="font-size: 32px; font-weight:bold; margin-top:15px; margin-bottom:5px;">{v1:.1f}</div>
                         </div>
                         <div style="flex: 1; border: 3px solid #8e44ad; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                            <b style="color: #8e44ad; font-size: 18px;">กล่อง B</b><hr style="border-top: 2px dashed #8e44ad;">
+                            <b style="color: #8e44ad; font-size: 18px;">ตัวคูณ (B)</b><hr style="border-top: 2px dashed #8e44ad;">
                             <div style="font-size: 32px; font-weight:bold; margin-top:15px; margin-bottom:5px;">{v2:.1f}</div>
                         </div>
                     </div>
@@ -2084,19 +2083,17 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         จงหาผลลัพธ์ของ &nbsp; <b>A <span style="color:#e74c3c;">×</span> B</b>
                     </div>
                     """
-                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br><span style='font-size:14px; color:#e74c3c;'>(⭐ ระดับแข่งขัน: ทศนิยมคูณทศนิยม)</span><br>{q_html}"
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br><span style='font-size:14px; color:#e74c3c;'>(🏆 ระดับแข่งขัน: ทศนิยมคูณทศนิยม)</span><br>{q_html}"
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#fcf3cf; border-left:4px solid #f1c40f; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    💡 <b>เทคนิคสำคัญ (การคูณทศนิยม):</b><br>
-                    1. นำจุดออก แล้วคูณเหมือนจำนวนเต็มปกติ<br>
-                    2. นับตำแหน่งทศนิยมของ <b>ตัวตั้ง</b> และ <b>ตัวคูณ</b> มารวมกัน<br>
-                    3. ใส่จุดทศนิยมที่ผลลัพธ์ตามจำนวนตำแหน่งที่รวมได้!
+                    💡 <b>เทคนิคสำคัญ (เอาจุดออกก่อนแล้วตั้งคูณ):</b><br>
+                    เพื่อให้คิดเลขง่ายขึ้น เราจะทำทั้งตัวตั้งและตัวคูณให้เป็นจำนวนเต็มก่อน!<br>
+                    • นำตัวตั้ง ({v1:.1f}) ไปคูณ 10 จะได้ <b>{int(v1*10)}</b><br>
+                    • นำตัวคูณ ({v2:.1f}) ไปคูณ 10 จะได้ <b>{int(v2*10)}</b>
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ขั้นที่ 1: นำจุดออกแล้วตั้งคูณ</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• {v1:.1f} นำจุดออกเป็น <b>{int(v1*10)}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• {v2:.1f} นำจุดออกเป็น <b>{int(v2*10)}</b><br>
+                    👉 <b>ขั้นที่ 1: ตั้งคูณจำนวนเต็มปกติ</b><br>
                     <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
                         <tr>
                             <td style="text-align: right; padding: 2px 10px;">{int(v1*10)}</td>
@@ -2111,12 +2108,15 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                             <td></td>
                         </tr>
                     </table><br>
+                    <div style='background-color:#e8f8f5; border-left:4px solid #1abc9c; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ทำไมผลลัพธ์ต้องนำ "ตำแหน่งทศนิยม" มาบวกกัน?</b><br>
+                    สังเกตว่าตอนแรกเราแอบขยายขนาดตัวตั้ง (คูณ 10) และขยายตัวคูณ (คูณ 10) แสดงว่าผลลัพธ์ที่ได้พองโตขึ้นไปถึง <b>10 × 10 = 100 เท่า!</b><br>
+                    ดังนั้น การจะปรับค่ากลับให้ถูกต้อง เราจึงต้อง <b>"หารออกด้วย 100"</b> (ซึ่งก็คือการเติมทศนิยมกลับไป 2 ตำแหน่งนั่นเองครับ)
+                    </div>
                     👉 <b>ขั้นที่ 2: นับตำแหน่งทศนิยมรวม</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้ง ({v1:.1f}) มี <b>1 ตำแหน่ง</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• ตัวคูณ ({v2:.1f}) มี <b>1 ตำแหน่ง</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• รวมกันต้องได้ทศนิยม = 1 + 1 = <b style='color:#e74c3c;'>2 ตำแหน่ง</b><br><br>
-                    👉 <b>ขั้นที่ 3: ใส่จุดทศนิยมที่ผลลัพธ์</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {ans_raw} มานับจากขวาไปซ้าย 2 หลัก แล้วใส่จุด จะได้ <b>{ans:.2f}</b><br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ {ans_raw} มาใส่ทศนิยมกลับคืน (1 + 1 = 2 ตำแหน่ง) จะได้ <b>{ans:.2f}</b><br><br>
                     <b>ตอบ: {ans:.2f}</b></span>"""
 
                 else:
@@ -2148,12 +2148,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
                     🔍 <b>วิเคราะห์โจทย์:</b><br>
                     • สินค้าราคาชิ้นละ <b>{item_price:.2f}</b> บาท ซื้อจำนวน <b>{qty}</b> ชิ้น<br>
-                    • หาราคารวมทั้งหมด ต้องใช้ <b>"การคูณ"</b> (ราคา × จำนวน)<br>
-                    • ประโยคสัญลักษณ์: {item_price:.2f} × {qty} = ?
+                    • หาราคารวมทั้งหมด ต้องใช้ <b>"การคูณ"</b> (ราคา × จำนวน)
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ขั้นที่ 1: นำจุดออกแล้วตั้งคูณ</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {item_price:.2f} เอาจุดออกเป็น {int(item_price*100)} แล้วคูณด้วย {qty}<br>
+                    👉 <b>ขั้นที่ 1: แปลงตัวตั้งเป็นจำนวนเต็มเพื่อตั้งคูณ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เราจะนำ {item_price:.2f} ไปคูณ 100 ก่อนเพื่อให้เป็นจำนวนเต็ม {int(item_price*100)} (คิดซะว่าแปลงหน่วยจาก บาท เป็น สตางค์) เพื่อให้คิดเลขง่ายขึ้น!</i><br>
                     <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
                         <tr>
                             <td style="text-align: right; padding: 2px 10px;">{int(item_price*100)}</td>
@@ -2168,10 +2167,9 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                             <td></td>
                         </tr>
                     </table><br>
-                    👉 <b>ขั้นที่ 2: ใส่จุดทศนิยมกลับคืน</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้ง ({item_price:.2f}) มีทศนิยม 2 ตำแหน่ง, ตัวคูณ ({qty}) มี 0 ตำแหน่ง<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• รวมกันเป็นทศนิยม <b>2 ตำแหน่ง</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {ans_raw} มาใส่จุด 2 ตำแหน่ง จะได้ <b>{ans:.2f}</b><br><br>
+                    👉 <b>ขั้นที่ 2: ปรับค่ากลับคืน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ตอนแรกเราแอบขยายค่าตัวตั้งไป 100 เท่า พอได้ผลลัพธ์ก็ต้อง <b>นำมาหาร 100 คืน</b> เพื่อให้ค่าถูกต้อง (หรือก็คือการทำสตางค์กลับเป็นบาท)</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ {ans_raw} ÷ 100 (ใส่ทศนิยม 2 ตำแหน่ง) จะได้ <b>{ans:.2f}</b><br><br>
                     <b>ตอบ: คุณครูต้องจ่ายเงินทั้งหมด {ans:.2f} บาท</b></span>"""
 
             elif actual_sub_t == "การหารทศนิยม":

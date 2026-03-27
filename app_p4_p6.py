@@ -1314,8 +1314,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {i1} = {w_a} ก., {i2} = {w_b} ก., {i3} = {w_c} ก.</b></span>"""
 
             elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":
-                # เพิ่ม prob_type 4 (โจทย์ออริจินัล: ปากกากับสมุด) กลับเข้ามา
-                prob_type = random.choice([1, 2, 3, 4]) 
+                prob_type = random.choice([1, 2, 3, 4]) # 1: รวม+ต่าง, 2: รวม+เท่า, 3: ต่าง+เท่า, 4: ราคาสินค้า 2 ชนิด
                 var = random.choice(["x", "y", "a", "ก", "m", "n"])
                 
                 # ฟังก์ชันช่วยวาดการตัดทอน
@@ -1456,8 +1455,17 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
 
                 else:
-                    # Level 4: ราคาสินค้า 2 ชนิด (โจทย์ออริจินัลที่คุณครูต้องการ)
-                    items = ["ปากกา", "สมุด"]
+                    # Level 4: ราคาสินค้า 2 ชนิด (เพิ่มความหลากหลายของสิ่งของ)
+                    item_pairs = [
+                        ["ปากกา", "สมุด"],
+                        ["ดินสอ", "ยางลบ"],
+                        ["ไม้บรรทัด", "กล่องดินสอ"],
+                        ["สีไม้", "สมุดวาดเขียน"],
+                        ["กรรไกร", "กาวน้ำ"],
+                        ["นมสด", "ขนมปัง"],
+                        ["น้ำผลไม้", "แซนด์วิช"]
+                    ]
+                    items = random.choice(item_pairs)
                     random.shuffle(items)
                     item1, item2 = items[0], items[1] # สุ่มสลับว่าอะไรแพงกว่า
                     

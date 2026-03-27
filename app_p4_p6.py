@@ -1314,7 +1314,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {i1} = {w_a} ก., {i2} = {w_b} ก., {i3} = {w_c} ก.</b></span>"""
 
             elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":
-                prob_type = random.choice([1, 2, 3]) # 1: รวม+ต่าง, 2: รวม+เท่า, 3: ต่าง+เท่า
+                # เพิ่ม prob_type 4 (โจทย์ออริจินัล: ปากกากับสมุด) กลับเข้ามา
+                prob_type = random.choice([1, 2, 3, 4]) 
                 var = random.choice(["x", "y", "a", "ก", "m", "n"])
                 
                 # ฟังก์ชันช่วยวาดการตัดทอน
@@ -1414,7 +1415,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 <b>{var} = {smaller}</b><br>
                     <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
 
-                else:
+                elif prob_type == 3:
                     # Level 3: ผลต่าง + จำนวนเท่า
                     themes = [
                         ("การสะสมแสตมป์", "ก้อง", "เก่ง", "ดวง"),
@@ -1453,6 +1454,49 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult-1, var)} = {frac_cancel_right(diff, mult-1, smaller)}<br><br>
                     👉 <b>{var} = {smaller}</b><br>
                     <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
+
+                else:
+                    # Level 4: ราคาสินค้า 2 ชนิด (โจทย์ออริจินัลที่คุณครูต้องการ)
+                    items = ["ปากกา", "สมุด"]
+                    random.shuffle(items)
+                    item1, item2 = items[0], items[1] # สุ่มสลับว่าอะไรแพงกว่า
+                    
+                    smaller = random.randint(10, 45) # ราคาของถูก
+                    diff = random.randint(5, 20)     # ส่วนต่างราคา
+                    larger = smaller + diff          # ราคาของแพง
+                    total = smaller + larger         # ราคารวม
+                    
+                    q = f"ซื้อ<b>{item1}</b>และ<b>{item2}</b>อย่างละ 1 ชิ้น จ่ายเงินรวมทั้งหมด <b>{total}</b> บาท <br>ถ้า{item1}ราคา<b>แพงกว่า</b>{item2}อยู่ <b>{diff}</b> บาท <br>อยากทราบว่า <b>{item2}</b> ราคาชิ้นละกี่บาท? <br><span style='font-size:14px; color:#7f8c8d;'>(กำหนดให้ {var} แทนราคาของ{item2})</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    โจทย์ข้อนี้เปรียบเทียบราคาสินค้า 2 ชนิด เราต้องกำหนดราคาให้ชนิดใดชนิดหนึ่งเป็นตัวแปรก่อน<br><br>
+                    👉 <b>1. กำหนดตัวไม่ทราบค่า:</b><br>
+                    ให้ {item2} (ของที่ราคาถูกกว่า) มีราคา = <b style='color:#e67e22;'>{var}</b> บาท<br><br>
+                    👉 <b>2. สร้างราคาของ {item1} (ทำไมต้องใช้ บวก +):</b><br>
+                    โจทย์บอกว่า {item1} <b>แพงกว่า</b> อยู่ {diff} บาท คำว่า "แพงกว่า" แปลว่าต้องเอาไป <b>บวกเพิ่ม</b><br>
+                    จะได้ว่า {item1} ราคา = <b style='color:#2980b9;'>{var} + {diff}</b> บาท<br><br>
+                    👉 <b>3. สร้างสมการรวม (ทำไมต้องใช้ บวก + และ เท่ากับ =):</b><br>
+                    ซื้ออย่างละ 1 ชิ้น <b>"จ่ายเงินรวม"</b> หมายถึงนำราคาทั้งสองอย่างมา <b>บวกกัน (+)</b> และต้อง <b>เท่ากับ (=)</b> เงินที่จ่ายไปคือ <b style='color:#27ae60;'>{total}</b> บาท<br>
+                    • (ราคา{item2}) + (ราคา{item1}) = {total}<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#e67e22;'>{var}</b> + (<b style='color:#2980b9;'>{var} + {diff}</b>) = <b style='color:#27ae60;'>{total}</b></span></b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: รวมตัวแปรเข้าด้วยกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: นำราคา <b style='color:#e67e22;'>{var}</b> มาบวกกับ <b style='color:#2980b9;'>{var}</b> จะมีค่าเท่ากับ <b>2{var}</b></i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เมื่อยุบรวมตัวแปรแล้ว จะได้สมการใหม่คือ: <b>2{var} + {diff} = {total}</b><br><br>
+                    👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่อยู่ไกลตัวแปร (วงนอก)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ <b style='color:#e74c3c;'>{diff}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ เพื่อหักส่วนต่างราคาออกไปก่อน<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;2{var} + {diff} <b style='color:#e74c3c;'>- {diff}</b> = {total} <b style='color:#e74c3c;'>- {diff}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> 2{var} = {total - diff}<br><br>
+                    👉 <b>ขั้นที่ 3: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข 2 เขียนติดกับ {var} แปลว่า "คูณอยู่" จึงต้องนำ <b>2</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ 2 ตัดทอน)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(2, var)} = {frac_cancel_right(total - diff, 2, smaller)}<br><br>
+                    👉 <b>{var} = {smaller}</b><br>
+                    <b>ตอบ: {item2} ราคาชิ้นละ {smaller} บาท</b></span>"""
 
             elif actual_sub_t == "การบวกและการลบทศนิยม":
                 op = random.choice(["+", "-"])

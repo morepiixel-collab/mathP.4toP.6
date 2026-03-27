@@ -1125,12 +1125,116 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: เก่งมีเงิน {s_v} บาท</b></span>"""
                     
             elif actual_sub_t == "สมการเชิงตรรกะและตาชั่งปริศนา":
-                val_a = random.randint(12, 25)
-                val_b = val_a * 2
-                val_c = random.randint(15, 45)
-                ans3 = val_b + val_c
-                q = f"ถ้า 🔴 + 🔴 = 🔵 และ 🔵 + 🟢 = {ans3}<br>ถ้า 🔴 มีค่าเท่ากับ {val_a} จงหาค่าของ 🟢 ?"
-                sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> 🔵 = {val_a} + {val_a} = {val_b} ➔ แทนค่าในสมการสอง {val_b} + 🟢 = {ans3} ➔ 🟢 = {ans3} - {val_b} = <b>{val_c}</b></span>"
+                # ชุดรูปภาพ 5 หมวด เพื่อความหลากหลายไม่ซ้ำซาก
+                icon_sets = [
+                    ("🍎", "🍌", "🍇", "ผลไม้"),
+                    ("🐶", "🐱", "🐰", "สัตว์เลี้ยง"),
+                    ("🍔", "🍟", "🥤", "อาหาร"),
+                    ("⚽", "🏀", "🏈", "กีฬา"),
+                    ("🚀", "🛸", "🌍", "อวกาศ")
+                ]
+                i1, i2, i3, theme = random.choice(icon_sets)
+                
+                # สุ่มประเภทของโจทย์ (Type 1: บวก/ลบพื้นฐาน, Type 2: ข้อสอบแข่งขัน มีคูณตอนท้าย)
+                puzzle_type = random.choice([1, 2])
+                
+                if puzzle_type == 1:
+                    val1 = random.randint(5, 20)
+                    val2 = random.randint(3, 15)
+                    val3 = random.randint(2, 12)
+                    
+                    eq1_res = val1 + val1
+                    eq2_res = val1 + val2
+                    eq3_res = val2 + val3
+                    ans = val1 + val2 + val3
+                    
+                    # จัด Layout แบบสมมาตรโดยใช้ Table ให้เครื่องหมาย = ตรงกัน
+                    q_html = f"""
+                    <div style='background-color: #fcfcfc; padding: 20px; border-radius: 8px; border: 2px dashed #95a5a6; width: 85%; margin: 15px auto; box-shadow: 2px 2px 5px rgba(0,0,0,0.05);'>
+                        <table style='margin: 0 auto; font-size: 28px; border-collapse: collapse; background-color: transparent;'>
+                            <tr><td style='text-align:right; padding:8px; border:none;'>{i1} + {i1}</td><td style='padding:8px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:8px; border:none; color:#2c3e50;'><b>{eq1_res}</b></td></tr>
+                            <tr><td style='text-align:right; padding:8px; border:none;'>{i1} + {i2}</td><td style='padding:8px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:8px; border:none; color:#2c3e50;'><b>{eq2_res}</b></td></tr>
+                            <tr><td style='text-align:right; padding:8px; border:none;'>{i2} + {i3}</td><td style='padding:8px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:8px; border:none; color:#2c3e50;'><b>{eq3_res}</b></td></tr>
+                            <tr><td colspan='3' style='border-top: 3px double #34495e; padding-top: 15px; text-align:center; border:none; border-top: 3px double #7f8c8d;'>{i1} + {i2} + {i3} = <b style='color:#e74c3c;'>?</b></td></tr>
+                        </table>
+                    </div>
+                    """
+                    q = f"จงหาค่าของปริศนา <b>หมวด{theme}</b> ต่อไปนี้ (แบบฝึกหัดตรรกะพื้นฐาน)<br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์ปริศนา (คิดทีละบรรทัด):</b><br>
+                    เวลาแก้ปริศนาภาพ ให้เริ่มจากบรรทัดที่มี <b>"รูปเหมือนกันทั้งหมด"</b> ก่อน เพื่อหาค่าเริ่มต้น!
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>บรรทัดที่ 1:</b> {i1} + {i1} = {eq1_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ของ 2 สิ่งเหมือนกันบวกกันได้ {eq1_res} แสดงว่า 1 สิ่งคือ {eq1_res} ÷ 2 = <b>{val1}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i1} = {val1}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 2:</b> {i1} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เรารู้แล้วว่า {i1} คือ {val1} จะได้สมการ: {val1} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แก้สมการโดยนำ {val1} ไปลบออก: {i2} = {eq2_res} - {val1} = <b>{val2}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i2} = {val2}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 3:</b> {i2} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เรารู้แล้วว่า {i2} คือ {val2} จะได้สมการ: {val2} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แก้สมการโดยนำ {val2} ไปลบออก: {i3} = {eq3_res} - {val2} = <b>{val3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i3} = {val3}</b><br><br>
+                    
+                    👉 <b>คำถาม:</b> {i1} + {i2} + {i3} = ?<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่ารูปภาพด้วยตัวเลข: {val1} + {val2} + {val3} = <b>{ans}</b><br>
+                    <b>ตอบ: {ans}</b></span>"""
+
+                else:
+                    # Type 2: ข้อสอบแข่งขัน (มีของ 3 ชิ้น และมีการคูณตอนท้าย)
+                    val1 = random.randint(3, 10)
+                    val2 = random.randint(2, 8)
+                    val3 = random.randint(2, 6)
+                    
+                    eq1_res = val1 * 3
+                    eq2_res = val1 + (val2 * 2)
+                    eq3_res = val2 + (val3 * 2)
+                    ans = val1 + (val2 * val3) # ต้องทำคูณก่อนบวก
+                    
+                    q_html = f"""
+                    <div style='background-color: #fdfefe; padding: 20px; border-radius: 8px; border: 2px solid #d0d3d4; width: 90%; margin: 15px auto; box-shadow: 3px 3px 10px rgba(0,0,0,0.08);'>
+                        <table style='margin: 0 auto; font-size: 26px; border-collapse: collapse; background-color: transparent;'>
+                            <tr><td style='text-align:right; padding:6px; border:none;'>{i1} + {i1} + {i1}</td><td style='padding:6px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:6px; border:none; color:#2c3e50;'><b>{eq1_res}</b></td></tr>
+                            <tr><td style='text-align:right; padding:6px; border:none;'>{i1} + {i2} + {i2}</td><td style='padding:6px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:6px; border:none; color:#2c3e50;'><b>{eq2_res}</b></td></tr>
+                            <tr><td style='text-align:right; padding:6px; border:none;'>{i2} + {i3} + {i3}</td><td style='padding:6px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:6px; border:none; color:#2c3e50;'><b>{eq3_res}</b></td></tr>
+                            <tr><td colspan='3' style='border-top: 3px double #7f8c8d; padding-top: 15px; text-align:center; border-bottom:none; border-left:none; border-right:none;'>{i1} + {i2} <b style='color:#e74c3c;'>×</b> {i3} = <b style='color:#e74c3c;'>?</b></td></tr>
+                        </table>
+                    </div>
+                    """
+                    q = f"จงหาค่าของปริศนา <b>หมวด{theme}</b> ต่อไปนี้ <br><span style='color:#e74c3c; font-size:14px;'>(⭐ แนวข้อสอบแข่งขัน: สังเกตเครื่องหมายในบรรทัดสุดท้ายให้ดี!)</span><br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์ปริศนา (แนวข้อสอบแข่งขัน):</b><br>
+                    หาค่าจากบรรทัดที่มีรูปซ้ำกันก่อน และระวัง <b>"ลำดับการคำนวณ (Order of Operations)"</b> ในบรรทัดสุดท้าย (ต้องทำ <b>คูณ</b> ก่อน <b>บวก</b> เสมอ!)
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>บรรทัดที่ 1:</b> {i1} + {i1} + {i1} = {eq1_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ของ 3 สิ่งเหมือนกันรวมได้ {eq1_res} แสดงว่า 1 สิ่งคือ {eq1_res} ÷ 3 = <b>{val1}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i1} = {val1}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 2:</b> {i1} + {i2} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่า {i1} = {val1} จะได้: {val1} + {i2} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;กำจัดวงนอก (นำ {val1} ลบออก): {i2} + {i2} = {eq2_res} - {val1} = {eq2_res - val1}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;มี {i2} สองอัน เท่ากับ {eq2_res - val1} ดังนั้น <b>{i2}</b> = {eq2_res - val1} ÷ 2 = <b>{val2}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 3:</b> {i2} + {i3} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่า {i2} = {val2} จะได้: {val2} + {i3} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;กำจัดวงนอก (นำ {val2} ลบออก): {i3} + {i3} = {eq3_res} - {val2} = {eq3_res - val2}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;มี {i3} สองอัน เท่ากับ {eq3_res - val2} ดังนั้น <b>{i3}</b> = {eq3_res - val2} ÷ 2 = <b>{val3}</b><br><br>
+                    
+                    👉 <b>คำถาม:</b> {i1} + {i2} <b style='color:#e74c3c;'>×</b> {i3} = ?<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่ารูปภาพ: {val1} + {val2} <b style='color:#e74c3c;'>×</b> {val3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>(🚨 กฎคณิตศาสตร์: ต้องคำนวณคู่ที่คูณกันก่อนเสมอ!)</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>({val2} × {val3})</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>{val2*val3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= <b>{ans}</b><br>
+                    <b>ตอบ: {ans}</b></span>"""
 
             elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":
                 val_1, val_2 = random.randint(30, 80), random.randint(10, 20)

@@ -964,60 +964,68 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 {var} = <b>{ans:,}</b><br>
                     <b>ตอบ: {ans:,}</b></span>"""
 
-            elif actual_sub_t == "การแก้สมการ (คูณ/หาร)":
+            elif actual_sub_t == "การแก้สม paraการ (คูณ/หาร)":
                 var = random.choice(["x", "y", "a", "m"])
                 scenario = random.choice(["mult", "div", "mult_add"])
+                
+                # ฟังก์ชันช่วยวาดเศษส่วนแบบตัดทอน
+                def frac_cancel(top, bottom, is_cancel=False):
+                    style = "text-decoration: line-through; text-decoration-color: #e74c3c; text-decoration-thickness: 2px;" if is_cancel else ""
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px; {style}'>{top}</span><span>{bottom}</span></span>"
+
                 if scenario == "mult":
                     a, ans = random.randint(4, 15), random.randint(3, 12)
                     b = a * ans
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} = {b}</b>"
                     
                     explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
-                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>{a}</b> (ที่คูณอยู่) ทิ้งไป<br>
-                    โดยใช้การดำเนินการตรงข้าม คือนำ <b>{a}</b> มา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง
+                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>{a}</b> ที่คูณอยู่ทิ้งไป<br>
+                    โดยนำ <b>{a}</b> มา <b style='color:#e74c3c;'>หารออกทั้งสองข้าง</b> (เขียนในรูปเศษส่วนเพื่อให้ตัดทอนได้ง่าย)
                     </div>"""
                     
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
                     {explain_box}
-                    👉 {a}{var} <b style='color:#e74c3c;'>÷ {a}</b> = {b} <b style='color:#e74c3c;'>÷ {a}</b><br>
-                    👉 {var} = <b>{ans}</b><br>
+                    👉 นำ {a} มาหารทั้งสองข้างของสมการ:<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel(f"{a}{var}", a, True)} = {frac_cancel(b, a)}<br><br>
+                    👉 <b>{var} = {ans}</b><br>
                     <b>ตอบ: {ans}</b></span>"""
+
                 elif scenario == "div":
                     a, ans = random.randint(3, 9), random.randint(5, 20)
                     c = a * ans
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{var} ÷ {a} = {ans}</b>"
                     
                     explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
-                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>{a}</b> (ที่หารอยู่) ทิ้งไป<br>
-                    โดยใช้การดำเนินการตรงข้าม คือนำ <b>{a}</b> มา <b style='color:#27ae60;'>คูณเข้า</b> ทั้งสองข้าง
+                    💡 <b>หลักการคิด:</b> เราต้องการกำจัด <b>{a}</b> ที่หารอยู่ทิ้งไป<br>
+                    โดยนำ <b>{a}</b> มา <b style='color:#27ae60;'>คูณเข้าทั้งสองข้าง</b> เพื่อให้ตัดทอนกับตัวหารเดิมได้
                     </div>"""
                     
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
                     {explain_box}
-                    👉 ({var} ÷ {a}) <b style='color:#27ae60;'>× {a}</b> = {ans} <b style='color:#27ae60;'>× {a}</b><br>
-                    👉 {var} = <b>{c}</b><br>
+                    👉 นำ {a} มาคูณทั้งสองข้างของสมการ:<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{f_html(var, a)} <b style='color:#27ae60;'>× {a}</b> = {ans} <b style='color:#27ae60;'>× {a}</b><br><br>
+                    👉 <i>(ตัวคูณ {a} จะตัดทอนกับตัวส่วน {a} จนหมดไป)</i><br>
+                    👉 <b>{var} = {c}</b><br>
                     <b>ตอบ: {c}</b></span>"""
+
                 elif scenario == "mult_add":
                     a, ans, b = random.randint(2, 6), random.randint(3, 10), random.randint(1, 15)
                     c = (a * ans) + b
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} + {b} = {c}</b>"
                     
                     explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
-                    💡 <b>ทำไมต้องกำจัด +{b} ก่อนกำจัด {a} ?</b><br>
-                    เวลาแก้สมการที่มีหลายขั้นตอน ให้คิดว่าเรากำลัง <b>"ปอกเปลือกจากข้างนอกเข้าหาข้างใน"</b><br>
-                    • ตัวเลข <b>{a}</b> คูณติดอยู่กับ <b>{var}</b> เปรียบเหมือนก้อนเดียวกัน (อยู่ชั้นใน)<br>
-                    • ตัวเลข <b>+{b}</b> ถูกนำมาบวกเพิ่มทีหลัง (อยู่วงนอก)<br>
-                    ดังนั้น เราจึงต้อง <b>กำจัดตัวที่อยู่ไกลตัวแปร หรือ ตัวที่อยู่วงนอกก่อนเสมอ</b> แล้วค่อยกำจัดตัวที่ติดแน่นกับตัวแปรครับ!
+                    💡 <b>ทำไมต้องกำจัด +{b} ก่อน?</b> เพราะเราต้อง <b>กำจัดตัวที่อยู่ไกลตัวแปร หรือ ตัวที่อยู่วงนอกก่อนเสมอ</b><br>
+                    แล้วค่อยจัดการตัวที่คูณติดกับตัวแปรในขั้นตอนสุดท้ายครับ
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
                     {explain_box}
-                    👉 <b>ขั้นที่ 1: กำจัดวงนอก</b> นำ <b style='color:#e74c3c;'>{b}</b> มา <b>ลบออก</b> ทั้งสองข้าง<br>
-                    👉 {a}{var} + {b} <b style='color:#e74c3c;'>- {b}</b> = {c} <b style='color:#e74c3c;'>- {b}</b><br>
-                    👉 {a}{var} = {c-b}<br><br>
-                    👉 <b>ขั้นที่ 2: กำจัดวงใน</b> นำ <b style='color:#e74c3c;'>{a}</b> มา <b>หารออก</b> ทั้งสองข้าง<br>
-                    👉 {a}{var} <b style='color:#e74c3c;'>÷ {a}</b> = {c-b} <b style='color:#e74c3c;'>÷ {a}</b><br>
-                    👉 {var} = <b>{ans}</b><br>
+                    👉 <b>ขั้นที่ 1:</b> นำ {b} มา <b>ลบออก</b> ทั้งสองข้าง<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{a}{var} + {b} <b style='color:#e74c3c;'>- {b}</b> = {c} <b style='color:#e74c3c;'>- {b}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{a}{var} = {c-b}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ {a} มา <b>หารออก</b> ทั้งสองข้าง (เขียนเป็นเศษส่วน)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel(f"{a}{var}", a, True)} = {frac_cancel(c-b, a)}<br><br>
+                    👉 <b>{var} = {ans}</b><br>
                     <b>ตอบ: {ans}</b></span>"""
 
             elif actual_sub_t == "สมการและตัวไม่ทราบค่าจากชีวิตประจำวัน":

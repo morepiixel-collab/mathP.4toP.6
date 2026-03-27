@@ -1317,6 +1317,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 prob_type = random.choice([1, 2, 3]) # 1: รวม+ต่าง, 2: รวม+เท่า, 3: ต่าง+เท่า
                 var = random.choice(["x", "y", "a", "ก", "m", "n"])
                 
+                # ฟังก์ชันช่วยวาดการตัดทอน
                 def frac_cancel_left(num, variable):
                     top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:super; margin-left:2px;'>1</span></span>{variable}"
                     bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
@@ -1328,7 +1329,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
 
                 if prob_type == 1:
-                    # Level 1: ผลรวม + ผลต่าง (ถอด Emoji ออกเพื่อป้องกันฟอนต์เพี้ยน)
+                    # Level 1: ผลรวม + ผลต่าง
                     themes = [
                         ("ฟาร์มแห่งหนึ่ง", "ไก่", "เป็ด", "ตัว"),
                         ("สองพี่น้อง", "พี่", "น้อง", "บาท"),
@@ -1343,28 +1344,37 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"ที่{place} มี{item1}และ{item2}รวมกันทั้งหมด <b>{total}</b> {unit} <br>ถ้ามี{item1}มากกว่า{item2}อยู่ <b>{diff}</b> {unit} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#7f8c8d;'>(กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
                     
                     analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    🔍 <b>วิเคราะห์โจทย์ (ผลรวม + ผลต่าง):</b><br>
-                    • ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit}<br>
-                    • {item1} มีมากกว่าอยู่ {diff} แสดงว่ามี = <b style='color:#2980b9;'>{var} + {diff}</b> {unit}<br>
-                    • ทั้งสองอย่าง <b>รวมกัน</b> เท่ากับ {total} ➔ นำมาบวกกันจะได้สมการ<br>
-                    🎯 <b>สมการ:</b> (<b style='color:#e67e22;'>{var}</b>) + (<b style='color:#2980b9;'>{var} + {diff}</b>) = <b style='color:#27ae60;'>{total}</b>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    เรามีของ 2 สิ่งที่ไม่รู้จำนวนเลย จึงต้องแปลงสิ่งหนึ่งให้เป็นตัวแปรเสียก่อน<br><br>
+                    👉 <b>1. กำหนดตัวไม่ทราบค่า:</b><br>
+                    เพื่อให้ง่าย เราจะให้ของที่มี<b>น้อยกว่า</b>เป็นตัวแปรเสมอ ดังนั้นให้ {item2} = <b style='color:#e67e22;'>{var}</b> {unit}<br><br>
+                    👉 <b>2. สร้างจำนวน {item1} (ทำไมต้องใช้ บวก +):</b><br>
+                    โจทย์บอกว่า {item1} มี<b>มากกว่า</b>อยู่ {diff} คำว่า "มากกว่า" แปลว่าต้องเอาไป <b>บวกเพิ่ม</b><br>
+                    จะได้ว่า {item1} = <b style='color:#2980b9;'>{var} + {diff}</b> {unit}<br><br>
+                    👉 <b>3. สร้างสมการ (ทำไมต้องใช้ บวก + และ เท่ากับ =):</b><br>
+                    โจทย์บอกว่าทั้งสองอย่าง <b>"รวมกัน"</b> ได้ {total} คำว่ารวมกันคือต้องจับมา <b>บวกกัน (+)</b> และผลลัพธ์จะต้อง <b>เท่ากับ (=)</b> <b style='color:#27ae60;'>{total}</b><br>
+                    • ({item2}) + ({item1}) = {total}<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#e67e22;'>{var}</b> + (<b style='color:#2980b9;'>{var} + {diff}</b>) = <b style='color:#27ae60;'>{total}</b></span></b>
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     {analysis}
-                    <b>วิธีแก้สมการ:</b><br>
-                    👉 <b>ขั้นที่ 1:</b> รวมตัวแปร {var} เข้าด้วยกัน ({var} + {var} = 2{var})<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<b>2{var} + {diff} = {total}</b><br><br>
-                    👉 <b>ขั้นที่ 2:</b> กำจัด {diff} (วงนอก) โดยนำมา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้าง<br>
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: รวมตัวแปรเข้าด้วยกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: <b style='color:#e67e22;'>{var}</b> บวกกับ <b style='color:#2980b9;'>{var}</b> จะมีค่าเท่ากับ <b>2{var}</b> (เปรียบเหมือนแอปเปิ้ล 1 ผล + แอปเปิ้ล 1 ผล = แอปเปิ้ล 2 ผล)</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เมื่อรวมตัวแปรแล้ว จะได้สมการใหม่คือ: <b>2{var} + {diff} = {total}</b><br><br>
+                    👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่อยู่ไกลตัวแปร (วงนอก)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ <b style='color:#e74c3c;'>{diff}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ เพื่อให้ฝั่งซ้ายเหลือแค่กลุ่มตัวแปร<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;2{var} + {diff} <b style='color:#e74c3c;'>- {diff}</b> = {total} <b style='color:#e74c3c;'>- {diff}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;2{var} = {total - diff}<br><br>
-                    👉 <b>ขั้นที่ 3:</b> กำจัด 2 โดยนำมา <b style='color:#e74c3c;'>หารออก</b> (ใช้แม่ 2 ตัดทอน)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> 2{var} = {total - diff}<br><br>
+                    👉 <b>ขั้นที่ 3: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข 2 เขียนติดกับ {var} แปลว่า "คูณอยู่" จึงต้องนำ <b>2</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ 2 ตัดทอน)<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(2, var)} = {frac_cancel_right(total - diff, 2, smaller)}<br><br>
                     👉 <b>{var} = {smaller}</b><br>
                     <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
 
                 elif prob_type == 2:
-                    # Level 2: ผลรวม + จำนวนเท่า (ถอด Emoji ออก)
+                    # Level 2: ผลรวม + จำนวนเท่า
                     themes = [
                         ("สวนสัตว์", "ลิง", "ช้าง", "ตัว"),
                         ("ลานจอดรถ", "รถยนต์", "รถจักรยานยนต์", "คัน"),
@@ -1379,26 +1389,33 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"ใน{place} มี{item1}และ{item2}รวมกันทั้งหมด <b>{total}</b> {unit} <br>ถ้าจำนวน{item1} <b>เป็น {mult} เท่า</b> ของจำนวน{item2} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#e74c3c;'>(⭐ ระดับแข่งขัน: กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
                     
                     analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    🔍 <b>วิเคราะห์โจทย์ (ผลรวม + จำนวนเท่า):</b><br>
-                    • ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit} (คิดเป็น 1 ส่วน)<br>
-                    • {item1} เป็น {mult} เท่า แสดงว่าต้องเอาไป <b>คูณ</b> = <b style='color:#2980b9;'>{mult}{var}</b> {unit} (คิดเป็น {mult} ส่วน)<br>
-                    • นำทั้งสองสิ่งมา <b>รวมกัน</b> ต้องเท่ากับ {total}<br>
-                    🎯 <b>สมการ:</b> <b style='color:#e67e22;'>{var}</b> + <b style='color:#2980b9;'>{mult}{var}</b> = <b style='color:#27ae60;'>{total}</b>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    👉 <b>1. กำหนดตัวไม่ทราบค่า:</b><br>
+                    ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit} (คิดเป็น 1 ส่วน)<br><br>
+                    👉 <b>2. สร้างจำนวน {item1} (ทำไมต้องใช้ คูณ ×):</b><br>
+                    โจทย์บอกว่า {item1} เป็น <b>{mult} เท่า</b> ของ{item2} คำว่า "เท่าของ" คือ <b>"การคูณ"</b><br>
+                    จะได้ว่า {item1} มีจำนวน = {mult} × {var} หรือเขียนสั้นๆ ว่า <b style='color:#2980b9;'>{mult}{var}</b> {unit} (คิดเป็น {mult} ส่วน)<br><br>
+                    👉 <b>3. สร้างสมการรวม (ทำไมต้องใช้ บวก + และ เท่ากับ =):</b><br>
+                    นำทั้งสองสิ่งมา <b>"รวมกัน (+)"</b> ต้องมีค่า <b>"เท่ากับ (=)"</b> <b style='color:#27ae60;'>{total}</b><br>
+                    • ({item2}) + ({item1}) = {total}<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#e67e22;'>{var}</b> + <b style='color:#2980b9;'>{mult}{var}</b> = <b style='color:#27ae60;'>{total}</b></span></b>
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     {analysis}
-                    <b>วิธีแก้สมการ:</b><br>
-                    👉 <b>ขั้นที่ 1:</b> รวมตัวแปร {var} เข้าด้วยกัน<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เทคนิค: {var} ตัวเดียว มีค่าเท่ากับ 1{var} เมื่อนำมารวมกับ {mult}{var} จะได้ (1 + {mult}){var} = {mult+1}{var}</i><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการใหม่: <b>{mult+1}{var} = {total}</b><br><br>
-                    👉 <b>ขั้นที่ 2:</b> กำจัด {mult+1} โดยนำมา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง (ใช้แม่ {mult+1} ตัดทอน)<br>
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: รวมตัวแปรเข้าด้วยกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: <b style='color:#e67e22;'>{var}</b> ตัวเดียว มีความหมายเท่ากับ <b>1{var}</b> เมื่อนำมาบวกกับ <b style='color:#2980b9;'>{mult}{var}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ให้นำตัวเลขข้างหน้ามาบวกกัน (1 + {mult} = {mult+1}) จะรวมกันได้เป็น <b>{mult+1}{var}</b></i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เมื่อยุบรวมแล้ว จะได้สมการใหม่คือ: <b>{mult+1}{var} = {total}</b><br><br>
+                    👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข {mult+1} คูณอยู่กับ {var} จึงต้องนำ <b style='color:#e74c3c;'>{mult+1}</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ {mult+1} ตัดทอน)<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult+1, var)} = {frac_cancel_right(total, mult+1, smaller)}<br><br>
                     👉 <b>{var} = {smaller}</b><br>
                     <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
 
                 else:
-                    # Level 3: ผลต่าง + จำนวนเท่า (ถอด Emoji ออก)
+                    # Level 3: ผลต่าง + จำนวนเท่า
                     themes = [
                         ("การสะสมแสตมป์", "ก้อง", "เก่ง", "ดวง"),
                         ("การสอบ", "ปุ๊ก", "ป๊อป", "คะแนน"),
@@ -1413,20 +1430,26 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"เรื่อง{place} พบว่า {item1} มีจำนวน <b>เป็น {mult} เท่า</b> ของ{item2} <br>และ {item1} มี<b>มากกว่า</b>{item2}อยู่ <b>{diff}</b> {unit} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#e74c3c;'>(🔥 ระดับแข่งขันขั้นสูง: กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
                     
                     analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    🔍 <b>วิเคราะห์โจทย์ (ผลต่าง + จำนวนเท่า):</b><br>
-                    • ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit}<br>
-                    • {item1} เป็น {mult} เท่า แสดงว่ามี = <b style='color:#2980b9;'>{mult}{var}</b> {unit}<br>
-                    • คำว่า <b>"มากกว่าอยู่"</b> คือการหา <b>"ผลต่าง"</b> จึงต้องนำสิ่งที่มีมากกว่าตั้ง แล้ว <b>ลบ (-)</b> ด้วยสิ่งที่มีน้อยกว่า<br>
-                    🎯 <b>สมการ:</b> <b style='color:#2980b9;'>{mult}{var}</b> - <b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{diff}</b>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    👉 <b>1. กำหนดตัวไม่ทราบค่า:</b><br>
+                    ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit}<br><br>
+                    👉 <b>2. สร้างจำนวน {item1} (ใช้ คูณ ×):</b><br>
+                    โจทย์บอกว่า {item1} เป็น <b>{mult} เท่า</b> ของ{item2} คำว่า "เท่าของ" คือ <b>"การคูณ"</b><br>
+                    จะได้ว่า {item1} มีจำนวน = <b style='color:#2980b9;'>{mult}{var}</b> {unit}<br><br>
+                    👉 <b>3. สร้างสมการจากผลต่าง (ทำไมต้องใช้ ลบ -):</b><br>
+                    คำว่า <b>"มากกว่าอยู่"</b> เป็นการเปรียบเทียบเพื่อหา <b>"ผลต่าง"</b> การหาผลต่างในทางคณิตศาสตร์ ต้องนำสิ่งที่มีมากกว่าตั้ง แล้ว <b>ลบ (-)</b> ด้วยสิ่งที่มีน้อยกว่า<br>
+                    • ({item1}) - ({item2}) = ผลต่าง<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#2980b9;'>{mult}{var}</b> - <b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{diff}</b></span></b>
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     {analysis}
-                    <b>วิธีแก้สมการ:</b><br>
-                    👉 <b>ขั้นที่ 1:</b> ลบตัวแปร {var} ออกจากกัน<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เทคนิค: มีอยู่ {mult}{var} ลบออกไป 1{var} จะเหลือ ({mult} - 1){var} = {mult-1}{var}</i><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการใหม่: <b>{mult-1}{var} = {diff}</b><br><br>
-                    👉 <b>ขั้นที่ 2:</b> กำจัด {mult-1} โดยนำมา <b style='color:#e74c3c;'>หารออก</b> ทั้งสองข้าง (ใช้แม่ {mult-1} ตัดทอน)<br>
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: ลบตัวแปรออกจากกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: มีอยู่ <b style='color:#2980b9;'>{mult}{var}</b> นำไปลบออก <b style='color:#e67e22;'>1{var}</b> (เอาเลขข้างหน้ามาลบกันคือ {mult} - 1 = {mult-1}) จะเหลือ <b>{mult-1}{var}</b></i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เมื่อลบกันแล้ว จะได้สมการใหม่คือ: <b>{mult-1}{var} = {diff}</b><br><br>
+                    👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข {mult-1} คูณอยู่ จึงต้องนำ <b style='color:#e74c3c;'>{mult-1}</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ {mult-1} ตัดทอน)<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult-1, var)} = {frac_cancel_right(diff, mult-1, smaller)}<br><br>
                     👉 <b>{var} = {smaller}</b><br>
                     <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""

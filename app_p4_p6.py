@@ -724,10 +724,34 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans}°</b></span>"
 
             elif actual_sub_t == "การสร้างมุมตามขนาดที่กำหนด":
-                p1, v, p2 = random.sample(list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 3)
+                # 🚫 ระบบคัดกรองคำต้องห้ามสำหรับเด็ก
+                bad_words = ["KUY", "KVY", "FUG", "FUQ", "FUC", "FUK", "SUK", "SUC", "CUM", "DIC", "DIK", "SEX", "ASS", "TIT", "FAP", "GAY", "PEE", "POO", "WTF", "BUM", "DOG", "PIG", "FAT", "SAD", "BAD", "MAD", "DIE", "RIP", "SOB"]
+                
+                while True:
+                    p1, v, p2 = random.sample(list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 3)
+                    angle_name = f"{p1}{v}{p2}"
+                    angle_name_rev = f"{p2}{v}{p1}"
+                    # เช็คว่าคำที่สุ่มมา หรือ คำที่อ่านย้อนหลัง ตรงกับคำต้องห้ามหรือไม่
+                    if angle_name not in bad_words and angle_name_rev not in bad_words:
+                        break
+                        
+                # 🎨 สร้างสัญลักษณ์มุม (หมวกสีแดง) ไว้บนอักษรตัวกลาง
+                hat_v = f"<span style='position:relative; display:inline-block;'>{v}<span style='position:absolute; top:-12px; left:50%; transform:translateX(-50%); color:#e74c3c; font-weight:normal; font-size:22px;'>^</span></span>"
+                angle_name_display = f"{p1}{hat_v}{p2}"
+
                 target_deg = random.choice([45, 60, 75, 120, 135, 150])
-                svg = f'''<div style="text-align:center; margin:15px 0;"><svg width="560" height="200"><line x1="230" y1="180" x2="430" y2="180" stroke="#34495e" stroke-width="2.5"/><circle cx="230" cy="180" r="4" fill="#2c3e50"/><text x="225" y="210" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{v}</text><text x="445" y="185" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{p2}</text></svg></div>'''
-                q = f"จงใช้ไม้โปรแทรกเตอร์สร้างมุม <b>{p1}{v}{p2}</b> ให้มีขนาด <b>{target_deg} องศา</b> พร้อมระบุชนิดของมุม<br>{svg}"
+                
+                # 📐 ปรับตำแหน่ง y ให้สูงขึ้น กันตัวหนังสือตกขอบ (ขยับจาก y=180 เป็น y=140)
+                svg = f'''<div style="text-align:center; margin:15px 0;">
+                    <svg width="560" height="200">
+                        <line x1="230" y1="140" x2="430" y2="140" stroke="#34495e" stroke-width="2.5"/>
+                        <circle cx="230" cy="140" r="4" fill="#2c3e50"/>
+                        <text x="225" y="170" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{v}</text>
+                        <text x="445" y="145" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{p2}</text>
+                    </svg>
+                </div>'''
+                
+                q = f"จงใช้ไม้โปรแทรกเตอร์สร้างมุม <b>{angle_name_display}</b> ให้มีขนาด <b>{target_deg} องศา</b> พร้อมระบุชนิดของมุม<br>{svg}"
                 a_type = "มุมแหลม" if target_deg < 90 else "มุมฉาก" if target_deg == 90 else "มุมป้าน"
                 sol = f"<span style='color:#2c3e50;'><b>เฉลย:</b> สร้างมุมกาง {target_deg}° (จัดเป็น <b>{a_type}</b>)</span>"
 

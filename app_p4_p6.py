@@ -937,12 +937,20 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     ans = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
                     c = ans + a
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{var} + {a:,} = {c:,}</b>"
-                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> ย้าย +{a:,} ไปลบอีกฝั่ง ➔ {var} = {c:,} - {a:,} = <b>{ans:,}</b></span>"
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
+                    👉 นำ <b style='color:#e74c3c;'>{a:,}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ<br>
+                    👉 {var} + {a:,} <b style='color:#e74c3c;'>- {a:,}</b> = {c:,} <b style='color:#e74c3c;'>- {a:,}</b><br>
+                    👉 {var} = <b>{ans:,}</b><br>
+                    <b>ตอบ: {ans:,}</b></span>"""
                 else:
                     c = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
                     ans = c + a
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{var} - {a:,} = {c:,}</b>"
-                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> ย้าย -{a:,} ไปบวกอีกฝั่ง ➔ {var} = {c:,} + {a:,} = <b>{ans:,}</b></span>"
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
+                    👉 นำ <b style='color:#27ae60;'>{a:,}</b> มา <b>บวกเข้า</b> ทั้งสองข้างของสมการ<br>
+                    👉 {var} - {a:,} <b style='color:#27ae60;'>+ {a:,}</b> = {c:,} <b style='color:#27ae60;'>+ {a:,}</b><br>
+                    👉 {var} = <b>{ans:,}</b><br>
+                    <b>ตอบ: {ans:,}</b></span>"""
 
             elif actual_sub_t == "การแก้สมการ (คูณ/หาร)":
                 var = random.choice(["x", "y", "a", "m"])
@@ -951,17 +959,32 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     a, ans = random.randint(4, 15), random.randint(3, 12)
                     b = a * ans
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} = {b}</b>"
-                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> ย้าย {a} ไปหารอีกฝั่ง ➔ {var} = {b} ÷ {a} = <b>{ans}</b></span>"
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
+                    👉 นำ <b style='color:#e74c3c;'>{a}</b> มา <b>หารออก</b> ทั้งสองข้างของสมการ<br>
+                    👉 {a}{var} <b style='color:#e74c3c;'>÷ {a}</b> = {b} <b style='color:#e74c3c;'>÷ {a}</b><br>
+                    👉 {var} = <b>{ans}</b><br>
+                    <b>ตอบ: {ans}</b></span>"""
                 elif scenario == "div":
                     a, ans = random.randint(3, 9), random.randint(5, 20)
                     c = a * ans
-                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{var}/{a} = {ans}</b>"
-                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> ย้าย {a} ไปคูณอีกฝั่ง ➔ {var} = {ans} × {a} = <b>{c}</b></span>"
+                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{var} ÷ {a} = {ans}</b>"
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน):</b><br>
+                    👉 นำ <b style='color:#27ae60;'>{a}</b> มา <b>คูณเข้า</b> ทั้งสองข้างของสมการ<br>
+                    👉 ({var} ÷ {a}) <b style='color:#27ae60;'>× {a}</b> = {ans} <b style='color:#27ae60;'>× {a}</b><br>
+                    👉 {var} = <b>{c}</b><br>
+                    <b>ตอบ: {c}</b></span>"""
                 elif scenario == "mult_add":
                     a, ans, b = random.randint(2, 6), random.randint(3, 10), random.randint(1, 15)
                     c = (a * ans) + b
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} + {b} = {c}</b>"
-                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> ย้าย +{b} ไปลบ จะได้ {a}{var} = {c-b} ➔ ย้าย {a} ไปหาร จะได้ {var} = {c-b} ÷ {a} = <b>{ans}</b></span>"
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (ใช้สมบัติการเท่ากัน 2 ขั้นตอน):</b><br>
+                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{b}</b> มา <b>ลบออก</b> ทั้งสองข้าง<br>
+                    👉 {a}{var} + {b} <b style='color:#e74c3c;'>- {b}</b> = {c} <b style='color:#e74c3c;'>- {b}</b><br>
+                    👉 {a}{var} = {c-b}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{a}</b> มา <b>หารออก</b> ทั้งสองข้าง<br>
+                    👉 {a}{var} <b style='color:#e74c3c;'>÷ {a}</b> = {c-b} <b style='color:#e74c3c;'>÷ {a}</b><br>
+                    👉 {var} = <b>{ans}</b><br>
+                    <b>ตอบ: {ans}</b></span>"""
 
             elif actual_sub_t == "สมการและตัวไม่ทราบค่าจากชีวิตประจำวัน":
                 person = random.choice(NAMES)

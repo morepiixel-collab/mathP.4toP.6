@@ -864,21 +864,34 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {area:,} ตารางเซนติเมตร</b></span>"""
 
             elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":
-                den = random.randint(3, 12) if not is_challenge else random.randint(13, 25)
-                whole, num_rem = random.randint(2, 9), random.randint(1, den - 1)
-                num_total = (whole * den) + num_rem
-                frac_str = f_html(num_total, den)
-                mixed_str = f"<span style='font-size: 24px; vertical-align: middle;'>{whole}</span> {f_html(num_rem, den)}"
-                q = f"จงแปลงเศษเกินต่อไปนี้ให้เป็นจำนวนคละ<br><br><div style='text-align:center; font-size:26px;'>{frac_str} = <span style='color:#2980b9;'>?</span></div>"
+                # สุ่มเลขเศษเกิน
+                den = random.randint(3, 12)
+                whole = random.randint(1, 9)
+                rem = random.randint(1, den - 1)
+                num = (whole * den) + rem
                 
-                sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
-                👉 <b>หลักการ:</b> ให้นำ "ตัวเศษ" (ด้านบน) เป็นตัวตั้ง แล้วหารด้วย "ตัวส่วน" (ด้านล่าง)<br>
-                👉 <b>คำนวณ:</b> {num_total} ÷ {den} = ได้ <b>{whole}</b> เศษ <b>{num_rem}</b><br><br>
-                👉 <b>นำตัวเลขมาประกอบร่างเป็นจำนวนคละ:</b><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;• <b>ผลหารที่ได้</b> (<b>{whole}</b>) ➔ นำไปเขียนเป็น <b>"จำนวนเต็ม"</b> ไว้ด้านหน้า<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;• <b>เศษที่เหลือ</b> (<b>{num_rem}</b>) ➔ นำไปเขียนเป็น <b>"ตัวเศษ"</b> ไว้ด้านบน<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;• <b>ตัวส่วน</b> (<b>{den}</b>) ➔ ใช้ตัวเลขเดิมไม่เปลี่ยนแปลง<br>
-                <b>ตอบ: {mixed_str}</b></span>"""
+                def draw_frac(n, d):
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold;'><span style='border-bottom:2px solid #333; padding:0 3px;'>{n}</span><span>{d}</span></span>"
+
+                q = f"จงแปลงเศษเกินต่อไปนี้ให้เป็นจำนวนคละ: <b>{draw_frac(num, den)}</b>"
+                
+                sol = f"""<span style='color:#2c3e50;'>
+                <div style='background-color:#fcf3cf; border-left:4px solid #f1c40f; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                💡 <b>หลักการคิด:</b><br>
+                นำตัวเศษ (เลขบน) ตั้ง แล้วหารด้วยตัวส่วน (เลขล่าง)<br>
+                • <b>ผลหาร</b> จะกลายเป็น <b>"เลขจำนวนเต็มด้านหน้า"</b><br>
+                • <b>เศษที่เหลือ</b> จะกลายเป็น <b>"ตัวเศษด้านบน"</b><br>
+                • <b>ตัวส่วน</b> จะยังคง <b>"เป็นเลขเดิมเสมอ"</b>
+                </div>
+                <b>วิธีทำอย่างละเอียด:</b><br>
+                👉 <b>ขั้นที่ 1: ตั้งหาร</b><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;{num} ÷ {den} = ?<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ท่องแม่ {den}: {den} × <b style='color:#e67e22;'>{whole}</b> = {whole*den} (เหลือเศษ <b style='color:#e74c3c;'>{rem}</b>)</i><br><br>
+                👉 <b>ขั้นที่ 2: นำมาเขียนในรูปจำนวนคละ</b><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;• เลขจำนวนเต็มคือ <b style='color:#e67e22;'>{whole}</b><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;• ตัวเศษใหม่คือ <b style='color:#e74c3c;'>{rem}</b><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;• ตัวส่วนคงเดิมคือ <b>{den}</b><br><br>
+                <b>ตอบ: <span style='font-size:20px;'><b style='color:#e67e22;'>{whole}</b>{draw_frac(f"<b style='color:#e74c3c;'>{rem}</b>", den)}</span></b></span>"""
 
             elif actual_sub_t == "การอ่านและการเขียนทศนิยม":
                 dp = random.randint(1, 3)

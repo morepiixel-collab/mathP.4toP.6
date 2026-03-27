@@ -1315,7 +1315,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
             elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":
                 prob_type = random.choice([1, 2, 3]) # 1: รวม+ต่าง, 2: รวม+เท่า, 3: ต่าง+เท่า
-                var = random.choice(["x", "y", "a", "ก"])
+                var = random.choice(["x", "y", "a", "ก", "m", "n"])
                 
                 def frac_cancel_left(num, variable):
                     top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:super; margin-left:2px;'>1</span></span>{variable}"
@@ -1328,11 +1328,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
 
                 if prob_type == 1:
-                    # Level 1: ผลรวม + ผลต่าง
+                    # Level 1: ผลรวม + ผลต่าง (ถอด Emoji ออกเพื่อป้องกันฟอนต์เพี้ยน)
                     themes = [
-                        ("ฟาร์มแห่งหนึ่ง", "ไก่ 🐔", "เป็ด 🦆", "ตัว"),
-                        ("สองพี่น้อง", "พี่ 👦", "น้อง 👧", "บาท"),
-                        ("ร้านเบเกอรี่", "โดนัท 🍩", "เค้ก 🍰", "ชิ้น")
+                        ("ฟาร์มแห่งหนึ่ง", "ไก่", "เป็ด", "ตัว"),
+                        ("สองพี่น้อง", "พี่", "น้อง", "บาท"),
+                        ("ร้านเบเกอรี่", "โดนัท", "เค้ก", "ชิ้น")
                     ]
                     place, item1, item2, unit = random.choice(themes)
                     smaller = random.randint(30, 150)
@@ -1364,14 +1364,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
 
                 elif prob_type == 2:
-                    # Level 2: ผลรวม + จำนวนเท่า (ข้อสอบแข่งขัน)
+                    # Level 2: ผลรวม + จำนวนเท่า (ถอด Emoji ออก)
                     themes = [
-                        ("สวนสัตว์", "ลิง 🐒", "ช้าง 🐘", "ตัว"),
-                        ("ลานจอดรถ", "รถยนต์ 🚗", "จักรยานยนต์ 🏍️", "คัน"),
-                        ("กระปุกออมสิน", "เหรียญสิบ 🪙", "เหรียญห้า", "เหรียญ")
+                        ("สวนสัตว์", "ลิง", "ช้าง", "ตัว"),
+                        ("ลานจอดรถ", "รถยนต์", "รถจักรยานยนต์", "คัน"),
+                        ("กระปุกออมสิน", "เหรียญสิบ", "เหรียญห้า", "เหรียญ")
                     ]
                     place, item1, item2, unit = random.choice(themes)
-                    mult = random.randint(3, 6) # จำนวนเท่า
+                    mult = random.randint(3, 6) 
                     smaller = random.randint(15, 50)
                     larger = smaller * mult
                     total = smaller + larger
@@ -1398,14 +1398,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
 
                 else:
-                    # Level 3: ผลต่าง + จำนวนเท่า (ข้อสอบแข่งขันขั้นสูง)
+                    # Level 3: ผลต่าง + จำนวนเท่า (ถอด Emoji ออก)
                     themes = [
-                        ("สะสมแสตมป์", "ก้อง 👦", "เก่ง 👨", "ดวง"),
-                        ("คะแนนสอบ", "ปุ๊ก 👧", "ป๊อป 👱‍♀️", "คะแนน"),
-                        ("โรงงานผลิต", "เสื้อยืด 👕", "กางเกง 👖", "ตัว")
+                        ("การสะสมแสตมป์", "ก้อง", "เก่ง", "ดวง"),
+                        ("การสอบ", "ปุ๊ก", "ป๊อป", "คะแนน"),
+                        ("โรงงานผลิต", "เสื้อยืด", "กางเกง", "ตัว")
                     ]
                     place, item1, item2, unit = random.choice(themes)
-                    mult = random.randint(3, 5) # จำนวนเท่า
+                    mult = random.randint(3, 5) 
                     smaller = random.randint(25, 80)
                     larger = smaller * mult
                     diff = larger - smaller

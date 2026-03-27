@@ -931,22 +931,47 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
             elif actual_sub_t == "การแก้สมการ (บวก/ลบ)":
                 var = random.choice(["A", "B", "x", "y", "ก", "ข"])
-                a = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
-                op = random.choice(["+", "-"])
-                if op == "+":
+                # สุ่มรูปแบบโจทย์: ตัวแปรบวก, ตัวแปรลบ, และ ตัวตั้งลบด้วยตัวแปร (ใหม่)
+                scenario = random.choice(["var_plus", "var_minus", "minus_var"])
+                
+                if scenario == "var_plus":
+                    a = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
                     ans = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
                     c = ans + a
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{var} + {a:,} = {c:,}</b>"
                     explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
                     💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>+{a:,}</b> ทิ้งไป<br>โดยใช้วิธีตรงข้าม คือนำ <b>{a:,}</b> มา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้างของสมการ</div>"""
                     sol = f"<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>{explain_box}👉 {var} + {a:,} <b style='color:#e74c3c;'>- {a:,}</b> = {c:,} <b style='color:#e74c3c;'>- {a:,}</b><br>👉 {var} = <b>{ans:,}</b><br><b>ตอบ: {ans:,}</b></span>"
-                else:
+                
+                elif scenario == "var_minus":
+                    a = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
                     c = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
                     ans = c + a
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{var} - {a:,} = {c:,}</b>"
                     explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
                     💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>-{a:,}</b> ทิ้งไป<br>โดยใช้วิธีตรงข้าม คือนำ <b>{a:,}</b> มา <b style='color:#27ae60;'>บวกเข้า</b> ทั้งสองข้างของสมการ</div>"""
                     sol = f"<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>{explain_box}👉 {var} - {a:,} <b style='color:#27ae60;'>+ {a:,}</b> = {c:,} <b style='color:#27ae60;'>+ {a:,}</b><br>👉 {var} = <b>{ans:,}</b><br><b>ตอบ: {ans:,}</b></span>"
+                
+                else: # minus_var (ตัวแปรติดลบ)
+                    ans = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
+                    c = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
+                    a = ans + c
+                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{a:,} - {var} = {c:,}</b>"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด (ตัวแปรติดลบ):</b> หน้าตัวแปรมีเครื่องหมายลบ (<b>-{var}</b>) เราต้องทำให้ตัวแปรเป็น <b>บวก</b> ก่อน<br>
+                    โดยนำ <b>{var}</b> มา <b style='color:#27ae60;'>บวกเข้า</b> ทั้งสองข้าง แล้วค่อยกำจัดตัวเลขในขั้นตอนถัดไปครับ
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
+                    {explain_box}
+                    👉 <b>ขั้นที่ 1 (ทำให้ตัวแปรเป็นบวก):</b> นำ <b>{var}</b> มา <b style='color:#27ae60;'>บวกเข้า</b> ทั้งสองข้าง<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{a:,} - {var} <b style='color:#27ae60;'>+ {var}</b> = {c:,} <b style='color:#27ae60;'>+ {var}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> &nbsp; {a:,} = {c:,} + {var}<br><br>
+                    👉 <b>ขั้นที่ 2 (กำจัดตัวเลข):</b> นำ <b>{c:,}</b> มา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้าง<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{a:,} <b style='color:#e74c3c;'>- {c:,}</b> = {c:,} + {var} <b style='color:#e74c3c;'>- {c:,}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> &nbsp; {ans:,} = {var}<br>
+                    <b>ตอบ: {ans:,}</b></span>"""
 
             elif actual_sub_t == "การแก้สมการ (คูณ/หาร)":
                 var = random.choice(["x", "y", "a", "m"])

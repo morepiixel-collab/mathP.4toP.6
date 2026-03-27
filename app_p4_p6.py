@@ -1125,7 +1125,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: เก่งมีเงิน {s_v} บาท</b></span>"""
                     
             elif actual_sub_t == "สมการเชิงตรรกะและตาชั่งปริศนา":
-                # ชุดรูปภาพ 5 หมวด เพื่อความหลากหลายไม่ซ้ำซาก
+                # ชุดรูปภาพ 5 หมวด เพื่อความหลากหลาย
                 icon_sets = [
                     ("🍎", "🍌", "🍇", "ผลไม้"),
                     ("🐶", "🐱", "🐰", "สัตว์เลี้ยง"),
@@ -1135,7 +1135,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 ]
                 i1, i2, i3, theme = random.choice(icon_sets)
                 
-                # สุ่มประเภทของโจทย์: 1=พื้นฐาน, 2=แข่งขัน(มีคูณ), 3=ตาชั่งปริศนา (3 ตาชั่ง)
+                # สุ่มประเภทของโจทย์
                 puzzle_type = random.choice([1, 2, 3])
                 
                 if puzzle_type == 1:
@@ -1231,7 +1231,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     w_a = w_b * mult_ab            # น้ำหนัก i1
                     
                     total_w = w_a + w_b + w_c      # น้ำหนักรวมบนตาชั่งที่ 3
-                    total_c_parts = (mult_ab * mult_bc) + mult_bc + 1 # จำนวนชิ้น i3 ทั้งหมดถ้ารวมกัน
+                    
+                    # ตัวแปรสำคัญที่ใช้เชื่อมโยงการสอน
+                    i1_in_i3 = mult_ab * mult_bc   # 1 ชิ้นใหญ่ เท่ากับกี่ชิ้นเล็กสุด (เช่น 1 แฮมเบอร์เกอร์ = 8 น้ำ)
+                    total_c_parts = i1_in_i3 + mult_bc + 1 # รวมจำนวนชิ้นเล็กสุดทั้งหมดในตาชั่งที่ 3
                     
                     # รูปแบบตาชั่ง
                     s1_l = i1
@@ -1263,6 +1266,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     """
                     q = f"จากภาพตาชั่งปริศนาทั้ง 3 เครื่องที่อยู่ในสภาวะสมดุล<br>จงหาว่า <b>{i1}, {i2} และ {i3} มีน้ำหนักชิ้นละกี่กรัม ?</b><br>{q_html}"
                     
+                    explain_box_step4 = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขในขั้นที่ 4 มาจากไหน?</b><br>
+                    • หา {i2}: จากขั้นที่ 1 เรารู้ว่า <b>1 {i2} = {mult_bc} {i3}</b> จึงนำน้ำหนักของ {i3} มาคูณด้วย {mult_bc}<br>
+                    • หา {i1}: จากขั้นที่ 2 เรารู้ว่า <b>1 {i1} = {i1_in_i3} {i3}</b> จึงนำน้ำหนักของ {i3} มาคูณด้วย {i1_in_i3} (วิธีนี้จะสอดคล้องกับสิ่งที่น้องๆ สรุปไว้ในขั้นที่ 2 ครับ)
+                    </div>"""
+                    
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
                     🔍 <b>วิเคราะห์ปริศนาตาชั่ง (การแทนค่า):</b><br>
@@ -1276,22 +1285,23 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     
                     👉 <b>ขั้นที่ 2: เปลี่ยน {i1} เป็น {i3} (จากตาชั่ง 1)</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่ง 1 บอกว่า <b>1 {i1} = {mult_ab} {i2}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;เราแทนค่า {i2} ด้วย {i3} จะได้: {mult_ab} × {mult_bc} = <b style='color:#e67e22;'>{mult_ab * mult_bc} {i3}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;สรุปคือ <b>1 {i1} = <span style='color:#e67e22;'>{mult_ab * mult_bc} {i3}</span></b><br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เราแทนค่า {i2} ด้วย {i3} จะได้: {mult_ab} × {mult_bc} = <b style='color:#e67e22;'>{i1_in_i3} {i3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุปคือ <b>1 {i1} = <span style='color:#e67e22;'>{i1_in_i3} {i3}</span></b><br><br>
                     
                     👉 <b>ขั้นที่ 3: รวมน้ำหนักในตาชั่งที่ 3</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่ง 3 มี: {i1} + {i2} + {i3} = {total_w} กรัม<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;เปลี่ยนทุกอย่างให้เป็น {i3}:<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• {i1} เปลี่ยนเป็น {mult_ab * mult_bc} {i3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {i1} เปลี่ยนเป็น {i1_in_i3} {i3}<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• {i2} เปลี่ยนเป็น {mult_bc} {i3}<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• {i3} มีอยู่แล้ว 1 {i3}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นับรวมทั้งหมดจะมี {i3} อยู่: {mult_ab * mult_bc} + {mult_bc} + 1 = <b style='color:#e74c3c;'>{total_c_parts} ชิ้น</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นับรวมทั้งหมดจะมี {i3} อยู่: {i1_in_i3} + {mult_bc} + 1 = <b style='color:#e74c3c;'>{total_c_parts} ชิ้น</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการ: <b style='color:#e74c3c;'>{total_c_parts}</b> × {i3} = {total_w} กรัม<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i3}</b> = {total_w} ÷ {total_c_parts} = <b style='color:#27ae60;'>{w_c} กรัม</b><br><br>
                     
                     👉 <b>ขั้นที่ 4: หาค่าที่เหลือ</b><br>
+                    {explain_box_step4}
                     &nbsp;&nbsp;&nbsp;&nbsp;• <b>{i2}</b> น้ำหนัก: {w_c} × {mult_bc} = <b style='color:#27ae60;'>{w_b} กรัม</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>{i1}</b> น้ำหนัก: {w_b} × {mult_ab} = <b style='color:#27ae60;'>{w_a} กรัม</b><br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>{i1}</b> น้ำหนัก: {w_c} × {i1_in_i3} = <b style='color:#27ae60;'>{w_a} กรัม</b><br><br>
                     <b>ตอบ: {i1} = {w_a} ก., {i2} = {w_b} ก., {i3} = {w_c} ก.</b></span>"""
 
             elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":

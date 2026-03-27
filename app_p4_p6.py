@@ -1125,7 +1125,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: เก่งมีเงิน {s_v} บาท</b></span>"""
                     
             elif actual_sub_t == "สมการเชิงตรรกะและตาชั่งปริศนา":
-                # ชุดรูปภาพ 5 หมวด เพื่อความหลากหลาย
                 icon_sets = [
                     ("🍎", "🍌", "🍇", "ผลไม้"),
                     ("🐶", "🐱", "🐰", "สัตว์เลี้ยง"),
@@ -1134,15 +1133,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     ("🚀", "🛸", "🌍", "อวกาศ")
                 ]
                 i1, i2, i3, theme = random.choice(icon_sets)
-                
-                # สุ่มประเภทของโจทย์
                 puzzle_type = random.choice([1, 2, 3])
                 
                 if puzzle_type == 1:
                     val1 = random.randint(5, 20)
                     val2 = random.randint(3, 15)
                     val3 = random.randint(2, 12)
-                    
                     eq1_res = val1 + val1
                     eq2_res = val1 + val2
                     eq3_res = val2 + val3
@@ -1188,7 +1184,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     val1 = random.randint(3, 10)
                     val2 = random.randint(2, 8)
                     val3 = random.randint(2, 6)
-                    
                     eq1_res = val1 * 3
                     eq2_res = val1 + (val2 * 2)
                     eq3_res = val2 + (val3 * 2)
@@ -1206,43 +1201,57 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     """
                     q = f"จงหาค่าของปริศนา <b>หมวด{theme}</b> ต่อไปนี้ <br><span style='color:#e74c3c; font-size:14px;'>(⭐ แนวข้อสอบแข่งขัน: สังเกตเครื่องหมายในบรรทัดสุดท้ายให้ดี!)</span><br>{q_html}"
                     
+                    explain_box_step = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขในแต่ละบรรทัดมาได้อย่างไร?</b><br>
+                    • <b>บรรทัดที่ 1:</b> นำผลรวมไป <b>หาร 3</b> จะได้ค่าของ 1 รูป<br>
+                    • <b>บรรทัดที่ 2 และ 3:</b> ให้นำค่าที่รู้แล้วไป <b>แทนค่า</b> ในรูปภาพ จากนั้นนำไป <b>ลบออก</b> จากผลรวมฝั่งขวา จะเหลือค่าของรูปอีก 2 รูปที่ยังไม่ทราบ นำไป <b>หาร 2</b> ก็จะได้ค่าของรูปนั้นครับ
+                    </div>"""
+                    
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
                     🔍 <b>วิเคราะห์ปริศนา (แนวข้อสอบแข่งขัน):</b><br>
                     ระวัง <b>"ลำดับการคำนวณ (Order of Operations)"</b> ในบรรทัดสุดท้าย (ต้องทำ <b>คูณ</b> ก่อน <b>บวก</b> เสมอ!)
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>บรรทัดที่ 1:</b> {i1} + {i1} + {i1} = {eq1_res}  ➔  <b>{i1} = {val1}</b><br>
-                    👉 <b>บรรทัดที่ 2:</b> {val1} + {i2} + {i2} = {eq2_res}  ➔  2 × {i2} = {eq2_res - val1}  ➔  <b>{i2} = {val2}</b><br>
-                    👉 <b>บรรทัดที่ 3:</b> {val2} + {i3} + {i3} = {eq3_res}  ➔  2 × {i3} = {eq3_res - val2}  ➔  <b>{i3} = {val3}</b><br><br>
+                    {explain_box_step}
+                    👉 <b>บรรทัดที่ 1:</b> {i1} + {i1} + {i1} = {eq1_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ของเหมือนกัน 3 ชิ้นรวมได้ {eq1_res} ➔ 1 ชิ้นคือ {eq1_res} ÷ 3 = <b>{val1}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุป: <b style='color:#2980b9;'>{i1} = {val1}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 2:</b> {i1} + {i2} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่า {i1} เป็น {val1} จะได้: {val1} + {i2} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {val1} ไปลบออก ➔ {i2} + {i2} = {eq2_res} - {val1} = <b>{eq2_res - val1}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{i2} สองชิ้นรวมได้ {eq2_res - val1} ➔ 1 ชิ้นคือ {eq2_res - val1} ÷ 2 = <b>{val2}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุป: <b style='color:#8e44ad;'>{i2} = {val2}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 3:</b> {i2} + {i3} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่า {i2} เป็น {val2} จะได้: {val2} + {i3} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {val2} ไปลบออก ➔ {i3} + {i3} = {eq3_res} - {val2} = <b>{eq3_res - val2}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{i3} สองชิ้นรวมได้ {eq3_res - val2} ➔ 1 ชิ้นคือ {eq3_res - val2} ÷ 2 = <b>{val3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุป: <b style='color:#27ae60;'>{i3} = {val3}</b><br><br>
+                    
                     👉 <b>คำถาม:</b> {i1} + {i2} <b style='color:#e74c3c;'>×</b> {i3} = ?<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;แทนค่ารูปภาพ: {val1} + {val2} <b style='color:#e74c3c;'>×</b> {val3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>(🚨 กฎคณิตศาสตร์: ต้องคำนวณคู่ที่คูณกันก่อนเสมอ!)</i><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>({val2} × {val3})</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>{val2*val3}</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;= <b>{ans}</b><br>
                     <b>ตอบ: {ans}</b></span>"""
 
                 else:
-                    # Type 3: ตาชั่งปริศนา 3 ตาชั่ง (Level up)
-                    w_c = random.randint(3, 8)     # น้ำหนักของชิ้นเล็กสุด (i3)
-                    mult_bc = random.randint(2, 4) # อัตราส่วน i2 = ? i3
-                    w_b = w_c * mult_bc            # น้ำหนัก i2
-                    mult_ab = random.randint(2, 3) # อัตราส่วน i1 = ? i2
-                    w_a = w_b * mult_ab            # น้ำหนัก i1
-                    
-                    total_w = w_a + w_b + w_c      # น้ำหนักรวมบนตาชั่งที่ 3
-                    
-                    # ตัวแปรสำคัญที่ใช้เชื่อมโยงการสอน
-                    i1_in_i3 = mult_ab * mult_bc   # 1 ชิ้นใหญ่ เท่ากับกี่ชิ้นเล็กสุด (เช่น 1 แฮมเบอร์เกอร์ = 8 น้ำ)
-                    total_c_parts = i1_in_i3 + mult_bc + 1 # รวมจำนวนชิ้นเล็กสุดทั้งหมดในตาชั่งที่ 3
-                    
-                    # รูปแบบตาชั่ง
+                    # Type 3: ตาชั่งปริศนา 3 ตาชั่ง (โค้ดเดิมที่ถูกต้องแล้ว ยกมาใส่ได้เลย)
+                    w_c = random.randint(3, 8)     
+                    mult_bc = random.randint(2, 4) 
+                    w_b = w_c * mult_bc            
+                    mult_ab = random.randint(2, 3) 
+                    w_a = w_b * mult_ab            
+                    total_w = w_a + w_b + w_c      
+                    i1_in_i3 = mult_ab * mult_bc   
+                    total_c_parts = i1_in_i3 + mult_bc + 1 
                     s1_l = i1
                     s1_r = " ".join([i2] * mult_ab)
-                    
                     s2_l = i2
                     s2_r = " ".join([i3] * mult_bc)
-                    
                     s3_l = f"{i1} {i2} {i3}"
                     s3_r = f"<span style='font-size:24px; font-weight:bold; color:#d35400;'>{total_w} กรัม</span>"
                     
@@ -1269,7 +1278,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     explain_box_step4 = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
                     💡 <b>ตัวเลขในขั้นที่ 4 มาจากไหน?</b><br>
                     • หา {i2}: จากขั้นที่ 1 เรารู้ว่า <b>1 {i2} = {mult_bc} {i3}</b> จึงนำน้ำหนักของ {i3} มาคูณด้วย {mult_bc}<br>
-                    • หา {i1}: จากขั้นที่ 2 เรารู้ว่า <b>1 {i1} = {i1_in_i3} {i3}</b> จึงนำน้ำหนักของ {i3} มาคูณด้วย {i1_in_i3} (วิธีนี้จะสอดคล้องกับสิ่งที่น้องๆ สรุปไว้ในขั้นที่ 2 ครับ)
+                    • หา {i1}: จากขั้นที่ 2 เรารู้ว่า <b>1 {i1} = {i1_in_i3} {i3}</b> จึงนำน้ำหนักของ {i3} มาคูณด้วย {i1_in_i3}
                     </div>"""
                     
                     sol = f"""<span style='color:#2c3e50;'>

@@ -2207,9 +2207,9 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
-                        <div style="text-align:center;">{draw_svg_decimal_grid_div(v1, parts)}<br><b style="color:#1abc9c;">พื้นที่ทั้งหมด ({v1:.2f})</b></div>
+                        <div style="text-align:center;">{draw_svg_decimal_grid_div(v1, parts)}<br><b style="color:#1abc9c; font-size:18px;">พื้นที่ทั้งหมด</b></div>
                         <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">÷</div>
-                        <div style="text-align:center;"><div style="font-size: 60px; font-weight: bold; color: #e67e22; padding: 0 20px;">{parts}</div><b style="color:#e67e22;">กลุ่มเท่าๆ กัน</b></div>
+                        <div style="text-align:center;"><div style="font-size: 60px; font-weight: bold; color: #e67e22; padding: 0 20px;">{parts}</div><b style="color:#e67e22; font-size:18px;">กลุ่มเท่าๆ กัน</b></div>
                         <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
                     </div>
                     """
@@ -2218,36 +2218,38 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
                     🔍 <b>วิเคราะห์จากภาพ:</b><br>
-                    • พื้นที่ระบายสีทั้งหมดมี {squares} ช่อง เขียนเป็นทศนิยมได้ <b>{v1:.2f}</b><br>
+                    • นับพื้นที่ระบายสีทั้งหมดได้ {squares} ช่อง เขียนเป็นทศนิยมได้ <b>{v1:.2f}</b><br>
                     • การ <b>"แบ่งเป็นกลุ่มเท่าๆ กัน"</b> คือการนำไป <b>หาร (÷)</b> ด้วย {parts}<br>
                     • ประโยคสัญลักษณ์: {v1:.2f} ÷ {parts} = ?
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ขั้นที่ 1: นำจุดออกแล้วตั้งหารปกติ</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เทคนิค: มอง {v1:.2f} เป็นจำนวนเต็มคือ {squares} แล้วนำมาหารด้วย {parts}</i><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• {squares} ÷ {parts} = <b>{ans_raw}</b> (หมายความว่ากลุ่มละ {ans_raw} ช่อง)<br><br>
-                    👉 <b>ขั้นที่ 2: ใส่จุดทศนิยมกลับคืนให้เท่ากับตัวตั้ง</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้ง ({v1:.2f}) มีทศนิยม <b>2 ตำแหน่ง</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• นำคำตอบ {ans_raw} มาใส่จุดทศนิยม 2 ตำแหน่ง จะได้ <b>{ans:.2f}</b><br><br>
+                    👉 <b>ขั้นที่ 1: แปลงตัวตั้งให้เป็นจำนวนเต็ม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เพื่อให้คิดง่ายขึ้น เราจะทำตัวตั้ง ({v1:.2f}) ให้เป็นจำนวนเต็มก่อน</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• เนื่องจาก {v1:.2f} มีทศนิยม 2 ตำแหน่ง จึงต้อง <b>คูณด้วย 100</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• จะได้: {v1:.2f} × 100 = <b>{squares}</b><br><br>
+                    👉 <b>ขั้นที่ 2: ตั้งหารปกติ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ {squares} ÷ {parts} = <b>{ans_raw}</b> (หมายความว่ากลุ่มละ {ans_raw} ช่อง)<br><br>
+                    👉 <b>ขั้นที่ 3: ปรับค่ากลับเป็นทศนิยม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เนื่องจากขั้นที่ 1 เรานำ 100 ไปคูณ ผลลัพธ์จึงต้อง <b>นำมาหารออกด้วย 100</b> เพื่อให้ค่ากลับมาถูกต้อง (การหารด้วย 100 คือการใส่จุดทศนิยม 2 ตำแหน่ง)</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {ans_raw} ÷ 100 = <b>{ans:.2f}</b><br><br>
                     <b>ตอบ: {ans:.2f}</b></span>"""
 
                 elif prob_style == 2:
-                    # แบบที่ 2: กล่องสมมาตร (ทศนิยม ÷ ทศนิยม) -> โจทย์แข่งขัน!
+                    # แบบที่ 2: กล่องสมมาตร (ทศนิยมหารทศนิยม) -> อธิบายการคูณเพื่อให้ตัวหารเป็นจำนวนเต็ม
                     ans_raw = random.randint(4, 15)
                     v2_raw = random.choice([2, 3, 4, 5, 6, 8])
                     v1_raw = ans_raw * v2_raw
                     
-                    # สุ่มว่าจะเป็น 1 ตำแหน่ง หรือ 2 ตำแหน่ง
                     if random.choice([True, False]):
-                        v1 = v1_raw / 10 # เช่น 4.8
-                        v2 = v2_raw / 10 # เช่น 0.6
-                        ans = v1 / v2    # ตอบ 8
-                        move_step = 1
+                        v1 = v1_raw / 10 # 1 ตำแหน่ง
+                        v2 = v2_raw / 10 # 1 ตำแหน่ง
+                        ans = v1 / v2    
+                        move_step = 10
                     else:
-                        v1 = v1_raw / 100 # เช่น 1.44
-                        v2 = v2_raw / 100 # เช่น 0.12
-                        ans = v1 / v2     # ตอบ 12
-                        move_step = 2
+                        v1 = v1_raw / 100 # 2 ตำแหน่ง
+                        v2 = v2_raw / 100 # 2 ตำแหน่ง
+                        ans = v1 / v2     
+                        move_step = 100
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
@@ -2268,17 +2270,19 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#fcf3cf; border-left:4px solid #f1c40f; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    💡 <b>เทคนิคสำคัญ (การเลื่อนจุดทศนิยม):</b><br>
-                    เราไม่สามารถตั้งหารได้ถ้า "ตัวหาร" ยังติดจุดทศนิยมอยู่! <br>
-                    กฎคือ: <b>"ต้องเลื่อนจุดตัวหารให้เป็นจำนวนเต็ม และต้องเลื่อนจุดตัวตั้งตามไปเท่าๆ กัน"</b>
+                    💡 <b>เทคนิคสำคัญ (การหารทศนิยมด้วยทศนิยม):</b><br>
+                    เราไม่สามารถตั้งหารได้ถ้า "ตัวหาร" (กล่อง B) ยังติดจุดทศนิยมอยู่!<br>
+                    • เราต้องทำ <b>ตัวหารให้เป็นจำนวนเต็มเสมอ</b> โดยการนำ 10 หรือ 100 มาคูณ<b>ทั้งตัวตั้งและตัวหารพร้อมกัน</b> เพื่อให้สมการยังคงมีค่าเท่าเดิม!
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ขั้นที่ 1: เลื่อนจุดทศนิยม</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวหารคือ {v2} ต้องเลื่อนจุดไปทางขวา <b>{move_step} ตำแหน่ง</b> เพื่อให้กลายเป็น <b>{v2_raw}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้งคือ {v1} จึงต้องเลื่อนจุดไปทางขวา <b>{move_step} ตำแหน่ง</b> ด้วยเช่นกัน กลายเป็น <b>{v1_raw}</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<i>(สมการใหม่คือ: <b>{v1_raw} ÷ {v2_raw}</b>)</i><br><br>
+                    👉 <b>ขั้นที่ 1: กำจัดจุดทศนิยมที่ตัวหาร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวหารคือ {v2} เราต้องการให้เป็นจำนวนเต็ม จึงต้องนำมา <b>คูณด้วย {move_step}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;➔ {v2} × {move_step} = <b>{v2_raw}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• ในเมื่อตัวหารคูณ {move_step} <b>ตัวตั้ง ({v1}) ก็ต้องคูณด้วย {move_step} ด้วยเช่นกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;➔ {v1} × {move_step} = <b>{v1_raw}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>(จะได้ประโยคสัญลักษณ์ใหม่ที่คำตอบเท่าเดิมคือ: <b>{v1_raw} ÷ {v2_raw}</b>)</i><br><br>
                     👉 <b>ขั้นที่ 2: ตั้งหารปกติ</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {v1_raw} ตั้ง แล้วหารด้วย {v2_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำตัวตั้งใหม่ ({v1_raw}) หารด้วย ตัวหารใหม่ ({v2_raw})<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• {v1_raw} ÷ {v2_raw} = <b>{int(ans)}</b><br><br>
                     <b>ตอบ: {int(ans)}</b></span>"""
 
@@ -2312,13 +2316,15 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     • ประโยคสัญลักษณ์: {total_bill:.2f} ÷ {people} = ?
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ขั้นที่ 1: นำจุดออกแล้วตั้งหาร</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {total_bill:.2f} เอาจุดออกเป็น <b>{int(total_bill*100)}</b> แล้วหารด้วย {people}<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• {int(total_bill*100)} ÷ {people} = <b>{int(price_per_person*100)}</b><br><br>
-                    👉 <b>ขั้นที่ 2: ใส่จุดทศนิยมกลับคืน</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ในการหารด้วยจำนวนเต็ม ทศนิยมของคำตอบจะต้องเท่ากับทศนิยมของตัวตั้งเสมอ!</i><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวตั้ง ({total_bill:.2f}) มีทศนิยม <b>2 ตำแหน่ง</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ {int(price_per_person*100)} มาใส่จุดทศนิยม 2 ตำแหน่ง จะได้ <b>{price_per_person:.2f}</b><br><br>
+                    👉 <b>ขั้นที่ 1: แปลงตัวตั้งให้เป็นจำนวนเต็ม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เพื่อให้หารเลขง่ายขึ้น เราจะทำตัวตั้ง ({total_bill:.2f}) ให้เป็นจำนวนเต็มก่อน</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• เนื่องจาก {total_bill:.2f} มีทศนิยม 2 ตำแหน่ง จึงต้อง <b>นำ 100 มาคูณ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• จะได้: {total_bill:.2f} × 100 = <b>{int(total_bill*100)}</b><br><br>
+                    👉 <b>ขั้นที่ 2: ตั้งหารปกติ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ {int(total_bill*100)} ÷ {people} = <b>{int(price_per_person*100)}</b><br><br>
+                    👉 <b>ขั้นที่ 3: ปรับค่ากลับเป็นทศนิยม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เนื่องจากขั้นแรกเราคูณ 100 เข้าไป ผลลัพธ์จึงต้อง <b>นำมาหารออกด้วย 100</b> เพื่อให้ค่ากลับมาเท่าเดิม (ซึ่งก็คือการใส่จุดทศนิยม 2 ตำแหน่ง)</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {int(price_per_person*100)} ÷ 100 = <b>{price_per_person:.2f}</b><br><br>
                     <b>ตอบ: จะต้องจ่ายคนละ {price_per_person:.2f} บาท</b></span>"""
 
 

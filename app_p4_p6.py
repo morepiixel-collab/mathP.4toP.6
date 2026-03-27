@@ -731,7 +731,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     p1, v, p2 = random.sample(list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 3)
                     angle_name = f"{p1}{v}{p2}"
                     angle_name_rev = f"{p2}{v}{p1}"
-                    # เช็คว่าคำที่สุ่มมา หรือ คำที่อ่านย้อนหลัง ตรงกับคำต้องห้ามหรือไม่
                     if angle_name not in bad_words and angle_name_rev not in bad_words:
                         break
                         
@@ -741,7 +740,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
                 target_deg = random.choice([45, 60, 75, 120, 135, 150])
                 
-                # 📐 ปรับตำแหน่ง y ให้สูงขึ้น กันตัวหนังสือตกขอบ (ขยับจาก y=180 เป็น y=140)
+                # 📐 SVG สำหรับโจทย์ (มีแค่เส้นฐาน)
                 svg = f'''<div style="text-align:center; margin:15px 0;">
                     <svg width="560" height="200">
                         <line x1="230" y1="140" x2="430" y2="140" stroke="#34495e" stroke-width="2.5"/>
@@ -751,9 +750,51 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     </svg>
                 </div>'''
                 
+                # 📐 SVG สำหรับเฉลย (มีไม้โปรแทรกเตอร์โปร่งใส + เส้นลากมุมสีแดง + ส่วนโค้งมุม)
+                cx, cy = 280, 220
+                r_out, r_in = 140, 100
+                svg_sol = '<div style="text-align:center; margin:15px 0;"><svg width="560" height="260">'
+                
+                # วาดไม้โปรแทรกเตอร์สีจางๆ เป็นพื้นหลัง
+                svg_sol += f'<path d="M {cx-r_out-15} {cy} A {r_out+15} {r_out+15} 0 0 1 {cx+r_out+15} {cy} Z" fill="#eef2f5" stroke="#bdc3c7" stroke-width="1.5" opacity="0.6"/>'
+                svg_sol += f'<path d="M {cx-r_out} {cy} A {r_out} {r_out} 0 0 1 {cx+r_out} {cy} Z" fill="none" stroke="#7f8c8d" stroke-width="1" opacity="0.6"/>'
+                svg_sol += f'<line x1="{cx-r_out-15}" y1="{cy}" x2="{cx+r_out+15}" y2="{cy}" stroke="#95a5a6" stroke-width="1.5" opacity="0.6"/>'
+                for idx in range(181):
+                    angle_rad = math.radians(idx)
+                    cos_a, sin_a = math.cos(angle_rad), math.sin(angle_rad)
+                    tick = 10 if idx % 10 == 0 else (7 if idx % 5 == 0 else 4)
+                    svg_sol += f'<line x1="{cx+r_out*cos_a}" y1="{cy-r_out*sin_a}" x2="{cx+(r_out-tick)*cos_a}" y2="{cy-(r_out-tick)*sin_a}" stroke="#7f8c8d" stroke-width="0.5" opacity="0.6"/>'
+                    if idx % 10 == 0 and idx not in [0, 180]:
+                        tx_in, ty_in = cx + (r_in+15)*cos_a, cy - (r_in+15)*sin_a
+                        svg_sol += f'<text x="{tx_in}" y="{ty_in+3}" font-family="sans-serif" font-size="9" fill="#7f8c8d" text-anchor="middle" opacity="0.8">{idx}</text>'
+
+                # วาดแขนของมุมตามองศาเป้าหมาย
+                rad = math.radians(target_deg)
+                end_x, end_y = cx + 180 * math.cos(rad), cy - 180 * math.sin(rad)
+                svg_sol += f'<line x1="{cx}" y1="{cy}" x2="{cx+180}" y2="{cy}" stroke="#34495e" stroke-width="3"/>'
+                svg_sol += f'<line x1="{cx}" y1="{cy}" x2="{end_x}" y2="{end_y}" stroke="#e74c3c" stroke-width="3.5" stroke-linecap="round"/>'
+                svg_sol += f'<circle cx="{cx}" cy="{cy}" r="5" fill="#2c3e50"/><circle cx="{cx+180}" cy="{cy}" r="4" fill="#2c3e50"/><circle cx="{end_x}" cy="{end_y}" r="5" fill="#e74c3c"/>'
+                
+                # ใส่ตัวอักษรกำกับจุด
+                svg_sol += f'<text x="{cx-5}" y="{cy+20}" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{v}</text>'
+                svg_sol += f'<text x="{cx+195}" y="{cy+5}" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{p2}</text>'
+                tx_p1, ty_p1 = cx + 200 * math.cos(rad), cy - 200 * math.sin(rad)
+                svg_sol += f'<text x="{tx_p1}" y="{ty_p1+5}" font-family="sans-serif" font-size="18" font-weight="bold" fill="#e74c3c" text-anchor="middle">{p1}</text>'
+                
+                # วาดเส้นโค้งระบุมุม
+                arc_r = 45
+                arc_end_x, arc_end_y = cx + arc_r * math.cos(rad), cy - arc_r * math.sin(rad)
+                large_arc = 1 if target_deg > 180 else 0
+                svg_sol += f'<path d="M {cx+arc_r} {cy} A {arc_r} {arc_r} 0 {large_arc} 0 {arc_end_x} {arc_end_y}" fill="none" stroke="#27ae60" stroke-width="2.5"/>'
+                text_r = 70
+                text_x, text_y = cx + text_r * math.cos(rad/2), cy - text_r * math.sin(rad/2)
+                svg_sol += f'<text x="{text_x}" y="{text_y+5}" font-family="Sarabun" font-size="16" font-weight="bold" fill="#27ae60" text-anchor="middle">{target_deg}°</text>'
+                
+                svg_sol += '</svg></div>'
+
                 q = f"จงใช้ไม้โปรแทรกเตอร์สร้างมุม <b>{angle_name_display}</b> ให้มีขนาด <b>{target_deg} องศา</b> พร้อมระบุชนิดของมุม<br>{svg}"
                 a_type = "มุมแหลม" if target_deg < 90 else "มุมฉาก" if target_deg == 90 else "มุมป้าน"
-                sol = f"<span style='color:#2c3e50;'><b>เฉลย:</b> สร้างมุมกาง {target_deg}° (จัดเป็น <b>{a_type}</b>)</span>"
+                sol = f"<span style='color:#2c3e50;'><b>เฉลย:</b> สร้างมุมกาง {target_deg}° (จัดเป็น <b>{a_type}</b>)<br>{svg_sol}</span>"
 
             elif actual_sub_t == "การหาความยาวรอบรูปสี่เหลี่ยมมุมฉาก":
                 is_square = random.choice([True, False])

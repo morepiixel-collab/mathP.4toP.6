@@ -2016,14 +2016,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return svg
 
                 if prob_style == 1:
-                    # แบบที่ 1: ตารางร้อย (ทศนิยม x จำนวนเต็ม)
+                    # แบบที่ 1: ตารางร้อย (ทศนิยม x จำนวนเต็ม) - เอาตัวเลขเฉลยใต้รูปออก
                     v1 = round(random.uniform(0.12, 0.25), 2)
                     m = random.randint(2, 4)
                     ans = round(v1 * m, 2)
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
-                        <div style="text-align:center;">{draw_svg_decimal_grid(v1, "#3498db")}<br><b style="color:#3498db;">รูปที่ 1 ({v1:.2f})</b></div>
+                        <div style="text-align:center;">{draw_svg_decimal_grid(v1, "#3498db")}<br><b style="color:#3498db;">รูปที่ 1</b></div>
                         <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">×</div>
                         <div style="text-align:center;"><div style="font-size: 60px; font-weight: bold; color: #e67e22; padding: 0 20px;">{m}</div><b style="color:#e67e22;">จำนวนเท่า</b></div>
                         <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
@@ -2173,7 +2173,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;• รวมกันเป็นทศนิยม <b>2 ตำแหน่ง</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;นำ {ans_raw} มาใส่จุด 2 ตำแหน่ง จะได้ <b>{ans:.2f}</b><br><br>
                     <b>ตอบ: คุณครูต้องจ่ายเงินทั้งหมด {ans:.2f} บาท</b></span>"""
-
 
             elif actual_sub_t in ["การบวกเศษส่วน", "การลบเศษส่วน", "การคูณเศษส่วน", "การหารเศษส่วน"]:
                 op_map = {"การบวกเศษส่วน": "+", "การลบเศษส่วน": "-", "การคูณเศษส่วน": "×", "การหารเศษส่วน": "÷"}

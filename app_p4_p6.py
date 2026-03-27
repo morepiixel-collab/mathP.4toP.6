@@ -952,64 +952,68 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 var = random.choice(["x", "y", "a", "m"])
                 scenario = random.choice(["mult", "div", "mult_add"])
                 
-                # ฟังก์ชันปรับปรุงใหม่: ขีดฆ่าเฉพาะตัวเลข ไม่ทับตัวแปร
-                def frac_cancel_num(num, variable, bottom):
-                    # ส่วนของตัวตั้ง (ด้านบน) ที่มีการขีดฆ่าเฉพาะตัวเลข
-                    top_html = f"<span style='text-decoration: line-through; text-decoration-color: #e74c3c; text-decoration-thickness: 2px;'>{num}</span>{variable}"
-                    # ส่วนของตัวหาร (ด้านล่าง) ที่ขีดฆ่า
-                    bottom_html = f"<span style='text-decoration: line-through; text-decoration-color: #e74c3c; text-decoration-thickness: 2px;'>{bottom}</span>"
-                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top_html}</span><span>{bottom_html}</span></span>"
+                # ฟังก์ชันตัดฝั่งตัวแปร (ตัดเลขเหลือ 1)
+                def frac_cancel_left(num, variable):
+                    top = f"<div style='position:relative; display:inline-block;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='position:absolute; top:-12px; right:-8px; font-size:12px; color:#e74c3c;'>1</span></div>{variable}"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+
+                # ฟังก์ชันตัดฝั่งตัวเลข (แสดงผลลัพธ์จากการตัด)
+                def frac_cancel_right(top_val, bot_val, result_val):
+                    top = f"<div style='position:relative; display:inline-block;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{top_val}</span><span style='position:absolute; top:-15px; right:-12px; font-size:14px; color:#e74c3c; font-weight:bold;'>{result_val}</span></div>"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{bot_val}</span><span style='font-size:12px; color:#e74c3c; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
 
                 if scenario == "mult":
                     a, ans = random.randint(4, 15), random.randint(3, 12)
                     b = a * ans
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} = {b}</b>"
-                    explain_box = f"<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>💡 <b>หลักการคิด:</b> กำจัด <b>{a}</b> ที่คูณอยู่ โดยนำมา <b style='color:#e74c3c;'>หารออกทั้งสองข้าง</b> เพื่อให้เหลือตัวแปรเพียงตัวเดียว</div>"
-                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b><br>{explain_box}👉 {frac_cancel_num(a, var, a)} = {f_html(b, a)}<br>👉 <b>{var} = {ans}</b></span>"
+                    sol = f"<span style='color:#2c3e50;'>👉 นำ {a} มาหารทั้งสองข้าง (ใช้สูตรคูณ<b>แม่ {a}</b> ในการตัดทอน):<br><br>&nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(a, var)} = {frac_cancel_right(b, a, ans)}<br><br>👉 <b>{var} = {ans}</b></span>"
                 elif scenario == "div":
                     a, ans = random.randint(3, 9), random.randint(5, 20)
                     c = a * ans
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{var} ÷ {a} = {ans}</b>"
-                    explain_box = f"<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>💡 <b>หลักการคิด:</b> กำจัด <b>{a}</b> ที่หารอยู่ โดยนำมา <b style='color:#27ae60;'>คูณเข้าทั้งสองข้าง</b></div>"
-                    # สำหรับการคูณเข้า ใช้การขีดฆ่าที่ตัวส่วนและตัวคูณ
-                    cancel_v_a = f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{var}</span><span style='text-decoration: line-through; text-decoration-color: #e74c3c; text-decoration-thickness: 2px;'>{a}</span></span>"
-                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b><br>{explain_box}👉 {cancel_v_a} <b style='color:#27ae60;'>× <span style='text-decoration: line-through; text-decoration-color: #e74c3c;'>{a}</span></b> = {ans} <b style='color:#27ae60;'>× {a}</b><br>👉 <b>{var} = {c}</b></span>"
+                    cancel_v_a = f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{var}</span><span style='text-decoration: line-through; text-decoration-color: #e74c3c;'>{a}</span><span style='font-size:10px; color:#e74c3c;'>1</span></span>"
+                    sol = f"<span style='color:#2c3e50;'>👉 นำ {a} มาคูณทั้งสองข้าง (ใช้สูตรคูณ<b>แม่ {a}</b> ในการตัดทอน):<br><br>&nbsp;&nbsp;&nbsp;&nbsp;{cancel_v_a} <b style='color:#27ae60;'>× <span style='text-decoration: line-through; text-decoration-color: #e74c3c;'>{a}</span><span style='font-size:10px; color:#e74c3c;'>1</span></b> = {ans} <b style='color:#27ae60;'>× {a}</b><br><br>👉 <b>{var} = {c}</b></span>"
                 else: # mult_add
                     a, ans, b = random.randint(2, 6), random.randint(3, 10), random.randint(1, 15)
                     c = (a * ans) + b
                     q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} + {b} = {c}</b>"
-                    explain_box = f"<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>💡 <b>ทำไมต้องกำจัด +{b} ก่อน?</b> เพราะต้อง <b>กำจัดตัวที่อยู่ไกลตัวแปร หรือ ตัวที่อยู่วงนอกก่อนเสมอ</b></div>"
-                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b><br>{explain_box}👉 <b>ขั้นที่ 1 (ไกลตัวแปร):</b> {a}{var} + {b} <b style='color:#e74c3c;'>- {b}</b> = {c} <b style='color:#e74c3c;'>- {b}</b> ➔ {a}{var} = {c-b}<br><br>👉 <b>ขั้นที่ 2 (ติดตัวแปร):</b> {frac_cancel_num(a, var, a)} = {f_html(c-b, a)}<br>👉 <b>{var} = {ans}</b></span>"
+                    sol = f"<span style='color:#2c3e50;'>👉 <b>ขั้นที่ 1 (ไกลตัวแปร):</b> {a}{var} + {b} <b style='color:#e74c3c;'>- {b}</b> = {c} <b style='color:#e74c3c;'>- {b}</b> ➔ {a}{var} = {c-b}<br><br>👉 <b>ขั้นที่ 2 (ใช้แม่ {a} ตัด):</b> {frac_cancel_left(a, var)} = {frac_cancel_right(c-b, a, ans)}<br>👉 <b>{var} = {ans}</b></span>"
 
             elif actual_sub_t == "สมการและตัวไม่ทราบค่าจากชีวิตประจำวัน":
                 scenario_type = random.choice(["shopping", "saving", "sharing", "comparing"])
                 var = random.choice(["x", "y", "ก", "n"])
-                def frac_cancel_num(num, variable, bottom):
-                    top_html = f"<span style='text-decoration: line-through; text-decoration-color: #e74c3c; text-decoration-thickness: 2px;'>{num}</span>{variable}"
-                    bottom_html = f"<span style='text-decoration: line-through; text-decoration-color: #e74c3c; text-decoration-thickness: 2px;'>{bottom}</span>"
-                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top_html}</span><span>{bottom_html}</span></span>"
+                def frac_cancel_left(num, variable):
+                    top = f"<div style='position:relative; display:inline-block;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='position:absolute; top:-12px; right:-8px; font-size:12px; color:#e74c3c;'>1</span></div>{variable}"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+                def frac_cancel_right(top_val, bot_val, result_val):
+                    top = f"<div style='position:relative; display:inline-block;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{top_val}</span><span style='position:absolute; top:-15px; right:-12px; font-size:14px; color:#e74c3c; font-weight:bold;'>{result_val}</span></div>"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{bot_val}</span><span style='font-size:12px; color:#e74c3c; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
                 
                 if scenario_type == "shopping":
                     item, p_u, cnt = random.choice(["ขนม", "สมุด", "ตุ๊กตา"]), random.randint(15, 50), random.randint(3, 10)
                     total = p_u * cnt
                     q = f"ซื้อ {item} {cnt} ชิ้น จ่ายเงิน {total} บาท ราคาชิ้นละกี่บาท (ให้ {var} แทนราคา)"
-                    sol = f"<b>สมการ:</b> {cnt}{var} = {total}<br><br><span style='color:#2c3e50;'>👉 นำ {cnt} มาหารทั้งสองข้าง:<br>{frac_cancel_num(cnt, var, cnt)} = {f_html(total, cnt)}<br>👉 <b>{var} = {p_u}</b></span>"
+                    sol = f"<b>สมการ:</b> {cnt}{var} = {total}<br><br><span style='color:#2c3e50;'>👉 ใช้สูตรคูณ<b>แม่ {cnt}</b> ตัดทอน:<br>{frac_cancel_left(cnt, var)} = {frac_cancel_right(total, cnt, p_u)}<br>👉 <b>{var} = {p_u}</b></span>"
                 elif scenario_type == "saving":
                     init, d_s, days = random.randint(100, 500), random.randint(10, 40), random.randint(5, 20)
                     total = init + (d_s * days)
                     q = f"เดิมมีเงิน {init} บาท ออมเพิ่ม {days} วัน มีเงินรวม {total} บาท ออมวันละกี่บาท (ให้ {var} แทนเงินออม)"
-                    sol = f"<b>สมการ:</b> {init} + {days}{var} = {total}<br><br><span style='color:#2c3e50;'>👉 <b>ขั้นที่ 1 (ไกลตัวแปร):</b> ลบ {init} ออก ➔ {days}{var} = {total-init}<br><br>👉 <b>ขั้นที่ 2:</b> {frac_cancel_num(days, var, days)} = {f_html(total-init, days)}<br>👉 <b>{var} = {d_s}</b></span>"
+                    sol = f"<b>สมการ:</b> {init} + {days}{var} = {total}<br><br><span style='color:#2c3e50;'>👉 <b>ขั้นที่ 1:</b> ลบ {init} ออก ➔ {days}{var} = {total-init}<br>👉 <b>ขั้นที่ 2 (แม่ {days} ตัด):</b> {frac_cancel_left(days, var)} = {frac_cancel_right(total-init, days, d_s)}<br>👉 <b>{var} = {d_s}</b></span>"
                 elif scenario_type == "sharing":
                     total, eat, fnds = random.randint(50, 150), random.randint(5, 20), random.randint(2, 5)
                     per = (total - eat) // fnds
                     total = (per * fnds) + eat
-                    q = f"มีขนม {total} ชิ้น กินเองไป {eat} ชิ้น ที่เหลือแบ่งเพื่อน {fnds} คน ได้คนละกี่ชิ้น (ให้ {var} แทนจำนวนที่เพื่อนได้)"
-                    sol = f"<b>สมการ:</b> {fnds}{var} + {eat} = {total}<br><br><span style='color:#2c3e50;'>👉 <b>ขั้นที่ 1 (วงนอก):</b> ลบ {eat} ออก ➔ {fnds}{var} = {total-eat}<br><br>👉 <b>ขั้นที่ 2:</b> {frac_cancel_num(fnds, var, fnds)} = {f_html(total-eat, fnds)}<br>👉 <b>{var} = {per}</b></span>"
+                    q = f"มีขนม {total} ชิ้น กินไป {eat} ชิ้น ที่เหลือแบ่งเพื่อน {fnds} คน ได้กี่ชิ้น (ให้ {var} แทนจำนวนที่ได้รับ)"
+                    sol = f"<b>สมการ:</b> {fnds}{var} + {eat} = {total}<br><br><span style='color:#2c3e50;'>👉 <b>ขั้นที่ 1:</b> ลบ {eat} ออก ➔ {fnds}{var} = {total-eat}<br>👉 <b>ขั้นที่ 2 (แม่ {fnds} ตัด):</b> {frac_cancel_left(fnds, var)} = {frac_cancel_right(total-eat, fnds, per)}<br>👉 <b>{var} = {per}</b></span>"
                 else:
                     s_v, diff = random.randint(100, 300), random.randint(50, 150)
                     l_v = s_v + diff
                     q = f"แดงมีเงิน {l_v} บาท มากกว่าดำอยู่ {diff} บาท ดำมีเงินกี่บาท (ให้ {var} แทนเงินดำ)"
-                    sol = f"<b>สมการ:</b> {var} + {diff} = {l_v}<br><br><span style='color:#2c3e50;'>👉 ลบออกด้วย {diff} ทั้งสองข้าง ➔ {var} = {s_v}</span>"
+                    sol = f"<b>สมการ:</b> {var} + {diff} = {l_v}<br><br><span style='color:#2c3e50;'>👉 ลบ {diff} ออกทั้งสองข้าง ➔ {var} = {s_v}</span>"
                     
             elif actual_sub_t == "สมการเชิงตรรกะและตาชั่งปริศนา":
                 val_a = random.randint(12, 25)

@@ -861,7 +861,15 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 frac_str = f_html(num_total, den)
                 mixed_str = f"<span style='font-size: 24px; vertical-align: middle;'>{whole}</span> {f_html(num_rem, den)}"
                 q = f"จงแปลงเศษเกินต่อไปนี้ให้เป็นจำนวนคละ<br><br><div style='text-align:center; font-size:26px;'>{frac_str} = <span style='color:#2980b9;'>?</span></div>"
-                sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> นำ {num_total} ÷ {den} จะได้ {whole} เศษ {num_rem} ➔ <b>ตอบ: {mixed_str}</b></span>"
+                
+                sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
+                👉 <b>หลักการ:</b> ให้นำ "ตัวเศษ" (ด้านบน) เป็นตัวตั้ง แล้วหารด้วย "ตัวส่วน" (ด้านล่าง)<br>
+                👉 <b>คำนวณ:</b> {num_total} ÷ {den} = ได้ <b>{whole}</b> เศษ <b>{num_rem}</b><br><br>
+                👉 <b>นำตัวเลขมาประกอบร่างเป็นจำนวนคละ:</b><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;• <b>ผลหารที่ได้</b> (<b>{whole}</b>) ➔ นำไปเขียนเป็น <b>"จำนวนเต็ม"</b> ไว้ด้านหน้า<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;• <b>เศษที่เหลือ</b> (<b>{num_rem}</b>) ➔ นำไปเขียนเป็น <b>"ตัวเศษ"</b> ไว้ด้านบน<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;• <b>ตัวส่วน</b> (<b>{den}</b>) ➔ ใช้ตัวเลขเดิมไม่เปลี่ยนแปลง<br>
+                <b>ตอบ: {mixed_str}</b></span>"""
 
             elif actual_sub_t == "การอ่านและการเขียนทศนิยม":
                 dp = random.randint(1, 3)

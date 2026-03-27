@@ -1671,11 +1671,20 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>วิธีทำอย่างละเอียด:</b><br>
                     👉 <b>ขั้นที่ 1: ตั้งบวกทศนิยม</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>หลักสำคัญที่สุด: ต้องตั้ง "จุดทศนิยม" ให้ตรงกัน!</i><br>
-                    <div style="font-family: monospace; font-size: 18px; margin-left: 40px; line-height: 1.5;">
-                    &nbsp;&nbsp;{v1:.2f}<br>
-                    <u style="text-decoration-color: #e74c3c;">+&nbsp;{v2:.2f}</u><br>
-                    &nbsp;&nbsp;<b>{total:.2f}</b>
-                    </div><br>
+                    <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px;">{v1:.2f}</td>
+                            <td style="width: 30px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{v2:.2f}</td>
+                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">+</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{total:.2f}</b></td>
+                            <td></td>
+                        </tr>
+                    </table><br>
                     👉 <b>สรุปผลลัพธ์:</b> ถ้านำมาระบายสีรวมกันจะได้ทั้งหมด {round(total*100)} ช่อง หรือ <b>{total:.2f}</b><br><br>
                     <b>ตอบ: {total:.2f}</b></span>"""
 
@@ -1683,7 +1692,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     # แบบที่ 2: กล่องสมมาตร (จำนวนตำแหน่งทศนิยมไม่เท่ากัน เพื่อดักทางเด็ก)
                     v1 = round(random.uniform(5.1, 25.9), 1)   # 1 ตำแหน่ง
                     v2 = round(random.uniform(1.11, 9.99), 2)  # 2 ตำแหน่ง
-                    if random.choice([True, False]): # สลับตำแหน่งตัวตั้ง-ตัวบวก
+                    if random.choice([True, False]): 
                         v1, v2 = v2, v1
                     
                     total = round(v1 + v2, 2)
@@ -1719,22 +1728,31 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;• {v1} เติมศูนย์ปรับเป็น <b>{v1_str}</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• {v2} เติมศูนย์ปรับเป็น <b>{v2_str}</b><br><br>
                     👉 <b>ขั้นที่ 2: ตั้งบวกให้จุดตรงกัน</b><br>
-                    <div style="font-family: monospace; font-size: 20px; margin-left: 40px; line-height: 1.5;">
-                    &nbsp;&nbsp;{v1_str}<br>
-                    <u style="text-decoration-color: #e74c3c;">+&nbsp;{v2_str}</u><br>
-                    &nbsp;&nbsp;<b>{total:.2f}</b>
-                    </div><br>
+                    <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px;">{v1_str}</td>
+                            <td style="width: 30px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{v2_str}</td>
+                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">+</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{total:.2f}</b></td>
+                            <td></td>
+                        </tr>
+                    </table><br>
                     <b>ตอบ: {total:.2f}</b></span>"""
 
                 else:
-                    # แบบที่ 3: ป้ายราคาสินค้า (Visual Word Problem แบบสวยงาม)
+                    # แบบที่ 3: ป้ายราคาสินค้า
                     items = [("สมุดโน้ต", 15.5, 25.5), ("ปากกาสี", 8.25, 12.75), ("ยางลบ", 5.5, 9.5), ("ไม้บรรทัด", 10.25, 15.5)]
                     item1 = random.choice(items)
                     items.remove(item1)
                     item2 = random.choice(items)
                     
                     p1 = round(random.uniform(item1[1], item1[2]), 2)
-                    p1 = round(p1 * 4) / 4 # ทำให้เลขลงท้ายด้วย .00, .25, .50, .75 เพื่อความสมจริง
+                    p1 = round(p1 * 4) / 4 
                     if p1.is_integer(): p1 += 0.5
                     
                     p2 = round(random.uniform(item2[1], item2[2]), 2)
@@ -1745,7 +1763,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     p1_str = f"{p1:.2f}"
                     p2_str = f"{p2:.2f}"
                     
-                    # วาด CSS รูปป้ายราคา
                     q_html = f"""
                     <div style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
                         <div style="background: #e74c3c; color: white; padding: 15px 25px; border-radius: 8px; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
@@ -1772,11 +1789,20 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>วิธีทำอย่างละเอียด:</b><br>
                     👉 <b>ตั้งบวกทศนิยม:</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ตั้งหลักและจุดทศนิยมให้ตรงกัน จากนั้นบวกจากขวาไปซ้ายเหมือนการบวกเลขปกติ</i><br>
-                    <div style="font-family: monospace; font-size: 20px; margin-left: 40px; line-height: 1.5;">
-                    &nbsp;&nbsp;&nbsp;{p1_str}<br>
-                    <u style="text-decoration-color: #e74c3c;">+&nbsp;&nbsp;{p2_str}</u><br>
-                    &nbsp;&nbsp;&nbsp;<b>{total:.2f}</b>
-                    </div><br>
+                    <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px;">{p1_str}</td>
+                            <td style="width: 30px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{p2_str}</td>
+                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">+</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{total:.2f}</b></td>
+                            <td></td>
+                        </tr>
+                    </table><br>
                     <b>ตอบ: คุณแม่ต้องจ่ายเงินทั้งหมด {total:.2f} บาท</b></span>"""
 
 

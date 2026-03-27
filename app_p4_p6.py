@@ -1135,8 +1135,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 ]
                 i1, i2, i3, theme = random.choice(icon_sets)
                 
-                # สุ่มประเภทของโจทย์ (Type 1: บวก/ลบพื้นฐาน, Type 2: ข้อสอบแข่งขัน มีคูณตอนท้าย)
-                puzzle_type = random.choice([1, 2])
+                # สุ่มประเภทของโจทย์: 1=พื้นฐาน, 2=แข่งขัน(มีคูณ), 3=ตาชั่งปริศนา
+                puzzle_type = random.choice([1, 2, 3])
                 
                 if puzzle_type == 1:
                     val1 = random.randint(5, 20)
@@ -1185,7 +1185,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;แทนค่ารูปภาพด้วยตัวเลข: {val1} + {val2} + {val3} = <b>{ans}</b><br>
                     <b>ตอบ: {ans}</b></span>"""
 
-                else:
+                elif puzzle_type == 2:
                     # Type 2: ข้อสอบแข่งขัน (มีของ 3 ชิ้น และมีการคูณตอนท้าย)
                     val1 = random.randint(3, 10)
                     val2 = random.randint(2, 8)
@@ -1235,6 +1235,66 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>{val2*val3}</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;= <b>{ans}</b><br>
                     <b>ตอบ: {ans}</b></span>"""
+
+                else:
+                    # Type 3: ตาชั่งปริศนา (Balance Scale Puzzle)
+                    w_a = random.randint(15, 45) # น้ำหนักของชิ้นเล็ก
+                    mult = random.randint(2, 4)  # อัตราส่วน (ของชิ้นใหญ่ 1 ชิ้น = ของชิ้นเล็ก mult ชิ้น)
+                    w_b = w_a * mult             # น้ำหนักของชิ้นใหญ่
+                    total_w = w_b + w_a          # น้ำหนักรวมบนตาชั่งที่ 2
+                    
+                    # รูปแบบตาชั่งฝั่งซ้าย-ขวา
+                    scale1_left = " ".join([i1] * mult)
+                    scale1_right = i2
+                    
+                    scale2_left = f"{i1} {i2}"
+                    scale2_right = f"<span style='font-size:20px; font-weight:bold; color:#d35400;'>{total_w} กรัม</span>"
+                    
+                    q_html = f"""
+                    <div style='background-color: #fcfcfc; padding: 20px; border-radius: 8px; border: 2px solid #bdc3c7; width: 90%; margin: 15px auto; box-shadow: 3px 3px 10px rgba(0,0,0,0.08); text-align:center;'>
+                        <div style='margin-bottom: 30px;'>
+                            <b style='color:#2980b9; font-size:18px;'>ตาชั่งที่ 1 (สมดุล)</b><br>
+                            <div style='display:flex; justify-content:center; align-items:flex-end; gap:10px; margin-top:10px;'>
+                                <div style='border-bottom:4px solid #34495e; padding:5px 20px; min-width:80px; font-size:32px;'>{scale1_left}</div>
+                                <div style='font-size:45px; margin-bottom:-20px;'>⚖️</div>
+                                <div style='border-bottom:4px solid #34495e; padding:5px 20px; min-width:80px; font-size:32px;'>{scale1_right}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <b style='color:#27ae60; font-size:18px;'>ตาชั่งที่ 2 (สมดุล)</b><br>
+                            <div style='display:flex; justify-content:center; align-items:flex-end; gap:10px; margin-top:10px;'>
+                                <div style='border-bottom:4px solid #34495e; padding:5px 20px; min-width:80px; font-size:32px;'>{scale2_left}</div>
+                                <div style='font-size:45px; margin-bottom:-20px;'>⚖️</div>
+                                <div style='border-bottom:4px solid #34495e; padding:5px 20px; min-width:80px; font-size:32px;'>{scale2_right}</div>
+                            </div>
+                        </div>
+                    </div>
+                    """
+                    q = f"จากภาพตาชั่งปริศนาที่อยู่ในสภาวะสมดุล (น้ำหนักซ้ายเท่ากับขวา)<br>จงหาว่า <b>{i1} และ {i2} มีน้ำหนักชิ้นละกี่กรัม ?</b><br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์ปริศนาตาชั่ง (การแทนค่า):</b><br>
+                    ตาชั่งสมดุล หมายถึง <b>ของทางซ้าย = ของทางขวา</b> (เปรียบเหมือนเครื่องหมาย <b>=</b> ในสมการ)<br>
+                    <b>เทคนิคคือ:</b> "แทนที่ของชิ้นใหญ่ ด้วยของชิ้นเล็ก" เพื่อให้ตาชั่งฝั่งนั้นมีแต่ของชิ้นเล็กเหมือนกันทั้งหมด!
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>จากตาชั่งที่ 1:</b> {scale1_left} มีน้ำหนักเท่ากับ {scale1_right}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แปลว่า ถ้าเจอ {i2} 1 ชิ้น ที่ไหน... เราสามารถเอา <b style='color:#e74c3c;'>{i1} จำนวน {mult} ชิ้น</b> ไปวางแทนได้เลย!<br><br>
+                    
+                    👉 <b>จากตาชั่งที่ 2:</b> มี {i1} และ {i2} วางรวมกัน หนัก {total_w} กรัม<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เราทำการ <b>แทนที่</b> {i2} ด้วยของชิ้นเล็ก (ตามที่รู้จากตาชั่งที่ 1)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่งฝั่งซ้ายจะกลายเป็น: {i1} รวมกับ {scale1_left}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นับรวมกันได้: <b style='color:#2980b9;'>มี {i1} ทั้งหมด {mult + 1} ชิ้น</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ตั้งเป็นสมการใหม่ได้คือ: <b style='color:#2980b9;'>{mult + 1} × {i1} = {total_w}</b><br><br>
+                    
+                    👉 <b>หาค่า {i1}:</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {mult + 1} ไปหารออก: {total_w} ÷ {mult + 1} = <b>{w_a} กรัม</b><br><br>
+                    
+                    👉 <b>หาค่า {i2}:</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จากตาชั่ง 1: {i2} เกิดจาก {i1} จำนวน {mult} ชิ้น<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำน้ำหนักมาคูณ: {w_a} × {mult} = <b>{w_b} กรัม</b><br><br>
+                    <b>ตอบ: {i1} หนัก {w_a} กรัม และ {i2} หนัก {w_b} กรัม</b></span>"""
 
             elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":
                 val_1, val_2 = random.randint(30, 80), random.randint(10, 20)

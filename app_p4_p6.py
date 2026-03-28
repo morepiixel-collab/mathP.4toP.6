@@ -1451,11 +1451,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 &nbsp;&nbsp;&nbsp;&nbsp;{whole_part[0]}0 + {whole_part[1]} + 0.{dec_part[0]} + 0.0{dec_part[1]} {"+ 0.00" + dec_part[2] if len(dec_part)==3 else ""}<br><br>
                 💡 <i>หมายเหตุ: การกระจายช่วยให้เราเข้าใจว่าเลขแต่ละตัวมีค่าเท่าไหร่ตามตำแหน่งของมัน</i></span>"""
 
+
+
+
             # ==========================================
-            # หมวดเศษส่วน ป.4 (อัปเกรดใหม่ มีรูปภาพและตัวเลขสุ่ม)
+            # หมวดเศษส่วน ป.4 (ฉบับแก้ไข Bug NameError)
             # ==========================================
             elif actual_sub_t in ["การบวกเศษส่วน", "การลบเศษส่วน", "การคูณเศษส่วน", "การหารเศษส่วน"]:
-                prob_style = random.choice([1, 2]) # 1: แบบรูปภาพ, 2: แบบตัวเลขล้วน
+                prob_style = random.choice([1, 2]) # 1: แบบรูปภาพ (ยกเว้นการหาร), 2: แบบตัวเลขล้วน
                 
                 # ฟังก์ชันภายในสำหรับจัดการเศษส่วน
                 def draw_f(n, d):
@@ -1468,47 +1471,61 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     for i in range(d):
                         fill = color if i < n else "#ecf0f1"
                         svg += f'<rect x="{i*w}" y="0" width="{w}" height="40" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
-                    svg += '</svg>'
+                    svg += f'</svg>'
                     return svg
 
-                # สุ่มค่าพื้นฐาน
+                # สุ่มค่าตัวส่วนพื้นฐาน (คละเลขเพื่อให้โจทย์หลากหลาย)
                 d = random.choice([4, 5, 6, 8, 10, 12])
                 n1 = random.randint(1, d-1)
                 
                 if "บวก" in actual_sub_t:
-                    n2 = random.randint(1, d - n1 if d-n1 > 0 else 1)
+                    # บวกกันแล้วไม่เกิน 1
+                    n2 = random.randint(1, d - n1) if d - n1 >= 1 else 1
                     ans_n = n1 + n2
                     op_sym = "+"
+                    q_val_2 = draw_f(n2, d)
                 elif "ลบ" in actual_sub_t:
-                    n2 = random.randint(1, n1 if n1 > 1 else 1)
+                    # ลบกันแล้วไม่ติดลบ
+                    n2 = random.randint(1, n1) if n1 >= 1 else 1
                     ans_n = n1 - n2
                     op_sym = "-"
+                    q_val_2 = draw_f(n2, d)
                 elif "คูณ" in actual_sub_t:
-                    n2 = random.randint(2, 5) # คูณจำนวนเต็ม
-                    ans_n = n1 * n2
+                    # คูณจำนวนเต็ม (ป.4)
+                    n2 = random.randint(2, 5)
+                    ans_n = n1 * n2 # ผลลัพธ์อาจเป็นเศษเกิน (ครู ป.4 สอนแปลงต่อได้)
                     op_sym = "×"
-                else: # หาร
-                    n2 = random.randint(2, 3) # หารด้วยจำนวนเต็ม
+                    q_val_2 = str(n2)
+                else: # การหารเศษส่วน (หารด้วยจำนวนเต็ม)
+                    n2 = random.randint(2, 4)
                     ans_n_num = n1
                     ans_d_num = d * n2
                     op_sym = "÷"
+                    q_val_2 = str(n2)
 
-                # สร้างเนื้อหาโจทย์
+                # --- ส่วนการสร้างโจทย์ ---
                 if prob_style == 1 and "หาร" not in actual_sub_t:
-                    q = f"จากรูปภาพ จงหาผลลัพธ์ของ {actual_sub_t}<br><br>"
+                    q = f"จากรูปภาพส่วนที่ระบายสี จงหาผลลัพธ์ของ {actual_sub_t}<br><br>"
                     q += f"<div style='display:flex; align-items:center; gap:10px;'>{draw_rect_f(n1, d)} <b>{op_sym}</b> "
-                    q += f"{draw_rect_f(n2, d) if 'คูณ' not in actual_sub_t else f'<b>{n2}</b>'}</div>"
-                else:
-                    if "คูณ" in actual_sym_t or "หาร" in actual_sub_t:
-                        q = f"จงหาผลลัพธ์ของ <b>{draw_f(n1, d)} {op_sym} {n2}</b>"
+                    if "คูณ" in actual_sub_t:
+                        q += f"<span style='font-size:24px; font-weight:bold;'>{n2}</span>"
                     else:
-                        q = f"จงหาผลลัพธ์ของ <b>{draw_f(n1, d)} {op_sym} {draw_f(n2, d)}</b>"
+                        q += f"{draw_rect_f(n2, d)}"
+                    q += f"</div>"
+                else:
+                    # แก้ไขจาก actual_sym_t เป็น actual_sub_t เรียบร้อยครับ
+                    q = f"จงหาผลลัพธ์ของ <b>{draw_f(n1, d)} {op_sym} {q_val_2}</b>"
 
-                # สร้างเฉลย
+                # --- ส่วนการสร้างเฉลย ---
                 if "หาร" in actual_sub_t:
                     sol = f"<b>วิธีทำ:</b> {draw_f(n1, d)} ÷ {n2} = {draw_f(n1, d)} × {draw_f(1, n2)} = <b>{draw_f(ans_n_num, ans_d_num)}</b>"
+                elif "คูณ" in actual_sub_t:
+                    sol = f"<b>วิธีทำ:</b> {draw_f(n1, d)} × {n2} = {draw_f(f'{n1} × {n2}', d)} = <b>{draw_f(ans_n, d)}</b>"
                 else:
-                    sol = f"<b>วิธีทำ:</b> คำนวณตามหลักการเศษส่วน จะได้คำตอบคือ <b>{draw_f(ans_n, d)}</b>"
+                    sol = f"<b>วิธีทำ:</b> เมื่อตัวส่วนเท่ากัน ให้นำตัวเศษมา {op_sym} กัน<br>จะได้ <b>{draw_f(ans_n, d)}</b>"
+
+
+
 
 
             elif actual_sub_t == "การบวกเศษส่วน":

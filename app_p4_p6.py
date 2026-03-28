@@ -803,32 +803,105 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
             elif actual_sub_t == "การหาความยาวรอบรูปสี่เหลี่ยมมุมฉาก":
                 is_square = random.choice([True, False])
+                units = random.choice(["ซม.", "ม.", "มม.", "นิ้ว", "วา"])
+                
+                # ฟังก์ชันวาดสี่เหลี่ยมสไตล์ข้อสอบ (มีสัญลักษณ์มุมฉากและขีดด้านเท่า)
+                def draw_exam_rect(w_real, h_real, w_text, h_text, is_sq):
+                    # กำหนดขนาดวาด (Fixed canvas size 300x200)
+                    svg_w, svg_h = 300, 200
+                    draw_w = 140 if is_sq else 200
+                    draw_h = 140 if is_sq else 100
+                    ox = (svg_w - draw_w) / 2
+                    oy = (svg_h - draw_h) / 2
+                    
+                    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+                    # วาดรูปสี่เหลี่ยม
+                    svg += f'<rect x="{ox}" y="{oy}" width="{draw_w}" height="{draw_h}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
+                    
+                    # วาดสัญลักษณ์มุมฉาก 4 มุม
+                    s = 10 # ขนาดสัญลักษณ์มุมฉาก
+                    svg += f'<polyline points="{ox},{oy+s} {ox+s},{oy+s} {ox+s},{oy}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += f'<polyline points="{ox+draw_w-s},{oy} {ox+draw_w-s},{oy+s} {ox+draw_w},{oy+s}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += f'<polyline points="{ox},{oy+draw_h-s} {ox+s},{oy+draw_h-s} {ox+s},{oy+draw_h}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += f'<polyline points="{ox+draw_w-s},{oy+draw_h} {ox+draw_w-s},{oy+draw_h-s} {ox+draw_w},{oy+draw_h-s}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
+                    
+                    # ขีดแสดงความยาวด้านเท่ากัน
+                    tick_len = 6
+                    mid_top_x, mid_top_y = ox + draw_w/2, oy
+                    mid_bot_x, mid_bot_y = ox + draw_w/2, oy + draw_h
+                    mid_l_x, mid_l_y = ox, oy + draw_h/2
+                    mid_r_x, mid_r_y = ox + draw_w, oy + draw_h/2
+                    
+                    if is_sq:
+                        # 1 ขีด ทุกด้าน (สีแดง)
+                        svg += f'<line x1="{mid_top_x}" y1="{mid_top_y-tick_len}" x2="{mid_top_x}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_bot_x}" y1="{mid_bot_y-tick_len}" x2="{mid_bot_x}" y2="{mid_bot_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_l_x-tick_len}" y1="{mid_l_y}" x2="{mid_l_x+tick_len}" y2="{mid_l_y}" stroke="#e74c3c" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_r_x-tick_len}" y1="{mid_r_y}" x2="{mid_r_x+tick_len}" y2="{mid_r_y}" stroke="#e74c3c" stroke-width="2"/>'
+                    else:
+                        # 1 ขีดด้านกว้าง(น้ำเงิน), 2 ขีดด้านยาว(แดง)
+                        svg += f'<line x1="{mid_top_x-3}" y1="{mid_top_y-tick_len}" x2="{mid_top_x-3}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_top_x+3}" y1="{mid_top_y-tick_len}" x2="{mid_top_x+3}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        
+                        svg += f'<line x1="{mid_bot_x-3}" y1="{mid_bot_y-tick_len}" x2="{mid_bot_x-3}" y2="{mid_bot_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_bot_x+3}" y1="{mid_bot_y-tick_len}" x2="{mid_bot_x+3}" y2="{mid_bot_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        
+                        svg += f'<line x1="{mid_l_x-tick_len}" y1="{mid_l_y}" x2="{mid_l_x+tick_len}" y2="{mid_l_y}" stroke="#3498db" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_r_x-tick_len}" y1="{mid_r_y}" x2="{mid_r_x+tick_len}" y2="{mid_r_y}" stroke="#3498db" stroke-width="2"/>'
+
+                    # ข้อความกำกับความยาว (ด้านล่าง และ ด้านขวา)
+                    svg += f'<text x="{mid_bot_x}" y="{mid_bot_y + 25}" font-family="Sarabun" font-size="16" font-weight="bold" fill="#2c3e50" text-anchor="middle">{w_text}</text>'
+                    svg += f'<text x="{mid_r_x + 15}" y="{mid_r_y + 5}" font-family="Sarabun" font-size="16" font-weight="bold" fill="#2c3e50" text-anchor="start">{h_text}</text>'
+                    
+                    svg += '</svg>'
+                    
+                    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+                        <div style="border: 1px solid #bdc3c7; border-radius: 8px; padding: 20px; background-color: #fdfefe; box-shadow: 2px 2px 5px rgba(0,0,0,0.05);">
+                            {svg}
+                        </div>
+                    </div>'''
+
                 if is_square:
-                    side = random.randint(5, 25)
+                    side = random.randint(12, 145)
                     peri = 4 * side
-                    svg = draw_rect_svg(side, side, f"{side} ม.", f"{side} ม.", "#fdf2e9")
-                    q = f"จงหาความยาวรอบรูปของ<b>สี่เหลี่ยมจัตุรัส</b>ต่อไปนี้<br>{svg}"
+                    svg = draw_exam_rect(side, side, f"{side} {units}", f"{side} {units}", is_sq=True)
+                    q = f"พิจารณารูป<b>สี่เหลี่ยมจัตุรัส</b>ที่กำหนดให้ จงหาความยาวรอบรูปทั้งหมด<br>{svg}"
                     
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>สูตร:</b> ความยาวรอบรูปสี่เหลี่ยมจัตุรัส = <b>4 × ความยาวด้าน</b><br>
-                    👉 <i>(<b>อธิบายที่มา:</b> สี่เหลี่ยมจัตุรัสมีด้านยาวเท่ากันทั้งหมด 4 ด้าน แทนที่จะนำมาบวกทีละด้านแบบ {side} + {side} + {side} + {side} เราจึงรวบใช้การคูณ 4 แทนได้เลย)</i><br>
-                    👉 จากรูป ความยาวแต่ละด้าน = {side} ม.<br>
-                    👉 แทนค่าลงในสูตร: 4 × {side} = <b>{peri} เมตร</b><br>
-                    <b>ตอบ: {peri} เมตร</b></span>"""
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#fcf3cf; border-left:4px solid #f1c40f; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    💡 <b>สูตร:</b> ความยาวรอบรูปสี่เหลี่ยมจัตุรัส = <b>4 × ความยาวด้าน</b>
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <i>(<b>วิเคราะห์:</b> สัญลักษณ์ 1 ขีดสีแดงบนทุกด้าน บ่งบอกว่าเป็นสี่เหลี่ยมจัตุรัสที่มีด้านยาวเท่ากันทั้งหมด 4 ด้าน แทนที่จะนำมาบวกทีละด้าน เราจึงรวบใช้การคูณ 4 แทนได้เลย)</i><br>
+                    👉 จากรูป ความยาวแต่ละด้าน = <b>{side} {units}</b><br>
+                    👉 แทนค่าลงในสูตร: 4 × {side} = <b>{peri:,}</b><br><br>
+                    <b>ตอบ: ความยาวรอบรูปคือ {peri:,} {units}</b></span>"""
                 else:
-                    w, h = random.randint(4, 15), random.randint(16, 30)
+                    w = random.randint(15, 85)
+                    h = w + random.randint(12, 60)
+                    # สลับแกนให้กว้าง-ยาวสุ่มไปมาบ้าง
+                    if random.choice([True, False]):
+                        w, h = h, w
+                        
                     peri = 2 * (w + h)
-                    # วาดให้ h เป็นแนวนอน (ด้านยาว) และ w เป็นแนวตั้ง (ด้านกว้าง)
-                    svg = draw_rect_svg(h, w, f"{h} ซม.", f"{w} ซม.", "#e8f8f5")
-                    q = f"จงหาความยาวรอบรูปของ<b>สี่เหลี่ยมผืนผ้า</b>ต่อไปนี้<br>{svg}"
+                    # กำหนดให้วาดด้านยาวเป็นแกนนอนเสมอเพื่อความสวยงามสมมาตร
+                    if w > h:
+                        svg = draw_exam_rect(w, h, f"{w} {units}", f"{h} {units}", is_sq=False)
+                    else:
+                        svg = draw_exam_rect(h, w, f"{h} {units}", f"{w} {units}", is_sq=False)
+                        
+                    q = f"พิจารณารูป<b>สี่เหลี่ยมผืนผ้า</b>ที่กำหนดให้ จงหาความยาวรอบรูปทั้งหมด<br>{svg}"
                     
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>สูตร:</b> ความยาวรอบรูปสี่เหลี่ยมผืนผ้า = <b>2 × (กว้าง + ยาว)</b><br>
-                    👉 <i>(<b>อธิบายที่มา:</b> สี่เหลี่ยมผืนผ้าจะมีด้านกว้างยาวเท่ากัน 2 ด้าน และด้านยาวเท่ากัน 2 ด้าน เราจึงนำด้านกว้าง 1 ด้านมารวมกับด้านยาว 1 ด้านให้เป็น 1 ชุดก่อน แล้วค่อยคูณ 2 เพื่อให้ได้ครบทั้ง 4 ด้าน)</i><br>
-                    👉 จากรูป ด้านกว้าง (ด้านสั้น) = {w} ซม. และ ด้านยาว = {h} ซม.<br>
-                    👉 นำ (กว้าง + ยาว) มาบวกกันก่อน: {w} + {h} = {w+h}<br>
-                    👉 แทนค่าลงในสูตร: 2 × {w+h} = <b>{peri} เซนติเมตร</b><br>
-                    <b>ตอบ: {peri} เซนติเมตร</b></span>"""
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    💡 <b>สูตร:</b> ความยาวรอบรูปสี่เหลี่ยมผืนผ้า = <b>2 × (กว้าง + ยาว)</b>
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <i>(<b>วิเคราะห์:</b> สี่เหลี่ยมผืนผ้ามีด้านกว้างยาวเท่ากัน 2 ด้าน (ขีดสีน้ำเงิน) และด้านยาวเท่ากัน 2 ด้าน (ขีดสีแดง) เราจึงนำด้านกว้าง 1 ด้านมารวมกับด้านยาว 1 ด้านให้เป็น 1 ชุดก่อน แล้วค่อยคูณ 2 เพื่อให้ครบทั้ง 4 ด้าน)</i><br>
+                    👉 จากรูป ด้านที่ 1 = <b>{min(w,h)} {units}</b> และ ด้านที่ 2 = <b>{max(w,h)} {units}</b><br>
+                    👉 นำมาบวกกันก่อน: {min(w,h)} + {max(w,h)} = <b>{w+h}</b><br>
+                    👉 นำผลบวกไปคูณ 2: 2 × {w+h} = <b>{peri:,}</b><br><br>
+                    <b>ตอบ: ความยาวรอบรูปคือ {peri:,} {units}</b></span>"""
 
 
 

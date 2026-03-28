@@ -3503,7 +3503,7 @@ def create_page(grade, sub_t, questions, is_key=False, q_margin="20px", ws_heigh
 # ==========================================
 st.sidebar.markdown("## ⚙️ พารามิเตอร์การสร้าง")
 
-selected_grade = st.sidebar.selectbox("📚 เลือกระดับชั้น:", ["ป.4", "ป.5"])
+selected_grade = st.sidebar.selectbox("📚 เลือกระดับชั้น:", ["ป.4"])
 main_topics_list = list(curriculum_db[selected_grade].keys())
 main_topics_list.append("🌟 โหมดพิเศษ (สุ่มทุกเรื่อง)")
 

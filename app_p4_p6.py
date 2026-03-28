@@ -1823,33 +1823,50 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     svg = draw_p4_real_life_geo_svg(scenario, shape_type, [w, l], unit)
 
                     if scenario == "fence":
-                        cost = random.choice([50, 80, 120])
+                        persons = ["คุณพ่อ", "คุณตา", "ชาวสวน", "คุณป้า", "เจ้าของฟาร์ม", "ผู้รับเหมา"]
+                        places = ["สวนผลไม้", "ฟาร์มเลี้ยงไก่", "แปลงดอกไม้", "บ่อปลา", "คอกม้า", "สนามเด็กเล่น"]
+                        person = random.choice(persons)
+                        place = random.choice(places)
+                        cost = random.choice([50, 80, 120, 150])
                         ans = perimeter * cost
-                        q = f"คุณพ่อล้อมรั้วลวดหนามรอบสวน{shape_desc} ถ้าค่าทำรั้ว{unit}ละ {cost} บาท จะต้องจ่ายเงินทั้งหมดเท่าไร?<br>{svg}"
+                        
+                        q = f"{person}ต้องการล้อมรั้วรอบ{place}{shape_desc} ถ้าค่าทำรั้ว{unit}ละ {cost} บาท จะต้องจ่ายเงินทั้งหมดเท่าไร?<br>{svg}"
                         step2_desc = f"นำความยาวรอบรูป คูณกับ ราคาต่อ{unit}"
                         step2_calc = f"{perimeter} × <b style='color:{c_red};'>{cost}</b> = <b style='color:#27ae60;'>{ans:,}</b> บาท"
                         ans_text = f"{ans:,} บาท"
                     
                     elif scenario == "running":
-                        laps = random.choice([3, 4, 5]) # วิ่งหลายรอบ (ข้อสอบแข่งขันชอบออก)
+                        persons = ["นักกีฬา", "นักเรียน", "คุณลุง", "ชาวบ้าน", "เด็กๆ", "คุณครูพละ"]
+                        places = ["สนามฟุตบอล", "ลานออกกำลังกาย", "สวนสาธารณะ", "ลานกีฬากลางแจ้ง", "รอบสระว่ายน้ำ"]
+                        person = random.choice(persons)
+                        place = random.choice(places)
+                        laps = random.choice([3, 4, 5, 6, 10])
                         ans = perimeter * laps
-                        q = f"นักกีฬาซ้อมวิ่งรอบสนามหญ้า{shape_desc} ถ้านักกีฬาวิ่งรอบสนามทั้งหมด <b>{laps} รอบ</b> จะวิ่งได้ระยะทางรวมกี่เมตร?<br>{svg}"
+                        
+                        q = f"{person}มาซ้อมวิ่งรอบ{place}{shape_desc} ถ้า{person}วิ่งรอบสถานที่นี้ทั้งหมด <b>{laps} รอบ</b> จะวิ่งได้ระยะทางรวมกี่{unit}?<br>{svg}"
                         step2_desc = f"นำความยาว 1 รอบ คูณกับ จำนวนรอบที่วิ่ง"
-                        step2_calc = f"{perimeter} × <b style='color:{c_red};'>{laps}</b> รอบ = <b style='color:#27ae60;'>{ans:,}</b> เมตร"
-                        ans_text = f"{ans:,} เมตร"
+                        step2_calc = f"{perimeter} × <b style='color:{c_red};'>{laps}</b> รอบ = <b style='color:#27ae60;'>{ans:,}</b> {unit}"
+                        ans_text = f"{ans:,} {unit}"
                         
                     elif scenario == "frame":
-                        cost = random.choice([15, 20, 25])
+                        persons = ["นักเรียน", "คุณครู", "ประธานนักเรียน", "เจ้าของร้าน", "นักออกแบบ"]
+                        places = ["บอร์ดนิทรรศการ", "ป้ายประกาศ", "กรอบรูปขนาดใหญ่", "ป้ายโฆษณา", "ขอบเวที"]
+                        items = ["ติดแถบไฟ LED", "ติดริบบิ้น", "ตอกคิ้วไม้", "ติดกระดาษสีตกแต่ง"]
+                        person = random.choice(persons)
+                        place = random.choice(places)
+                        item = random.choice(items)
+                        cost = random.choice([15, 20, 25, 30])
                         ans = perimeter * cost
-                        q = f"นักเรียนต้องการติดแถบไฟ LED รอบขอบบอร์ดนิทรรศการ{shape_desc} ถ้าไฟ LED ราคา{unit}ละ {cost} บาท จะต้องจ่ายเงินกี่บาท?<br>{svg}"
-                        step2_desc = f"นำความยาวรอบขอบบอร์ด คูณกับ ราคาต่อ{unit}"
+                        
+                        q = f"{person}ต้องการ{item}รอบขอบ{place}{shape_desc} ถ้าวัสดุตกแต่งราคา{unit}ละ {cost} บาท จะต้องจ่ายเงินกี่บาท?<br>{svg}"
+                        step2_desc = f"นำความยาวรอบขอบ คูณกับ ราคาต่อ{unit}"
                         step2_calc = f"{perimeter} × <b style='color:{c_red};'>{cost}</b> = <b style='color:#27ae60;'>{ans:,}</b> บาท"
                         ans_text = f"{ans:,} บาท"
 
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#fef5e7; border-left:4px solid #e67e22; padding:15px; margin-bottom:15px; border-radius:8px;'>
                     💡 <b>วิเคราะห์โจทย์ (ล้อมรอบขอบ = ความยาวรอบรูป):</b><br>
-                    คำว่า "ล้อมรอบ, วิ่งรอบ, ติดขอบ" หมายถึงการหา <b>ความยาวรอบรูป</b> จากนั้นค่อยนำไปคำนวณราคาหรือจำนวนรอบตามที่โจทย์ถามครับ
+                    คำว่า "ล้อมรั้ว, วิ่งรอบ, ตกแต่งขอบ" หมายถึงการหา <b>ความยาวรอบรูป</b> จากนั้นค่อยนำไปคำนวณราคาหรือจำนวนรอบตามที่โจทย์ถามครับ
                     </div>
                     <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
                     👉 <b>ขั้นที่ 1: หาความยาวรอบรูป 1 รอบ</b><br>
@@ -1879,20 +1896,37 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
                     svg = draw_p4_real_life_geo_svg(scenario, shape_type, [w, l], unit)
 
-                    cost = random.choice([150, 250, 300, 450])
-                    ans = area * cost
-                    
                     if scenario == "tile":
-                        q = f"ช่างปูกระเบื้องห้องโถง{shape_desc} ถ้าค่าปูกระเบื้องตาราง{unit}ละ {cost} บาท จะต้องจ่ายค่าจ้างกี่บาท?<br>{svg}"
+                        persons = ["ช่างปูน", "ผู้รับเหมา", "คุณพ่อ", "ผู้อำนวยการโรงเรียน", "เจ้าของบ้าน"]
+                        places = ["ห้องโถง", "ลานซักล้าง", "ระเบียงบ้าน", "พื้นลานจอดรถ", "ลานวัด", "ลานกิจกรรม"]
+                        person = random.choice(persons)
+                        place = random.choice(places)
+                        cost = random.choice([150, 200, 250, 300, 400])
+                        ans = area * cost
+                        q = f"{person}ต้องการปูกระเบื้อง{place}{shape_desc} ถ้าค่าปูกระเบื้องตาราง{unit}ละ {cost} บาท จะต้องจ่ายค่าจ้างทั้งหมดกี่บาท?<br>{svg}"
+                        
                     elif scenario == "carpet":
-                        q = f"แม่ซื้อพรมมาปูพื้นห้องนอน{shape_desc} ถ้าพรมราคาตาราง{unit}ละ {cost} บาท แม่ต้องจ่ายเงินกี่บาท?<br>{svg}"
+                        persons = ["คุณแม่", "ฝ่ายอาคาร", "เจ้าของห้อง", "ผู้จัดการโรงแรม", "ห้องสมุด"]
+                        places = ["ห้องนอน", "ห้องประชุม", "ห้องอ่านหนังสือ", "เวทีการแสดง", "ห้องนั่งเล่น"]
+                        person = random.choice(persons)
+                        place = random.choice(places)
+                        cost = random.choice([120, 180, 250, 350])
+                        ans = area * cost
+                        q = f"{person}สั่งซื้อพรมมาปูพื้น{place}{shape_desc} ถ้าพรมราคาตาราง{unit}ละ {cost} บาท จะต้องจ่ายเงินกี่บาท?<br>{svg}"
+                        
                     elif scenario == "paint":
-                        q = f"ลุงช่างทาสีกำแพงบ้าน{shape_desc} ถ้าค่าจ้างทาสีตาราง{unit}ละ {cost} บาท ลุงช่างจะได้ค่าจ้างทั้งหมดกี่บาท?<br>{svg}"
+                        persons = ["ลุงช่างทาสี", "เทศบาล", "จิตรกร", "ภารโรง", "กลุ่มนักศึกษา"]
+                        places = ["กำแพงบ้าน", "ผนังห้องเรียน", "กำแพงโรงเรียน", "รั้วปูน", "ป้ายร้านค้าขนาดใหญ่"]
+                        person = random.choice(persons)
+                        place = random.choice(places)
+                        cost = random.choice([80, 100, 150, 200])
+                        ans = area * cost
+                        q = f"{person}รับเหมาทาสี{place}{shape_desc} ถ้าคิดค่าจ้างทาสีตาราง{unit}ละ {cost} บาท {person}จะได้ค่าจ้างทั้งหมดกี่บาท?<br>{svg}"
 
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#e8f8f5; border-left:4px solid #1abc9c; padding:15px; margin-bottom:15px; border-radius:8px;'>
                     💡 <b>วิเคราะห์โจทย์ (ปกคลุมพื้นผิว = การหาพื้นที่):</b><br>
-                    คำว่า "ปูกระเบื้อง, ปูพรม, ทาสี" คือการทำสิ่งที่คลุมผิวหน้าทั้งหมด จึงต้องหา <b>พื้นที่ (กว้าง × ยาว)</b> จากนั้นนำไปคูณกับราคาต่อตารางหน่วยครับ
+                    คำว่า "ปูกระเบื้อง, ปูพรม, ทาสี" คือการทำสิ่งที่คลุมผิวหน้าทั้งหมด จึงต้องหา <b>พื้นที่ (กว้าง × ยาว หรือ ด้าน × ด้าน)</b> จากนั้นนำไปคูณกับราคาต่อตารางหน่วยครับ
                     </div>
                     <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
                     👉 <b>ขั้นที่ 1: หาพื้นที่ทั้งหมด</b><br>

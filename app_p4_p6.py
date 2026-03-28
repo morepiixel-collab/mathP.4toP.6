@@ -1786,6 +1786,89 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
 
+            elif actual_sub_t == "โจทย์ปัญหาเรขาคณิต (รั้วและพื้นที่ชีวิตจริง)":
+                unit = "ม." # ใช้หน่วยเมตรสำหรับชีวิตจริงให้ดูสมเหตุสมผล
+                scenario = random.choice(["fence", "tile"])
+                shape_type = random.choice(["square", "rectangle"])
+                
+                # กำหนดตัวแปรและสีที่จะใช้เน้นในเฉลย
+                c_blue, c_red = "#3498db", "#e74c3c"
+                
+                if scenario == "fence":
+                    # --- โจทย์แนวความยาวรอบรูป (ล้อมรั้ว) ---
+                    cost_per_m = random.choice([50, 80, 120, 150])
+                    
+                    if shape_type == "square":
+                        side = random.randint(12, 45)
+                        perimeter = side * 4
+                        total_cost = perimeter * cost_per_m
+                        svg = draw_p4_real_life_geo_svg("fence", "square", [side], unit)
+                        q = f"คุณพ่อต้องการล้อมรั้วลวดหนามรอบสวนรูป<b>สี่เหลี่ยมจัตุรัส</b>ที่มีความยาวด้านละ {side} เมตร ถ้าค่าทำรั้วเมตรละ {cost_per_m} บาท คุณพ่อจะต้องจ่ายเงินทั้งหมดกี่บาท?<br>{svg}"
+                        shape_desc = f"รูปสี่เหลี่ยมจัตุรัส (ด้านยาวเท่ากัน 4 ด้าน)"
+                        step1_calc = f"{side} × 4 = <b style='color:{c_blue};'>{perimeter}</b> เมตร"
+                    else:
+                        w = random.randint(10, 30)
+                        l = random.randint(w + 5, w + 25)
+                        perimeter = (w + l) * 2
+                        total_cost = perimeter * cost_per_m
+                        svg = draw_p4_real_life_geo_svg("fence", "rectangle", [w, l], unit)
+                        q = f"คุณลุงต้องการล้อมรั้วไม้รอบแปลงผักรูป<b>สี่เหลี่ยมผืนผ้า</b> กว้าง {w} เมตร ยาว {l} เมตร ถ้าค่าทำรั้วเมตรละ {cost_per_m} บาท คุณลุงจะต้องจ่ายเงินทั้งหมดกี่บาท?<br>{svg}"
+                        shape_desc = f"รูปสี่เหลี่ยมผืนผ้า (กว้าง {w} ม. และ ยาว {l} ม.)"
+                        step1_calc = f"({w} + {l}) × 2 = <b style='color:{c_blue};'>{perimeter}</b> เมตร"
+
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#fef5e7; border-left:4px solid #e67e22; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                    💡 <b>วิเคราะห์โจทย์ (ล้อมรั้ว = ความยาวรอบรูป):</b><br>
+                    การ "ล้อมรั้ว" คือการหา <b>ความยาวรอบรูป</b> จากนั้นนำไปคูณกับ <b>ราคาต่อเมตร</b> เพื่อหาค่าใช้จ่ายทั้งหมด
+                    </div>
+                    <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                    👉 <b>ขั้นที่ 1: หาความยาวรั้วทั้งหมด (ความยาวรอบรูป)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;พื้นที่เป็น {shape_desc}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ความยาวรอบรูป = {step1_calc}<br>
+                    👉 <b>ขั้นที่ 2: คำนวณค่าใช้จ่ายทั้งหมด</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ค่าทำรั้วเมตรละ <b style='color:{c_red};'>{cost_per_m}</b> บาท<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำความยาวที่ได้มาคูณกับราคา ➔ {perimeter} × {cost_per_m}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;คิดเป็นเงิน = <b style='color:#27ae60;'>{total_cost:,}</b> บาท<br><br>
+                    <b>ตอบ: จะต้องจ่ายเงินทั้งหมด {total_cost:,} บาท</b></span>"""
+
+                else:
+                    # --- โจทย์แนวพื้นที่ (ปูกระเบื้อง/ปลูกหญ้า) ---
+                    cost_per_sqm = random.choice([150, 200, 250, 300])
+                    
+                    if shape_type == "square":
+                        side = random.randint(5, 15)
+                        area = side * side
+                        total_cost = area * cost_per_sqm
+                        svg = draw_p4_real_life_geo_svg("tile", "square", [side], unit)
+                        q = f"ช่างต้องการปูกระเบื้องห้องลานซักล้างรูป<b>สี่เหลี่ยมจัตุรัส</b>ที่มีความยาวด้านละ {side} เมตร ถ้าค่าปูกระเบื้องตารางเมตรละ {cost_per_sqm} บาท จะต้องจ่ายค่าปูกระเบื้องทั้งหมดกี่บาท?<br>{svg}"
+                        shape_desc = f"รูปสี่เหลี่ยมจัตุรัส (ด้าน × ด้าน)"
+                        step1_calc = f"{side} × {side} = <b style='color:{c_blue};'>{area}</b> ตารางเมตร"
+                    else:
+                        w = random.randint(4, 12)
+                        l = random.randint(w + 2, w + 10)
+                        area = w * l
+                        total_cost = area * cost_per_sqm
+                        svg = draw_p4_real_life_geo_svg("tile", "rectangle", [w, l], unit)
+                        q = f"เทศบาลต้องการปลูกหญ้าที่ลานอเนกประสงค์รูป<b>สี่เหลี่ยมผืนผ้า</b> กว้าง {w} เมตร ยาว {l} เมตร ถ้ารักษาและปลูกหญ้าตารางเมตรละ {cost_per_sqm} บาท จะต้องใช้งบประมาณทั้งหมดกี่บาท?<br>{svg}"
+                        shape_desc = f"รูปสี่เหลี่ยมผืนผ้า (กว้าง × ยาว)"
+                        step1_calc = f"{w} × {l} = <b style='color:{c_blue};'>{area}</b> ตารางเมตร"
+
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#e8f8f5; border-left:4px solid #1abc9c; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                    💡 <b>วิเคราะห์โจทย์ (ปูพื้น/ปลูกหญ้า = พื้นที่):</b><br>
+                    การทำอะไรที่คลุมผิวหน้า (เช่น ปูกระเบื้อง, ปลูกหญ้า) คือการหา <b>พื้นที่</b> (ตารางหน่วย) จากนั้นนำไปคูณกับ <b>ราคาต่อตารางเมตร</b>
+                    </div>
+                    <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                    👉 <b>ขั้นที่ 1: หาพื้นที่ทั้งหมด</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;พื้นที่เป็น {shape_desc}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;พื้นที่ = {step1_calc}<br>
+                    👉 <b>ขั้นที่ 2: คำนวณค่าใช้จ่ายทั้งหมด</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ค่าใช้จ่ายตารางเมตรละ <b style='color:{c_red};'>{cost_per_sqm}</b> บาท<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำพื้นที่ทั้งหมดมาคูณกับราคา ➔ {area} × {cost_per_sqm}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;คิดเป็นเงิน = <b style='color:#27ae60;'>{total_cost:,}</b> บาท<br><br>
+                    <b>ตอบ: จะต้องจ่ายเงินทั้งหมด {total_cost:,} บาท</b></span>"""
+
+
 
 
             elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":

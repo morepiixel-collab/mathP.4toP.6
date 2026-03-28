@@ -70,6 +70,46 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
 import math
 import random
 
+def draw_p4_grid_area_svg(shape_pts, unit="ตารางหน่วย"):
+    svg_w, svg_h = 450, 270 # เพิ่มความสูงนิดหน่อยให้มีที่วางคำอธิบาย
+    cols, rows = 14, 8
+    cell = 25
+    
+    # คำนวณจุดกึ่งกลางในการวาดตาราง
+    ox = (svg_w - (cols * cell)) / 2
+    oy = (svg_h - (rows * cell)) / 2 - 15 
+
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+
+    # 1. วาดเส้นตาราง (Grid Lines) เป็นเส้นประสีเทาอ่อน
+    for r in range(rows + 1):
+        y = oy + r * cell
+        svg += f'<line x1="{ox}" y1="{y}" x2="{ox + cols * cell}" y2="{y}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>'
+    for c in range(cols + 1):
+        x = ox + c * cell
+        svg += f'<line x1="{x}" y1="{oy}" x2="{x}" y2="{oy + rows * cell}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>'
+
+    # 2. วาดรูปทรงที่ระบายสี (Fill Color)
+    pts_str = " ".join([f"{ox + p[0]*cell},{oy + p[1]*cell}" for p in shape_pts])
+    svg += f'<polygon points="{pts_str}" fill="#85c1e9" fill-opacity="0.9" stroke="#2980b9" stroke-width="2.5" stroke-linejoin="round"/>'
+
+    # 3. วาดคำอธิบาย (Legend) ด้านล่างสุด
+    leg_y = oy + rows * cell + 25
+    svg += f'<rect x="{ox + 30}" y="{leg_y - 15}" width="20" height="20" fill="#85c1e9" fill-opacity="0.9" stroke="#2980b9" stroke-width="1.5"/>'
+    svg += f'<text x="{ox + 60}" y="{leg_y}" font-family="Sarabun" font-size="16" font-weight="bold" fill="#2c3e50">กำหนดให้ 1 ช่อง มีพื้นที่ = 1 {unit}</text>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+        <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 20px 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            {svg}
+        </div></div>'''
+
+
+
+
+import math
+import random
+
 def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, unit="ซม."):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 120

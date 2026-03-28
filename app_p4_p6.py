@@ -1479,29 +1479,39 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 n1 = random.randint(1, d-1)
                 
                 if "บวก" in actual_sub_t:
-                    # บวกกันแล้วไม่เกิน 1
-                    n2 = random.randint(1, d - n1) if d - n1 >= 1 else 1
-                    ans_n = n1 + n2
+                    # สุ่มตัวส่วน (ป.4 เน้นส่วนเท่ากัน หรือส่วนที่เป็นพหุคูณ)
+                    d = random.choice([4, 6, 8, 10, 12])
+                    n1 = random.randint(1, d // 2)
+                    n2 = random.randint(1, d // 2)
+                    
+                    ans_n_raw = n1 + n2
+                    ans_d_raw = d
+                    
+                    # หาเศษส่วนอย่างต่ำสำหรับเฉลย
+                    common = math.gcd(ans_n_raw, ans_d_raw)
+                    ans_n_final = ans_n_raw // common
+                    ans_d_final = ans_d_raw // common
+                    
                     op_sym = "+"
                     q_val_2 = draw_f(n2, d)
-                elif "ลบ" in actual_sub_t:
-                    # ลบกันแล้วไม่ติดลบ
-                    n2 = random.randint(1, n1) if n1 >= 1 else 1
-                    ans_n = n1 - n2
-                    op_sym = "-"
-                    q_val_2 = draw_f(n2, d)
-                elif "คูณ" in actual_sub_t:
-                    # คูณจำนวนเต็ม (ป.4)
-                    n2 = random.randint(2, 5)
-                    ans_n = n1 * n2 # ผลลัพธ์อาจเป็นเศษเกิน (ครู ป.4 สอนแปลงต่อได้)
-                    op_sym = "×"
-                    q_val_2 = str(n2)
-                else: # การหารเศษส่วน (หารด้วยจำนวนเต็ม)
-                    n2 = random.randint(2, 4)
-                    ans_n_num = n1
-                    ans_d_num = d * n2
-                    op_sym = "÷"
-                    q_val_2 = str(n2)
+                    
+                    # --- สร้างเฉลยแบบละเอียด (กู้คืนกลับมา) ---
+                    step_reduce = ""
+                    if common > 1:
+                        step_reduce = f"""
+                        👉 <b>ขั้นที่ 2: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำ {common} มาหารทั้งเศษและส่วน ➔ {draw_f(f"{ans_n_raw} ÷ {common}", f"{ans_d_raw} ÷ {common}")} = <b>{draw_f(ans_n_final, ans_d_final) if ans_d_final != 1 else ans_n_final}</b><br>
+                        """
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    💡 <b>หลักการบวกเศษส่วน:</b> เมื่อตัวส่วนเท่ากัน ให้นำ "ตัวเศษ" มาบวกกันได้เลย โดยตัวส่วนยังคงเดิม
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: นำตัวเศษมาบวกกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_f(n1, d)} + {draw_f(n2, d)} = {draw_f(f"{n1} + {n2}", d)} = <b>{draw_f(ans_n_raw, ans_d_raw)}</b><br>
+                    {step_reduce}
+                    <br><b>ตอบ: {draw_f(ans_n_final, ans_d_final) if ans_d_final != 1 else ans_n_final}</b></span>"""
 
                 # --- ส่วนการสร้างโจทย์ ---
                 if prob_style == 1 and "หาร" not in actual_sub_t:

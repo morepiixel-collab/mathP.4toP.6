@@ -1451,9 +1451,64 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 &nbsp;&nbsp;&nbsp;&nbsp;{whole_part[0]}0 + {whole_part[1]} + 0.{dec_part[0]} + 0.0{dec_part[1]} {"+ 0.00" + dec_part[2] if len(dec_part)==3 else ""}<br><br>
                 💡 <i>หมายเหตุ: การกระจายช่วยให้เราเข้าใจว่าเลขแต่ละตัวมีค่าเท่าไหร่ตามตำแหน่งของมัน</i></span>"""
 
+            # ==========================================
+            # หมวดเศษส่วน ป.4 (อัปเกรดใหม่ มีรูปภาพและตัวเลขสุ่ม)
+            # ==========================================
             elif actual_sub_t in ["การบวกเศษส่วน", "การลบเศษส่วน", "การคูณเศษส่วน", "การหารเศษส่วน"]:
-                q = f"จงคำนวณและแสดงวิธีทำ {actual_sub_t} ตามที่กำหนดให้"
-                sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> หาผลลัพธ์ของ {actual_sub_t} พร้อมทำเป็นเศษส่วนอย่างต่ำ</span>"
+                prob_style = random.choice([1, 2]) # 1: แบบรูปภาพ, 2: แบบตัวเลขล้วน
+                
+                # ฟังก์ชันภายในสำหรับจัดการเศษส่วน
+                def draw_f(n, d):
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
+                
+                # ฟังก์ชันวาดรูปแถบสี่เหลี่ยม (Visual)
+                def draw_rect_f(n, d, color="#3498db"):
+                    svg = f'<svg width="120" height="40" viewBox="0 0 120 40">'
+                    w = 120 / d
+                    for i in range(d):
+                        fill = color if i < n else "#ecf0f1"
+                        svg += f'<rect x="{i*w}" y="0" width="{w}" height="40" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += '</svg>'
+                    return svg
+
+                # สุ่มค่าพื้นฐาน
+                d = random.choice([4, 5, 6, 8, 10, 12])
+                n1 = random.randint(1, d-1)
+                
+                if "บวก" in actual_sub_t:
+                    n2 = random.randint(1, d - n1 if d-n1 > 0 else 1)
+                    ans_n = n1 + n2
+                    op_sym = "+"
+                elif "ลบ" in actual_sub_t:
+                    n2 = random.randint(1, n1 if n1 > 1 else 1)
+                    ans_n = n1 - n2
+                    op_sym = "-"
+                elif "คูณ" in actual_sub_t:
+                    n2 = random.randint(2, 5) # คูณจำนวนเต็ม
+                    ans_n = n1 * n2
+                    op_sym = "×"
+                else: # หาร
+                    n2 = random.randint(2, 3) # หารด้วยจำนวนเต็ม
+                    ans_n_num = n1
+                    ans_d_num = d * n2
+                    op_sym = "÷"
+
+                # สร้างเนื้อหาโจทย์
+                if prob_style == 1 and "หาร" not in actual_sub_t:
+                    q = f"จากรูปภาพ จงหาผลลัพธ์ของ {actual_sub_t}<br><br>"
+                    q += f"<div style='display:flex; align-items:center; gap:10px;'>{draw_rect_f(n1, d)} <b>{op_sym}</b> "
+                    q += f"{draw_rect_f(n2, d) if 'คูณ' not in actual_sub_t else f'<b>{n2}</b>'}</div>"
+                else:
+                    if "คูณ" in actual_sym_t or "หาร" in actual_sub_t:
+                        q = f"จงหาผลลัพธ์ของ <b>{draw_f(n1, d)} {op_sym} {n2}</b>"
+                    else:
+                        q = f"จงหาผลลัพธ์ของ <b>{draw_f(n1, d)} {op_sym} {draw_f(n2, d)}</b>"
+
+                # สร้างเฉลย
+                if "หาร" in actual_sub_t:
+                    sol = f"<b>วิธีทำ:</b> {draw_f(n1, d)} ÷ {n2} = {draw_f(n1, d)} × {draw_f(1, n2)} = <b>{draw_f(ans_n_num, ans_d_num)}</b>"
+                else:
+                    sol = f"<b>วิธีทำ:</b> คำนวณตามหลักการเศษส่วน จะได้คำตอบคือ <b>{draw_f(ans_n, d)}</b>"
 
 
             elif actual_sub_t == "การบวกเศษส่วน":

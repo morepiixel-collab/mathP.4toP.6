@@ -1578,6 +1578,72 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
 
+            elif actual_sub_t == "การหาพื้นที่โดยการนับตาราง":
+                unit = random.choice(["ตร.ซม.", "ตร.ม.", "ตารางหน่วย"])
+                
+                # สุ่มรูปแบบของรูปทรง (6 สไตล์ที่แตกต่างกัน)
+                shapes_list = ["L", "T", "U", "Plus", "Stair", "Rectangle"]
+                choice = random.choice(shapes_list)
+
+                # สร้างพิกัด (x, y) เริ่มจากมุม (0,0) และคำนวณพื้นที่
+                if choice == "Rectangle":
+                    w, h = random.randint(3, 7), random.randint(3, 6)
+                    pts = [(0,0), (w,0), (w,h), (0,h)]
+                    area = w * h
+                elif choice == "L":
+                    t = random.randint(1, 2)
+                    h, w = random.randint(4, 7), random.randint(4, 7)
+                    pts = [(0,0), (t,0), (t,h-t), (w,h-t), (w,h), (0,h)]
+                    area = t*h + (w-t)*t
+                elif choice == "T":
+                    t = random.randint(1, 2)
+                    w = random.choice([5, 7]) # ให้ความกว้างเป็นเลขคี่ เพื่อให้ก้านตัว T อยู่ตรงกลางพอดี
+                    h = random.randint(4, 7)
+                    stem_w = random.choice([1, 3])
+                    margin = (w - stem_w) // 2
+                    pts = [(0,0), (w,0), (w,t), (margin+stem_w,t), (margin+stem_w,h), (margin,h), (margin,t), (0,t)]
+                    area = w*t + stem_w*(h-t)
+                elif choice == "U":
+                    t = random.randint(1, 2)
+                    w = random.choice([5, 6, 7])
+                    h = random.randint(4, 6)
+                    pts = [(0,0), (t,0), (t,h-t), (w-t,h-t), (w-t,0), (w,0), (w,h), (0,h)]
+                    area = w*h - (w-2*t)*(h-t)
+                elif choice == "Plus":
+                    t = random.randint(1, 2)
+                    arm = random.randint(1, 2)
+                    w, h = t + arm*2, t + arm*2
+                    pts = [(arm,0), (arm+t,0), (arm+t,arm), (w,arm), (w,arm+t), (arm+t,arm+t), (arm+t,h), (arm,h), (arm,arm+t), (0,arm+t), (0,arm), (arm,arm)]
+                    area = t*h + 2*(arm*t)
+                elif choice == "Stair":
+                    step_w, step_h = random.randint(1, 2), random.randint(1, 2)
+                    # บันได 3 ขั้น
+                    pts = [(0, 0), (step_w, 0), (step_w, step_h), (step_w*2, step_h), (step_w*2, step_h*2), (step_w*3, step_h*2), (step_w*3, step_h*3), (0, step_h*3)]
+                    area = (step_w * step_h * 3) + (step_w * step_h * 2) + (step_w * step_h * 1)
+
+                # 🎯 คำนวณเพื่อย้ายรูปทรงไปอยู่ตรง "กึ่งกลาง" ของตารางพอดีเป๊ะ
+                max_x = max(p[0] for p in pts)
+                max_y = max(p[1] for p in pts)
+                offset_x = (14 - max_x) // 2
+                offset_y = (8 - max_y) // 2
+                final_pts = [(p[0]+offset_x, p[1]+offset_y) for p in pts]
+
+                svg = draw_p4_grid_area_svg(final_pts, unit)
+                q = f"พิจารณารูปที่กำหนดให้บนตาราง จงหา<b>พื้นที่</b>ของส่วนที่ระบายสี<br>{svg}"
+
+                sol = f"""<span style='color:#2c3e50;'>
+                <div style='background-color:#f8f9f9; border-left:4px solid #8e44ad; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                💡 <b>หลักการหาพื้นที่โดยการนับตาราง:</b><br>
+                ให้เราทำการ <b>"นับจำนวนช่องสี่เหลี่ยมเต็มช่อง"</b> ที่ถูกระบายสี<br>
+                โดยอ้างอิงจากสิ่งที่โจทย์กำหนด คือ 1 ช่อง มีพื้นที่ = 1 {unit}
+                </div>
+                <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                👉 <b>ขั้นที่ 1:</b> ค่อยๆ นับจำนวนช่องสี่เหลี่ยมที่ถูกระบายสีทีละช่อง<br>
+                👉 <b>ขั้นที่ 2:</b> เมื่อนับจนครบทุกส่วนของรูป จะได้จำนวนทั้งหมด <b>{area}</b> ช่องพอดี<br>
+                👉 <b>ขั้นที่ 3:</b> นำจำนวนช่องที่นับได้ มาคูณกับพื้นที่ต่อช่อง ➔ {area} × 1 = <b>{area}</b><br><br>
+                <b>ตอบ: พื้นที่ของรูประบายสีคือ {area} {unit}</b></span>"""
+
+
 
             elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":
                 # สุ่มเลขเศษเกิน

@@ -1309,33 +1309,47 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
             elif actual_sub_t == "การหาพื้นที่รูปสี่เหลี่ยมมุมฉาก":
-                is_square = random.choice([True, False])
-                if is_square:
-                    side = random.randint(5, 25)
+                unit = random.choice(["ซม.", "ม.", "วา"])
+                mode = random.choice(["square", "rectangle"])
+                
+                if mode == "square":
+                    # สุ่มเลขจัตุรัส
+                    side = random.randint(12, 45)
                     area = side * side
-                    svg = draw_rect_svg(side, side, f"{side} ม.", f"{side} ม.", "#fdf2e9")
-                    q = f"จงหาพื้นที่ของ<b>สี่เหลี่ยมจัตุรัส</b>ต่อไปนี้<br>{svg}"
                     
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>สูตร:</b> พื้นที่สี่เหลี่ยมจัตุรัส = <b>ความยาวด้าน × ความยาวด้าน</b><br>
-                    👉 <i>(<b>อธิบาย:</b> การหาพื้นที่คือการคำนวณขนาดของพื้นผิวที่อยู่ "ด้านใน" ของรูป เนื่องจากสี่เหลี่ยมจัตุรัสมีด้านทุกด้านยาวเท่ากัน เราจึงนำขนาดของด้านมาคูณกันเองได้เลย)</i><br>
-                    👉 จากรูป ความยาวด้านแต่ละด้าน = {side} ม.<br>
-                    👉 แทนค่าลงในสูตร: {side} × {side} = <b>{area:,}</b><br>
-                    👉 <i>(<b>ข้อควรจำ:</b> หน่วยของการหาพื้นที่ต้องขึ้นต้นด้วยคำว่า "ตาราง" เสมอ)</i><br>
-                    <b>ตอบ: {area:,} ตารางเมตร</b></span>"""
-                else:
-                    w, h = random.randint(4, 15), random.randint(16, 30)
-                    area = w * h
-                    svg = draw_rect_svg(h, w, f"{h} ซม.", f"{w} ซม.", "#e8f8f5")
-                    q = f"จงหาพื้นที่ของ<b>สี่เหลี่ยมผืนผ้า</b>ต่อไปนี้<br>{svg}"
+                    svg = draw_p4_rectangle_area_svg("square", [side], unit)
+                    q = f"พิจารณารูป<b>สี่เหลี่ยมจัตุรัส</b>ที่กำหนดให้ (มีสัญลักษณ์มุมฉากและด้านยาวเท่ากันทุกด้าน) จงหา<b>พื้นที่</b>ของรูปสี่เหลี่ยมนี้<br>{svg}"
                     
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>สูตร:</b> พื้นที่สี่เหลี่ยมผืนผ้า = <b>ความกว้าง × ความยาว</b><br>
-                    👉 <i>(<b>อธิบาย:</b> การหาพื้นที่คือการคำนวณขนาดของพื้นผิวที่อยู่ "ด้านใน" รูป โดยนำความยาวของด้านที่สั้นกว่า (ความกว้าง) มาคูณกับด้านที่ยาวกว่า (ความยาว))</i><br>
-                    👉 จากรูป ด้านกว้าง = {w} ซม. และ ด้านยาว = {h} ซม.<br>
-                    👉 แทนค่าลงในสูตร: {w} × {h} = <b>{area:,}</b><br>
-                    👉 <i>(<b>ข้อควรจำ:</b> หน่วยของการหาพื้นที่ต้องขึ้นต้นด้วยคำว่า "ตาราง" เสมอ)</i><br>
-                    <b>ตอบ: {area:,} ตารางเซนติเมตร</b></span>"""
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#e8f8f5; border-left:4px solid #1abc9c; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                    💡 <b>สูตรการหาพื้นที่สี่เหลี่ยมจัตุรัส:</b><br>
+                    <b>พื้นที่</b> = ความยาวด้าน × ความยาวด้าน (หรือ ด้าน × ด้าน)
+                    </div>
+                    <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                    👉 <b>ขั้นที่ 1:</b> จากรูป ความยาวด้านคือ {side} {unit}<br>
+                    👉 <b>ขั้นที่ 2:</b> แทนค่าในสูตร ➔ {side} × {side}<br>
+                    👉 <b>ขั้นที่ 3:</b> คำนวณผลคูณ ➔ {side} × {side} = <b>{area:,}</b><br><br>
+                    <b>ตอบ: พื้นที่ของรูปสี่เหลี่ยมจัตุรัสคือ {area:,} ตาราง{unit.replace('.','')}</b></span>"""
+                
+                else: # rectangle
+                    # สุ่มเลขผืนผ้า (ด้านกว้าง ต้องสั้นกว่า ด้านยาวเสมอ)
+                    width = random.randint(10, 35)
+                    length = random.randint(width + 5, width + 50)
+                    area = width * length
+                    
+                    svg = draw_p4_rectangle_area_svg("rectangle", [width, length], unit)
+                    q = f"พิจารณารูป<b>สี่เหลี่ยมผืนผ้า</b>ที่กำหนดให้ จงหา<b>พื้นที่</b>ของรูปสี่เหลี่ยมส่วนที่ระบายสี<br>{svg}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#e8f8f5; border-left:4px solid #1abc9c; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                    💡 <b>สูตรการหาพื้นที่สี่เหลี่ยมผืนผ้า:</b><br>
+                    <b>พื้นที่</b> = ความกว้าง × ความยาว (หรือ กว้าง × ยาว)
+                    </div>
+                    <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                    👉 <b>ขั้นที่ 1:</b> จากรูป ความกว้าง (ด้านสั้น) = {width} {unit} และ ความยาว (ด้านยาว) = {length} {unit}<br>
+                    👉 <b>ขั้นที่ 2:</b> แทนค่าในสูตร ➔ {width} × {length}<br>
+                    👉 <b>ขั้นที่ 3:</b> คำนวณผลคูณ ➔ {width} × {length} = <b>{area:,}</b><br><br>
+                    <b>ตอบ: พื้นที่ของรูปสี่เหลี่ยมผืนผ้าคือ {area:,} ตาราง{unit.replace('.','')}</b></span>"""
 
 
 

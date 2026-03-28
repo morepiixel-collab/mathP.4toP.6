@@ -2132,6 +2132,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
             elif actual_sub_t == "การบวกทศนิยม":
                 prob_style = random.choice([1, 2, 3])
                 
+                # ฟังก์ชันวาดตารางร้อย (คงไว้ในสโคปนี้หรือย้ายไป Helpers ก็ได้ครับ)
                 def draw_svg_decimal_grid(val, color="#3498db"):
                     squares = round(val * 100)
                     svg = '<svg width="100" height="100" viewBox="0 0 100 100" style="border: 2px solid #2c3e50; background-color: #ecf0f1;">'
@@ -2145,6 +2146,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return svg
 
                 if prob_style == 1:
+                    # แบบที่ 1: ตารางร้อย (Visual Math)
                     v1 = round(random.uniform(0.10, 0.45), 2)
                     v2 = round(random.uniform(0.10, 0.45), 2)
                     total = round(v1 + v2, 2)
@@ -2157,18 +2159,18 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
                     </div>
                     """
-                    q = f"จากภาพ ตารางร้อย 1 ตารางมีค่าเท่ากับ 1 หน่วย ถ้านำส่วนที่ระบายสีมาบวกกัน จะได้ทศนิยมเท่าใด?<br>{q_html}"
+                    q = f"จากภาพ ตารางร้อย 1 ตารางมีค่าเท่ากับ 1 หน่วย ถ้านำส่วนที่ระบายสีมารวมกัน จะได้ทศนิยมเท่าใด?<br>{q_html}"
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    &#128269; <b>วิเคราะห์จากภาพ:</b><br>
                     • ตารางมี 100 ช่องเล็ก 1 ช่องเล็กมีค่า <b>0.01</b><br>
                     • <b style="color:#3498db;">รูปที่ 1</b> ระบายสี {round(v1*100)} ช่อง เขียนเป็นทศนิยมได้ <b>{v1:.2f}</b><br>
                     • <b style="color:#e67e22;">รูปที่ 2</b> ระบายสี {round(v2*100)} ช่อง เขียนเป็นทศนิยมได้ <b>{v2:.2f}</b>
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ขั้นที่ 1: ตั้งบวกทศนิยม</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>หลักสำคัญที่สุด: ต้องตั้ง "จุดทศนิยม" ให้ตรงกัน!</i><br>
+                    &#128073; <b>ขั้นที่ 1: ตั้งบวกทศนิยม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&#128161; <i>หลักสำคัญที่สุด: ต้องตั้ง "จุดทศนิยม" ให้ตรงกัน!</i><br>
                     <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
                         <tr>
                             <td style="text-align: right; padding: 2px 10px;">{v1:.2f}</td>
@@ -2183,15 +2185,13 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                             <td></td>
                         </tr>
                     </table><br>
-                    👉 <b>สรุปผลลัพธ์:</b> ถ้านำมาระบายสีรวมกันจะได้ทั้งหมด {round(total*100)} ช่อง หรือ <b>{total:.2f}</b><br><br>
                     <b>ตอบ: {total:.2f}</b></span>"""
 
                 elif prob_style == 2:
+                    # แบบที่ 2: กล่องสมมาตร (จำนวนตำแหน่งไม่เท่ากัน)
                     v1 = round(random.uniform(5.1, 25.9), 1)   
                     v2 = round(random.uniform(1.11, 9.99), 2)  
-                    if random.choice([True, False]): 
-                        v1, v2 = v2, v1
-                    
+                    if random.choice([True, False]): v1, v2 = v2, v1
                     total = round(v1 + v2, 2)
                     
                     q_html = f"""
@@ -2216,107 +2216,33 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#fcf3cf; border-left:4px solid #f1c40f; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    💡 <b>เทคนิคสำคัญ (การบวกทศนิยม):</b><br>
+                    &#128161; <b>เทคนิคสำคัญ (การบวกทศนิยม):</b><br>
                     เมื่อจำนวนตำแหน่งทศนิยมไม่เท่ากัน ให้ <b>"เติม 0"</b> ต่อท้ายเลขที่มีตำแหน่งน้อยกว่า เพื่อให้จำนวนหลักเท่ากัน และจะได้ตั้ง <b>"จุดทศนิยม"</b> ให้ตรงกันได้ง่ายขึ้น!
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ขั้นที่ 1: เติม 0 ให้ตำแหน่งเท่ากัน</b><br>
+                    &#128073; <b>ขั้นที่ 1: เติม 0 ให้ตำแหน่งเท่ากัน</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• {v1} เติมศูนย์ปรับเป็น <b>{v1_str}</b><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• {v2} เติมศูนย์ปรับเป็น <b>{v2_str}</b><br><br>
-                    👉 <b>ขั้นที่ 2: ตั้งบวกให้จุดตรงกัน</b><br>
+                    &#128073; <b>ขั้นที่ 2: ตั้งบวกให้จุดตรงกัน</b><br>
                     <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
-                        <tr>
-                            <td style="text-align: right; padding: 2px 10px;">{v1_str}</td>
-                            <td style="width: 30px;"></td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{v2_str}</td>
-                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">+</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{total:.2f}</b></td>
-                            <td></td>
-                        </tr>
+                        <tr><td style="text-align: right; padding: 2px 10px;">{v1_str}</td><td style="width: 30px;"></td></tr>
+                        <tr><td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{v2_str}</td>
+                            <td style="text-align: center; color: #e74c3c; font-weight: bold;">+</td></tr>
+                        <tr><td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{total:.2f}</b></td><td></td></tr>
                     </table><br>
                     <b>ตอบ: {total:.2f}</b></span>"""
 
                 else:
+                    # แบบที่ 3: ป้ายราคาสินค้า (ใช้รหัส HTML &#3647; แทนสัญลักษณ์บาท)
                     items = [("สมุดโน้ต", 15.5, 25.5), ("ปากกาสี", 8.25, 12.75), ("ยางลบ", 5.5, 9.5), ("ไม้บรรทัด", 10.25, 15.5)]
                     item1 = random.choice(items)
                     items.remove(item1)
                     item2 = random.choice(items)
                     
-                    p1 = round(random.uniform(item1[1], item1[2]), 2)
-                    p1 = round(p1 * 4) / 4 
-                    if p1.is_integer(): p1 += 0.5
-                    
-                    p2 = round(random.uniform(item2[1], item2[2]), 2)
-                    p2 = round(p2 * 4) / 4
-                    if p2.is_integer(): p2 += 0.25
-
+                    p1 = round(p1 * 4) / 4 if (p1 := random.uniform(item1[1], item1[2])) and not p1.is_integer() else p1 + 0.5
+                    p2 = round(p2 * 4) / 4 if (p2 := random.uniform(item2[1], item2[2])) and not p2.is_integer() else p2 + 0.25
                     total = round(p1 + p2, 2)
-                    p1_str = f"{p1:.2f}"
-                    p2_str = f"{p2:.2f}"
-                    
-                    q_html = f"""
-                    <div style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
-                        <div style="background: #e74c3c; color: white; padding: 15px 25px; border-radius: 8px; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
-                            <div style="font-size: 16px;">{item1[0]}</div>
-                            <div style="font-size: 24px; font-weight: bold;">฿ {p1_str}</div>
-                            <div style="position: absolute; left: -10px; top: 20px; width: 20px; height: 20px; background: white; border-radius: 50%;"></div>
-                        </div>
-                        <div style="font-size: 30px; font-weight: bold; color: #7f8c8d; display:flex; align-items:center;">+</div>
-                        <div style="background: #8e44ad; color: white; padding: 15px 25px; border-radius: 8px; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
-                            <div style="font-size: 16px;">{item2[0]}</div>
-                            <div style="font-size: 24px; font-weight: bold;">฿ {p2_str}</div>
-                            <div style="position: absolute; left: -10px; top: 20px; width: 20px; height: 20px; background: white; border-radius: 50%;"></div>
-                        </div>
-                    </div>
-                    """
-                    q = f"คุณแม่ต้องการซื้อสินค้า 2 ชิ้นตามป้ายราคาด้านล่าง คุณแม่ต้องจ่ายเงินทั้งหมดกี่บาท?<br>{q_html}"
-                    
-                    sol = f"""<span style='color:#2c3e50;'>
-                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    🔍 <b>วิเคราะห์โจทย์:</b><br>
-                    • หา <b>"ราคารวม"</b> ต้องนำราคาสินค้าทั้งสองชิ้นมา <b>บวกกัน</b><br>
-                    • ประโยคสัญลักษณ์: {p1_str} + {p2_str} = ?
-                    </div>
-                    <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ตั้งบวกทศนิยม:</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ตั้งหลักและจุดทศนิยมให้ตรงกัน จากนั้นบวกจากขวาไปซ้ายเหมือนการบวกเลขปกติ</i><br>
-                    <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
-                        <tr>
-                            <td style="text-align: right; padding: 2px 10px;">{p1_str}</td>
-                            <td style="width: 30px;"></td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{p2_str}</td>
-                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">+</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{total:.2f}</b></td>
-                            <td></td>
-                        </tr>
-                    </table><br>
-                    <b>ตอบ: คุณแม่ต้อง
-else:
-                    # แบบที่ 3: ป้ายราคา (ราคา x จำนวนชิ้น) [โจทย์การบวกทศนิยมที่ค้างอยู่]
-                    items = [("สมุดโน้ต", 15.5, 25.5), ("ปากกาสี", 8.25, 12.75), ("ยางลบ", 5.5, 9.5), ("ไม้บรรทัด", 10.25, 15.5)]
-                    item1 = random.choice(items)
-                    items.remove(item1)
-                    item2 = random.choice(items)
-                    
-                    p1 = round(random.uniform(item1[1], item1[2]), 2)
-                    p1 = round(p1 * 4) / 4 
-                    if p1.is_integer(): p1 += 0.5
-                    
-                    p2 = round(random.uniform(item2[1], item2[2]), 2)
-                    p2 = round(p2 * 4) / 4
-                    if p2.is_integer(): p2 += 0.25
-
-                    total = round(p1 + p2, 2)
-                    p1_str = f"{p1:.2f}"
-                    p2_str = f"{p2:.2f}"
+                    p1_str, p2_str = f"{p1:.2f}", f"{p2:.2f}"
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
@@ -2337,26 +2263,18 @@ else:
                     
                     sol = f"""<span style='color:#2c3e50;'>
                     <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
-                    🔍 <b>วิเคราะห์โจทย์:</b><br>
+                    &#128269; <b>วิเคราะห์โจทย์:</b><br>
                     • หา <b>"ราคารวม"</b> ต้องนำราคาสินค้าทั้งสองชิ้นมา <b>บวกกัน</b><br>
                     • ประโยคสัญลักษณ์: {p1_str} + {p2_str} = ?
                     </div>
                     <b>วิธีทำอย่างละเอียด:</b><br>
-                    👉 <b>ตั้งบวกทศนิยม:</b><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ตั้งหลักและจุดทศนิยมให้ตรงกัน จากนั้นบวกจากขวาไปซ้ายเหมือนการบวกเลขปกติ</i><br>
+                    &#128073; <b>ตั้งบวกทศนิยม:</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&#128161; <i>ตั้งหลักและจุดทศนิยมให้ตรงกัน จากนั้นบวกจากขวาไปซ้ายเหมือนการบวกเลขปกติ</i><br>
                     <table style="font-family: 'Courier New', monospace; font-size: 22px; margin-left: 50px; border-collapse: collapse;">
-                        <tr>
-                            <td style="text-align: right; padding: 2px 10px;">{p1_str}</td>
-                            <td style="width: 30px;"></td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{p2_str}</td>
-                            <td style="text-align: center; color: #e74c3c; font-weight: bold; font-size: 24px; vertical-align: bottom; padding-bottom: 5px;">+</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{total:.2f}</b></td>
-                            <td></td>
-                        </tr>
+                        <tr><td style="text-align: right; padding: 2px 10px;">{p1_str}</td><td style="width: 30px;"></td></tr>
+                        <tr><td style="text-align: right; padding: 2px 10px; border-bottom: 2px solid #333;">{p2_str}</td>
+                            <td style="text-align: center; color: #e74c3c; font-weight: bold;">+</td></tr>
+                        <tr><td style="text-align: right; padding: 5px 10px; border-bottom: 4px double #333;"><b>{total:.2f}</b></td><td></td></tr>
                     </table><br>
                     <b>ตอบ: คุณแม่ต้องจ่ายเงินทั้งหมด {total:.2f} บาท</b></span>"""
 

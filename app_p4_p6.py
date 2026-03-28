@@ -3130,7 +3130,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
 
-elif actual_sub_t == "การแก้สมการ (บวก/ลบ)":
+            elif actual_sub_t == "การแก้สมการ (บวก/ลบ)":
                 var = random.choice(["A", "B", "x", "y", "ก", "ข"])
                 # สุ่มรูปแบบโจทย์: ตัวแปรบวก, ตัวแปรลบ, และ ตัวตั้งลบด้วยตัวแปร (ใหม่)
                 scenario = random.choice(["var_plus", "var_minus", "minus_var"])

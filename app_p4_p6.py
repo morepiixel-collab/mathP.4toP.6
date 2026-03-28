@@ -66,6 +66,67 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
 # ==========================================
 
 
+import math
+import random
+
+def draw_p4_kite_svg(sides, unit="ซม."):
+    svg_w, svg_h = 450, 250
+    cx, cy = 225, 125
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+    
+    # 📐 ไดนามิก: สุ่มสัดส่วนของรูปว่าวให้แต่ละข้อดูไม่ซ้ำกัน
+    half_w = random.randint(60, 100)   # ครึ่งความกว้าง (สุ่มความอ้วน/ผอม)
+    top_h = random.randint(30, 55)     # ความสูงส่วนบน (คู่สั้น)
+    bottom_h = random.randint(70, 110) # ความสูงส่วนล่าง (คู่ยาว)
+    
+    # พิกัด 4 มุม (บน, ขวา, ล่าง, ซ้าย) ขยับพิกัด Y ขึ้นนิดหน่อยให้อยู่กึ่งกลางกรอบ
+    offset_y = 10
+    top = (cx, cy - top_h - offset_y)
+    right = (cx + half_w, cy - offset_y)
+    bottom = (cx, cy + bottom_h - offset_y)
+    left = (cx - half_w, cy - offset_y)
+    
+    pts = f"{top[0]},{top[1]} {right[0]},{right[1]} {bottom[0]},{bottom[1]} {left[0]},{left[1]}"
+    
+    # วาดตัวรูป
+    svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
+    
+    # ฟังก์ชันช่วยคำนวณองศาให้เส้น "ตั้งฉาก" กับด้านเอียงแบบ 100%
+    def get_tick_angle(p1, p2):
+        dx = p2[0] - p1[0]
+        dy = p2[1] - p1[1]
+        return math.degrees(math.atan2(dy, dx)) + 90
+
+    # 🎯 สัญลักษณ์ 1 ขีด สำหรับคู่ประชิดด้านบน (ด้านสั้น)
+    for p1, p2 in [(left, top), (top, right)]:
+        mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+        angle = get_tick_angle(p1, p2)
+        svg += f'<line x1="{mx}" y1="{my-7}" x2="{mx}" y2="{my+7}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+        
+    # 🎯 สัญลักษณ์ 2 ขีด สำหรับคู่ประชิดด้านล่าง (ด้านยาว)
+    for p1, p2 in [(left, bottom), (right, bottom)]:
+        mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+        angle = get_tick_angle(p1, p2)
+        svg += f'<line x1="{mx-3}" y1="{my-7}" x2="{mx-3}" y2="{my+7}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+        svg += f'<line x1="{mx+3}" y1="{my-7}" x2="{mx+3}" y2="{my+7}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+
+    # 🎯 วางตัวเลขให้เยื้องออกจากเส้นเอียง ไม่ให้ทับซ้อนกัน
+    # ตัวเลขด้านบนขวา
+    mid_tr_x, mid_tr_y = (top[0]+right[0])/2, (top[1]+right[1])/2
+    svg += f'<text x="{mid_tr_x + 15}" y="{mid_tr_y - 10}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[0]} {unit}</text>'
+    
+    # ตัวเลขด้านล่างขวา
+    mid_br_x, mid_br_y = (right[0]+bottom[0])/2, (right[1]+bottom[1])/2
+    svg += f'<text x="{mid_br_x + 15}" y="{mid_br_y + 15}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+        <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            {svg}
+        </div></div>'''
+
+
+
 
 def draw_p4_parallelogram_rhombus_svg(shape_type, sides, unit="วา"):
     svg_w, svg_h = 450, 250

@@ -76,7 +76,6 @@ def draw_p4_real_life_geo_svg(scenario, shape_type, sides, unit="ม."):
     cx, cy = 225, 125
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
-    # กำหนดความกว้างและความยาวบนหน้าจอ
     if shape_type == "square":
         v_length = 140
         v_width = 140
@@ -99,33 +98,39 @@ def draw_p4_real_life_geo_svg(scenario, shape_type, sides, unit="ม."):
     
     pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
     
-    # 🎨 ตกแต่งสีสันและลวดลายตามสถานการณ์
+    # 🎨 ตกแต่งลวดลายแยกตาม 6 สถานการณ์
     if scenario == "fence":
-        # สนามหญ้า + ล้อมรั้ว (เน้นเส้นรอบขอบ)
+        # 1. ล้อมรั้ว: พื้นเขียว มีเส้นประลวดหนามด้านนอก
         svg += f'<polygon points="{pts}" fill="#d5f5e3" stroke="#27ae60" stroke-width="4"/>'
-        # วาดเส้นประจำลองรั้วด้านนอกนิดๆ
-        svg += f'<rect x="{tl[0]-5}" y="{tl[1]-5}" width="{v_length+10}" height="{v_width+10}" fill="none" stroke="#e67e22" stroke-width="2.5" stroke-dasharray="8,4"/>'
+        svg += f'<rect x="{tl[0]-6}" y="{tl[1]-6}" width="{v_length+12}" height="{v_width+12}" fill="none" stroke="#e67e22" stroke-width="2.5" stroke-dasharray="8,4"/>'
+    elif scenario == "running":
+        # 2. วิ่งรอบสนาม: พื้นสนามหญ้า มีลู่วิ่งสีแดงอิฐด้านนอก
+        svg += f'<polygon points="{pts}" fill="#abebc6" stroke="#2ecc71" stroke-width="2"/>'
+        svg += f'<rect x="{tl[0]-8}" y="{tl[1]-8}" width="{v_length+16}" height="{v_width+16}" fill="none" stroke="#e74c3c" stroke-width="3" stroke-dasharray="5,5"/>'
+    elif scenario == "frame":
+        # 3. กรอบรูป/บอร์ด: ขอบไม้หนาๆ ด้านในสีเหลืองอ่อน
+        svg += f'<polygon points="{pts}" fill="#fcf3cf" stroke="#8a360f" stroke-width="8" stroke-linejoin="miter"/>'
+        svg += f'<rect x="{tl[0]+8}" y="{tl[1]+8}" width="{v_length-16}" height="{v_width-16}" fill="none" stroke="#f39c12" stroke-width="1.5"/>'
     elif scenario == "tile":
-        # ปูกระเบื้อง (เน้นพื้นที่ด้านใน)
-        # สร้าง Pattern ตารางกระเบื้องจำลอง
-        svg += f'''
-        <defs>
-            <pattern id="tilePattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <rect width="20" height="20" fill="#fdfefe" stroke="#d5d8dc" stroke-width="1"/>
-            </pattern>
-        </defs>
-        '''
+        # 4. ปูกระเบื้อง: ลายตารางกระเบื้อง
+        svg += f'''<defs><pattern id="tilePattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <rect width="20" height="20" fill="#fdfefe" stroke="#d5d8dc" stroke-width="1"/></pattern></defs>'''
         svg += f'<polygon points="{pts}" fill="url(#tilePattern)" stroke="#34495e" stroke-width="3"/>'
-        # ระบายสีทับบางๆ ให้ดูละมุน
-        svg += f'<polygon points="{pts}" fill="#f5cba7" fill-opacity="0.3" stroke="none"/>'
+        svg += f'<polygon points="{pts}" fill="#f5cba7" fill-opacity="0.2" stroke="none"/>'
+    elif scenario == "carpet":
+        # 5. ปูพรม: พรมสีม่วง มีรอยเย็บขอบด้านใน
+        svg += f'<polygon points="{pts}" fill="#ebdef0" stroke="#8e44ad" stroke-width="5" stroke-linejoin="round"/>'
+        svg += f'<rect x="{tl[0]+5}" y="{tl[1]+5}" width="{v_length-10}" height="{v_width-10}" fill="none" stroke="#6c3483" stroke-width="2" stroke-dasharray="4,4"/>'
+    elif scenario == "paint":
+        # 6. ทาสีผนัง: ผนังสีชมพูพาสเทล ขอบเข้ม
+        svg += f'<polygon points="{pts}" fill="#fadbd8" stroke="#c0392b" stroke-width="3"/>'
 
-    # 🎯 วางตัวเลขความยาวกำกับ (สีเข้มอ่านง่าย)
+    # 🎯 ตัวเลขกำกับรูป
     text_color = "#2c3e50"
     if shape_type == "square":
         svg += f'<text x="{cx}" y="{bl[1] + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="{text_color}">ด้านละ {disp_l} {unit}</text>'
     else:
         svg += f'<text x="{cx}" y="{bl[1] + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="{text_color}">ยาว {disp_l} {unit}</text>'
-        # ขยับตัวเลขด้านกว้างไม่ให้ทับรั้ว
         svg += f'<text x="{tr[0] + 15}" y="{cy + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="{text_color}">กว้าง {disp_w} {unit}</text>'
 
     svg += '</svg>'

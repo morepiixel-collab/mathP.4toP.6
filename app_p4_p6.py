@@ -1516,6 +1516,36 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
 
+            elif actual_sub_t == "การหาพื้นที่สี่เหลี่ยมด้านขนานและขนมเปียกปูน (พื้นฐาน)":
+                unit = random.choice(["ซม.", "ม.", "วา"])
+                mode = random.choice(["parallelogram", "rhombus"])
+                
+                # สุ่มตัวเลข ฐาน และ สูง
+                base = random.randint(15, 60)
+                height = random.randint(10, base - 2) if base > 12 else random.randint(10, 30)
+                area = base * height
+                
+                if mode == "rhombus":
+                    svg = draw_p4_parallelogram_rhombus_area_svg("rhombus", base, height, unit)
+                    q = f"พิจารณารูป<b>สี่เหลี่ยมขนมเปียกปูน</b>ที่กำหนดให้ (สังเกตเส้นประบอกความสูง) จงหา<b>พื้นที่</b>ของรูปสี่เหลี่ยมนี้<br>{svg}"
+                else:
+                    svg = draw_p4_parallelogram_rhombus_area_svg("parallelogram", base, height, unit)
+                    q = f"พิจารณารูป<b>สี่เหลี่ยมด้านขนาน</b>ที่กำหนดให้ (สังเกตเส้นประบอกความสูง) จงหา<b>พื้นที่</b>ของรูปสี่เหลี่ยมนี้<br>{svg}"
+                
+                sol = f"""<span style='color:#2c3e50;'>
+                <div style='background-color:#e8f8f5; border-left:4px solid #1abc9c; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                💡 <b>สูตรการหาพื้นที่สี่เหลี่ยมด้านขนานและขนมเปียกปูน:</b><br>
+                <b>พื้นที่</b> = ความยาวฐาน × ความสูง
+                </div>
+                <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                👉 <b>ขั้นที่ 1:</b> จากรูป ระบุความยาวฐาน = <b style="color:#2980b9;">{base} {unit}</b> และ ความสูง (เส้นตั้งฉาก) = <b style="color:#e74c3c;">{height} {unit}</b><br>
+                👉 <b>ขั้นที่ 2:</b> นำตัวเลขมาแทนค่าในสูตร ➔ {base} × {height}<br>
+                👉 <b>ขั้นที่ 3:</b> คำนวณผลคูณ ➔ {base} × {height} = <b>{area:,}</b><br><br>
+                <b>ตอบ: พื้นที่ของรูปสี่เหลี่ยมนี้คือ {area:,} ตาราง{unit.replace('.','')}</b></span>"""
+
+
+
+
             elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":
                 # สุ่มเลขเศษเกิน
                 den = random.randint(3, 12)

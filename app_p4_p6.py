@@ -80,41 +80,57 @@ def draw_grid_counting_svg(grid_data):
     pass
 
 
+import math # อย่าลืม import math ที่บรรทัดบนสุดของไฟล์นะครับ!
+
 def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
     svg_w, svg_h = 450, 250
+    # คำนวณพิกัดกึ่งกลาง (Symmetry)
+    cx, cy = 225, 125 
+    
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
-    # กำหนดพิกัดรูปสามเหลี่ยมให้สมมาตร (อยู่กึ่งกลาง)
-    # จุดยอด (Top), ซ้ายล่าง (Left), ขวาล่าง (Right)
-    t, l, r = (225, 60), (130, 190), (320, 190)
+    # 📐 สามเหลี่ยม (Top), ซ้ายล่าง (Left), ขวาล่าง (Right)
+    # วางพิกัดให้เป็นสามเหลี่ยมด้านเท่า/หน้าจั่วเพื่อความสวยงาม
+    t = (cx, cy - 80)
+    l = (cx - 100, cy + 70)
+    r = (cx + 100, cy + 70)
     pts = f"{t[0]},{t[1]} {l[0]},{l[1]} {r[0]},{r[1]}"
     
     # วาดตัวรูป
     svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
 
-    # เพิ่มสัญลักษณ์ "ขีด" บอกด้านที่เท่ากัน (สำหรับข้อสอบแข่งขัน)
+    # 🎯 🛠️ แก้ไขขีดด้านเท่าให้สมมาตรเป๊ะ (วงสีแดงเดิม)
     if triangle_type == "equilateral": # ด้านเท่า (3 ขีด)
-        for p1, p2 in [(t, l), (t, r), (l, r)]:
+        lines_data = [
+            (t, l, -60), # ด้านซ้ายเอียง 60 องศา
+            (t, r, 60),  # ด้านขวาเอียง -60 องศา
+            (l, r, 0)   # ด้านล่างเอียง 0 องศา
+        ]
+        
+        for p1, p2, angle in lines_data:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
-            svg += f'<line x1="{mx-5}" y1="{my-5}" x2="{mx+5}" y2="{my+5}" stroke="#e74c3c" stroke-width="2"/>'
-    elif triangle_type == "isosceles": # หน้าจั่ว (2 ขีดที่ด้านข้าง)
-        for p1, p2 in [(t, l), (t, r)]:
-            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
-            svg += f'<line x1="{mx-5}" y1="{my-5}" x2="{mx+5}" y2="{my+5}" stroke="#e74c3c" stroke-width="2"/>'
+            # วาดขีดสีแดงพร้อมหมุนให้ทำมุมตั้งฉากกับด้านเสมอ
+            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
 
-    # การวางตำแหน่งตัวเลข (ให้ห่างจากเส้นเล็กน้อยเพื่อความสวยงาม)
+    elif triangle_type == "isosceles": # หน้าจั่ว (2 ขีด)
+        lines_data = [(t, l, -60), (t, r, 60)]
+        for p1, p2, angle in lines_data:
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+
+    # การวางตำแหน่งตัวเลข (ให้สมมาตร)
     if triangle_type == "equilateral":
         # ให้เลขด้านเดียว (เด็กต้องรู้เองว่าทุกด้านเท่ากัน)
-        svg += f'<text x="225" y="215" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+        svg += f'<text x="{cx}" y="{cy + 100}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
     elif triangle_type == "isosceles":
         # ให้เลขฐาน และเลขด้านข้างหนึ่งด้าน
-        svg += f'<text x="225" y="215" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
-        svg += f'<text x="160" y="125" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[1]} {unit}</text>'
+        svg += f'<text x="{cx}" y="{cy + 100}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+        svg += f'<text x="{cx - 105}" y="{cy + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[1]} {unit}</text>'
     else: # ด้านไม่เท่า
         # ให้ครบทุกด้าน
-        svg += f'<text x="225" y="215" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
-        svg += f'<text x="160" y="125" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[1]} {unit}</text>'
-        svg += f'<text x="290" y="125" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[2]} {unit}</text>'
+        svg += f'<text x="{cx}" y="{cy + 100}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+        svg += f'<text x="{cx - 105}" y="{cy + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[1]} {unit}</text>'
+        svg += f'<text x="{cx + 105}" y="{cy + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[2]} {unit}</text>'
 
     svg += '</svg>'
     return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">

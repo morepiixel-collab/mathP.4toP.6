@@ -103,7 +103,59 @@ def draw_p4_grid_area_svg(shape_pts, unit="ตารางหน่วย"):
         <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 20px 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             {svg}
         </div></div>'''
+    
+def draw_p4_grid_area_solution_svg(rects, unit="ตารางหน่วย"):
+    svg_w, svg_h = 450, 270
+    cols, rows = 14, 8
+    cell = 25
+    
+    # คำนวณหาจุดกึ่งกลางของรูปทรงทั้งหมด
+    min_x = min(r[0] for r in rects)
+    max_x = max(r[0] + r[2] for r in rects)
+    min_y = min(r[1] for r in rects)
+    max_y = max(r[1] + r[3] for r in rects)
+    
+    shape_w = max_x - min_x
+    shape_h = max_y - min_y
+    
+    offset_x = (cols - shape_w) // 2 - min_x
+    offset_y = (rows - shape_h) // 2 - min_y
+    
+    ox = (svg_w - (cols * cell)) / 2
+    oy = (svg_h - (rows * cell)) / 2 - 15 
 
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+
+    # 1. วาดเส้นตาราง
+    for r in range(rows + 1):
+        y = oy + r * cell
+        svg += f'<line x1="{ox}" y1="{y}" x2="{ox + cols * cell}" y2="{y}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>'
+    for c in range(cols + 1):
+        x = ox + c * cell
+        svg += f'<line x1="{x}" y1="{oy}" x2="{x}" y2="{oy + rows * cell}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>'
+
+    # 2. วาดสี่เหลี่ยมย่อยๆ พร้อมระบายสีแยกส่วน
+    for rx, ry, rw, rh, color in rects:
+        final_x = ox + (rx + offset_x) * cell
+        final_y = oy + (ry + offset_y) * cell
+        final_w = rw * cell
+        final_h = rh * cell
+        
+        # วาดกล่องสี
+        svg += f'<rect x="{final_x}" y="{final_y}" width="{final_w}" height="{final_h}" fill="{color}" fill-opacity="0.85" stroke="#2c3e50" stroke-width="2" stroke-linejoin="round"/>'
+        
+        # ใส่ตัวเลขพื้นที่กำกับตรงกลางกล่อง
+        cx_rect = final_x + final_w/2
+        cy_rect = final_y + final_h/2 + 6 
+        area_val = rw * rh
+        svg += f'<text x="{cx_rect}" y="{cy_rect}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#ffffff" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{area_val}</text>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 10px 0;">
+        <div style="border: 2px dashed #8e44ad; border-radius: 12px; padding: 15px; background-color: #fdfafb; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="text-align:center; font-weight:bold; font-size:16px; color:#8e44ad; margin-bottom:10px;">ภาพอธิบาย: การแบ่งรูปเพื่อคำนวณพื้นที่</div>
+            {svg}
+        </div></div>'''
 
 
 
@@ -1583,21 +1635,23 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 shapes_list = ["L", "T", "U", "Plus", "Stair", "Rectangle"]
                 choice = random.choice(shapes_list)
 
-                calc_steps = ""
+                # กำหนดสีที่จะใช้ในเฉลย
+                c_blue, c_red, c_green = "#3498db", "#e74c3c", "#2ecc71"
 
-                # สร้างพิกัด (x, y) และคำนวณพื้นที่พร้อมสร้าง "คำอธิบายการคำนวณ"
                 if choice == "Rectangle":
                     w, h = random.randint(3, 7), random.randint(3, 6)
                     pts = [(0,0), (w,0), (w,h), (0,h)]
+                    rects = [(0, 0, w, h, c_blue)]
                     area = w * h
-                    calc_steps = f"รูปสี่เหลี่ยมมุมฉากขนาด กว้าง {w} ช่อง × ยาว {h} ช่อง<br>👉 พื้นที่ = {w} × {h} = <b>{area}</b> ช่อง"
+                    calc_steps = f"รูปนี้เป็นรูปสี่เหลี่ยมมุมฉากอยู่แล้ว ไม่ต้องแบ่งส่วนย่อย<br>👉 <b style='color:{c_blue};'>ส่วนสีฟ้า:</b> กว้าง {w} ช่อง × ยาว {h} ช่อง = <b>{area}</b> ช่อง"
 
                 elif choice == "L":
                     t = random.randint(1, 2)
                     h, w = random.randint(4, 7), random.randint(4, 7)
                     pts = [(0,0), (t,0), (t,h-t), (w,h-t), (w,h), (0,h)]
-                    area = t*h + (w-t)*t
-                    calc_steps = f"<b>แบ่งรูปเป็น 2 ส่วน (แนวตั้งและแนวนอน):</b><br>👉 ส่วนที่ 1 (แนวตั้ง): กว้าง {t} × ยาว {h} = {t*h} ช่อง<br>👉 ส่วนที่ 2 (แนวนอน): กว้าง {w-t} × ยาว {t} = {(w-t)*t} ช่อง<br>👉 นำพื้นที่มารวมกัน = {t*h} + {(w-t)*t} = <b>{area}</b> ช่อง"
+                    rects = [(0, 0, t, h, c_blue), (t, h-t, w-t, t, c_red)]
+                    area = (t*h) + ((w-t)*t)
+                    calc_steps = f"แบ่งรูปออกเป็น 2 ส่วนย่อย เพื่อคำนวณแยกกัน:<br>👉 <b style='color:{c_blue};'>ส่วนที่ 1 (สีฟ้า):</b> กว้าง {t} × ยาว {h} = {t*h} ช่อง<br>👉 <b style='color:{c_red};'>ส่วนที่ 2 (สีแดง):</b> กว้าง {w-t} × ยาว {t} = {(w-t)*t} ช่อง<br>👉 นำพื้นที่มารวมกัน = {t*h} + {(w-t)*t} = <b>{area}</b> ช่อง"
 
                 elif choice == "T":
                     t = random.randint(1, 2)
@@ -1606,51 +1660,61 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     stem_w = random.choice([1, 3])
                     margin = (w - stem_w) // 2
                     pts = [(0,0), (w,0), (w,t), (margin+stem_w,t), (margin+stem_w,h), (margin,h), (margin,t), (0,t)]
-                    area = w*t + stem_w*(h-t)
-                    calc_steps = f"<b>แบ่งรูปเป็น 2 ส่วน (หัวรูปตัว T และ ก้าน):</b><br>👉 ส่วนหัว (แนวนอน): กว้าง {w} × ยาว {t} = {w*t} ช่อง<br>👉 ส่วนก้าน (แนวตั้ง): กว้าง {stem_w} × ยาว {h-t} = {stem_w*(h-t)} ช่อง<br>👉 นำพื้นที่มารวมกัน = {w*t} + {stem_w*(h-t)} = <b>{area}</b> ช่อง"
+                    rects = [(0, 0, w, t, c_blue), (margin, t, stem_w, h-t, c_red)]
+                    area = (w*t) + (stem_w*(h-t))
+                    calc_steps = f"แบ่งรูปออกเป็น 2 ส่วน (ส่วนหัวและก้าน):<br>👉 <b style='color:{c_blue};'>ส่วนหัว (สีฟ้า):</b> กว้าง {w} × ยาว {t} = {w*t} ช่อง<br>👉 <b style='color:{c_red};'>ส่วนก้าน (สีแดง):</b> กว้าง {stem_w} × ยาว {h-t} = {stem_w*(h-t)} ช่อง<br>👉 นำพื้นที่มารวมกัน = {w*t} + {stem_w*(h-t)} = <b>{area}</b> ช่อง"
 
                 elif choice == "U":
                     t = random.randint(1, 2)
                     w = random.choice([5, 6, 7])
                     h = random.randint(4, 6)
                     pts = [(0,0), (t,0), (t,h-t), (w-t,h-t), (w-t,0), (w,0), (w,h), (0,h)]
-                    area = w*h - (w-2*t)*(h-t)
-                    calc_steps = f"<b>เทคนิคขั้นสูง 'พื้นที่รูปใหญ่ - พื้นที่ช่องว่าง':</b><br>👉 พื้นที่สี่เหลี่ยมใหญ่ทั้งหมด (ถ้าระบายเต็ม): กว้าง {w} × ยาว {h} = {w*h} ช่อง<br>👉 พื้นที่ช่องว่างตรงกลาง: กว้าง {w-2*t} × ยาว {h-t} = {(w-2*t)*(h-t)} ช่อง<br>👉 พื้นที่จริง = {w*h} - {(w-2*t)*(h-t)} = <b>{area}</b> ช่อง"
+                    rects = [(0, 0, t, h, c_blue), (w-t, 0, t, h, c_red), (t, h-t, w-2*t, t, c_green)]
+                    area = (t*h) + (t*h) + ((w-2*t)*t)
+                    calc_steps = f"แบ่งรูปตัว U ออกเป็น 3 แท่ง:<br>👉 <b style='color:{c_blue};'>ขาซ้าย (สีฟ้า):</b> กว้าง {t} × ยาว {h} = {t*h} ช่อง<br>👉 <b style='color:{c_red};'>ขาขวา (สีแดง):</b> กว้าง {t} × ยาว {h} = {t*h} ช่อง<br>👉 <b style='color:{c_green};'>ฐานเชื่อม (สีเขียว):</b> กว้าง {w-2*t} × ยาว {t} = {(w-2*t)*t} ช่อง<br>👉 นำพื้นที่มารวมกัน = {t*h} + {t*h} + {(w-2*t)*t} = <b>{area}</b> ช่อง"
 
                 elif choice == "Plus":
                     t = random.randint(1, 2)
                     arm = random.randint(1, 2)
                     w, h = t + arm*2, t + arm*2
                     pts = [(arm,0), (arm+t,0), (arm+t,arm), (w,arm), (w,arm+t), (arm+t,arm+t), (arm+t,h), (arm,h), (arm,arm+t), (0,arm+t), (0,arm), (arm,arm)]
-                    area = t*h + 2*(arm*t)
-                    calc_steps = f"<b>แบ่งรูปเป็น 3 ส่วน (แกนกลาง และ แขน 2 ข้าง):</b><br>👉 แกนกลางแนวตั้ง: กว้าง {t} × ยาว {h} = {t*h} ช่อง<br>👉 แขนซ้าย-ขวา (2 ข้าง): ข้างละ {arm} × {t} = {arm*t} ช่อง ➔ 2 ข้างรวม {arm*t*2} ช่อง<br>👉 นำพื้นที่มารวมกัน = {t*h} + {arm*t*2} = <b>{area}</b> ช่อง"
+                    rects = [(arm, 0, t, h, c_blue), (0, arm, arm, t, c_red), (arm+t, arm, arm, t, c_green)]
+                    area = (t*h) + (arm*t) + (arm*t)
+                    calc_steps = f"แบ่งรูปกากบาทออกเป็น 3 ส่วน:<br>👉 <b style='color:{c_blue};'>แกนกลาง (สีฟ้า):</b> กว้าง {t} × ยาว {h} = {t*h} ช่อง<br>👉 <b style='color:{c_red};'>แขนซ้าย (สีแดง):</b> กว้าง {arm} × ยาว {t} = {arm*t} ช่อง<br>👉 <b style='color:{c_green};'>แขนขวา (สีเขียว):</b> กว้าง {arm} × ยาว {t} = {arm*t} ช่อง<br>👉 นำพื้นที่มารวมกัน = {t*h} + {arm*t} + {arm*t} = <b>{area}</b> ช่อง"
 
                 elif choice == "Stair":
                     step_w, step_h = random.randint(1, 2), random.randint(1, 2)
                     pts = [(0, 0), (step_w, 0), (step_w, step_h), (step_w*2, step_h), (step_w*2, step_h*2), (step_w*3, step_h*2), (step_w*3, step_h*3), (0, step_h*3)]
                     col1, col2, col3 = 3*step_h*step_w, 2*step_h*step_w, 1*step_h*step_w
+                    rects = [(0, 0, step_w, 3*step_h, c_blue), (step_w, step_h, step_w, 2*step_h, c_red), (step_w*2, step_h*2, step_w, step_h, c_green)]
                     area = col1 + col2 + col3
-                    calc_steps = f"<b>แบ่งรูปบันไดเป็นแท่งแนวตั้ง 3 แท่ง:</b><br>👉 แท่งที่ 1 (ซ้ายสุด): สูง {3*step_h} × กว้าง {step_w} = {col1} ช่อง<br>👉 แท่งที่ 2 (กลาง): สูง {2*step_h} × กว้าง {step_w} = {col2} ช่อง<br>👉 แท่งที่ 3 (ขวาสุด): สูง {step_h} × กว้าง {step_w} = {col3} ช่อง<br>👉 นำพื้นที่มารวมกัน = {col1} + {col2} + {col3} = <b>{area}</b> ช่อง"
+                    calc_steps = f"แบ่งรูปขั้นบันไดเป็นแท่งแนวตั้ง 3 แท่ง:<br>👉 <b style='color:{c_blue};'>แท่งที่ 1 (สีฟ้า):</b> กว้าง {step_w} × ยาว {3*step_h} = {col1} ช่อง<br>👉 <b style='color:{c_red};'>แท่งที่ 2 (สีแดง):</b> กว้าง {step_w} × ยาว {2*step_h} = {col2} ช่อง<br>👉 <b style='color:{c_green};'>แท่งที่ 3 (สีเขียว):</b> กว้าง {step_w} × ยาว {step_h} = {col3} ช่อง<br>👉 นำพื้นที่มารวมกัน = {col1} + {col2} + {col3} = <b>{area}</b> ช่อง"
 
-                # 🎯 คำนวณเพื่อย้ายรูปทรงไปอยู่ตรง "กึ่งกลาง" ของตารางพอดีเป๊ะ
+                # ขยับรูปโจทย์ให้อยู่กึ่งกลาง
                 max_x = max(p[0] for p in pts)
                 max_y = max(p[1] for p in pts)
                 offset_x = (14 - max_x) // 2
                 offset_y = (8 - max_y) // 2
                 final_pts = [(p[0]+offset_x, p[1]+offset_y) for p in pts]
 
-                svg = draw_p4_grid_area_svg(final_pts, unit)
-                q = f"พิจารณารูปที่กำหนดให้บนตาราง จงหา<b>พื้นที่</b>ของส่วนที่ระบายสี<br>{svg}"
+                # สร้างภาพโจทย์ (สีเดียว) และภาพเฉลย (แยกสี)
+                svg_q = draw_p4_grid_area_svg(final_pts, unit)
+                svg_sol = draw_p4_grid_area_solution_svg(rects, unit)
+
+                q = f"พิจารณารูปที่กำหนดให้บนตาราง จงหา<b>พื้นที่</b>ของส่วนที่ระบายสี<br>{svg_q}"
 
                 sol = f"""<span style='color:#2c3e50;'>
                 <div style='background-color:#f8f9f9; border-left:4px solid #8e44ad; padding:15px; margin-bottom:15px; border-radius:8px;'>
-                💡 <b>เทคนิคการคำนวณพื้นที่บนตาราง (ไม่ต้องนั่งนับ):</b><br>
-                เราสามารถใช้วิธี <b>"แบ่งรูปทรงย่อย"</b> เป็นรูปสี่เหลี่ยมมุมฉากเล็กๆ หลายๆ รูป หรือใช้เทคนิค <b>"สี่เหลี่ยมรูปใหญ่ลบด้วยช่องว่าง"</b> แล้วใช้สูตร (กว้าง × ยาว) เพื่อความรวดเร็วและแม่นยำ!
+                💡 <b>เทคนิคการแบ่งรูป (Decomposition):</b><br>
+                แทนที่จะเสียเวลานั่งนับทีละช่อง ให้เราขีดเส้นแบ่งรูปทรงที่ซับซ้อนออกเป็นสี่เหลี่ยมมุมฉากย่อยๆ จากนั้นใช้สูตร <b>(กว้าง × ยาว)</b> เพื่อหาพื้นที่แต่ละส่วน แล้วนำมารวมกันครับ
                 </div>
+                {svg_sol}
                 <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
-                {calc_steps}<br>
-                👉 นำจำนวนช่องรวม คูณกับพื้นที่ต่อช่อง ➔ {area} × 1 = <b>{area}</b><br><br>
+                {calc_steps}<br><br>
                 <b>ตอบ: พื้นที่ของรูประบายสีคือ {area} {unit}</b></span>"""
+
+
+
 
 
             elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":

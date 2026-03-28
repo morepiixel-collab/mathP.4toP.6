@@ -66,6 +66,76 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
 # ==========================================
 
 
+
+import math
+import random
+
+def draw_p4_triangle_area_svg(tri_type, base_val, height_val, unit="ซม."):
+    svg_w, svg_h = 450, 250
+    cx, cy = 225, 120 # ขยับจุดศูนย์กลางแกน Y ขึ้นนิดหน่อยเพื่อให้มีที่วางตัวเลขฐาน
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+
+    # 📐 ไดนามิก: สุ่มสัดส่วนการวาดให้มีความหลากหลาย ไม่จำเจ
+    v_base = random.randint(140, 200)   # ความยาวฐานบนหน้าจอ
+    v_height = random.randint(90, 130)  # ความสูงบนหน้าจอ
+
+    bottom_y = cy + v_height/2
+    top_y = cy - v_height/2
+
+    if tri_type == "right":
+        # 📐 สามเหลี่ยมมุมฉาก (มุมฉากอยู่ซ้ายล่าง)
+        bl = (cx - v_base/2, bottom_y)
+        br = (cx + v_base/2, bottom_y)
+        top = (bl[0], top_y)
+
+        pts = f"{top[0]},{top[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
+        svg += f'<polygon points="{pts}" fill="#e8f8f5" stroke="#2c3e50" stroke-width="2.5"/>'
+
+        # 🎯 สัญลักษณ์มุมฉากสีแดง
+        s = 15
+        svg += f'<polyline points="{bl[0]},{bl[1]-s} {bl[0]+s},{bl[1]-s} {bl[0]+s},{bl[1]}" fill="none" stroke="#e74c3c" stroke-width="2.5"/>'
+
+        # 🎯 ตัวเลข (ฐานสีน้ำเงิน, สูงสีแดง)
+        svg += f'<text x="{cx}" y="{bottom_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">ฐาน {base_val} {unit}</text>'
+        svg += f'<text x="{bl[0] - 15}" y="{cy}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#e74c3c">สูง {height_val} {unit}</text>'
+
+    else: 
+        # 📐 สามเหลี่ยมมุมแหลม (หน้าจั่ว หรือ ด้านไม่เท่า)
+        bl = (cx - v_base/2, bottom_y)
+        br = (cx + v_base/2, bottom_y)
+
+        # สุ่มจุดยอด (Top) ให้ตรงกลาง(หน้าจั่ว) หรือ เยื้องไปทางซ้าย/ขวา(ด้านไม่เท่า)
+        if tri_type == "isosceles":
+            top_x = cx
+        else:
+            offset = random.choice([-v_base*0.3, v_base*0.25, v_base*0.35])
+            top_x = cx + offset
+
+        top = (top_x, top_y)
+
+        pts = f"{top[0]},{top[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
+        svg += f'<polygon points="{pts}" fill="#e8f8f5" stroke="#2c3e50" stroke-width="2.5"/>'
+
+        # 🎯 เส้นส่วนสูง (เส้นประสีแดง)
+        svg += f'<line x1="{top_x}" y1="{top_y}" x2="{top_x}" y2="{bottom_y}" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="6,4"/>'
+
+        # 🎯 สัญลักษณ์มุมฉากที่ฐาน
+        s = 12
+        svg += f'<polyline points="{top_x},{bottom_y-s} {top_x+s},{bottom_y-s} {top_x+s},{bottom_y}" fill="none" stroke="#e74c3c" stroke-width="2.5"/>'
+
+        # 🎯 ตัวเลข
+        svg += f'<text x="{cx}" y="{bottom_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">ฐาน {base_val} {unit}</text>'
+        # ตัวเลขความสูง ขยับให้ไม่ทับเส้น
+        svg += f'<text x="{top_x + 10}" y="{cy}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#e74c3c">สูง {height_val} {unit}</text>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+        <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            {svg}
+        </div></div>'''
+
+
+
 import math
 import random
 

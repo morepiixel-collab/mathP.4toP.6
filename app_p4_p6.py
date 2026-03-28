@@ -899,6 +899,715 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
 
+            elif actual_sub_t == "การบวกเศษส่วน":
+                import math
+                # สุ่มรูปแบบโจทย์ (1: วงกลมแบ่งส่วน, 2: แถบสี่เหลี่ยม, 3: ตารางเงื่อนไข)
+                prob_style = random.choice([1, 2, 3])
+                
+                # ฟังก์ชันช่วยวาดตัวเลขเศษส่วน
+                def draw_frac(n, d):
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
+                
+                # ฟังก์ชันวาดวงกลมเศษส่วน (มีเส้นแบ่งส่วนชัดเจน)
+                def draw_svg_pie(n, d, color="#2ecc71"):
+                    if d == 1 or n == d:
+                        return f'<svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="{color}" stroke="#2c3e50" stroke-width="2"/></svg>'
+                    if n == 0:
+                        return f'<svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="#ecf0f1" stroke="#2c3e50" stroke-width="2"/></svg>'
+                    
+                    svg = '<svg width="80" height="80" viewBox="0 0 80 80">'
+                    svg += '<circle cx="40" cy="40" r="38" fill="#ecf0f1" stroke="#2c3e50" stroke-width="2"/>'
+                    for i in range(d):
+                        start_a = i * (360 / d)
+                        end_a = (i + 1) * (360 / d)
+                        r1 = math.radians(start_a - 90)
+                        r2 = math.radians(end_a - 90)
+                        x1 = 40 + 38 * math.cos(r1)
+                        y1 = 40 + 38 * math.sin(r1)
+                        x2 = 40 + 38 * math.cos(r2)
+                        y2 = 40 + 38 * math.sin(r2)
+                        fill = color if i < n else "none"
+                        la = 1 if (end_a - start_a) > 180 else 0
+                        # วาดชิ้นส่วนแต่ละชิ้นพร้อมเส้นขอบ
+                        svg += f'<path d="M 40 40 L {x1} {y1} A 38 38 0 {la} 1 {x2} {y2} Z" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += '</svg>'
+                    return svg
+
+                # ฟังก์ชันวาดแถบสี่เหลี่ยมเศษส่วน (มีเส้นแบ่งช่องชัดเจน)
+                def draw_svg_rect(n, d, color="#9b59b6"):
+                    svg = f'<svg width="120" height="40" viewBox="0 0 120 40">'
+                    w = 120 / d
+                    for i in range(d):
+                        fill = color if i < n else "#ecf0f1"
+                        svg += f'<rect x="{i*w}" y="0" width="{w}" height="40" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += '</svg>'
+                    return svg
+
+                if prob_style == 1:
+                    # แบบที่ 1: แผนภาพวงกลม (ตัวส่วนเท่ากัน)
+                    d = random.choice([4, 6, 8, 10, 12])
+                    n1 = random.randint(1, d-1)
+                    n2 = random.randint(1, d-1)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        <div style="text-align:center;">{draw_svg_pie(n1, d, "#3498db")}<br><b style="color:#3498db;">รูปที่ 1</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">+</div>
+                        <div style="text-align:center;">{draw_svg_pie(n2, d, "#e67e22")}<br><b style="color:#e67e22;">รูปที่ 2</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
+                    </div>
+                    """
+                    q = f"จากภาพวงกลมที่ถูกแบ่งเป็นส่วนเท่าๆ กัน ถ้านำส่วนที่ระบายสีมารวมกัน จะเขียนเป็นเศษส่วนได้อย่างไร?<br>{q_html}"
+                    
+                    sum_n = n1 + n2
+                    gcd_v = math.gcd(sum_n, d)
+                    ans_n, ans_d = sum_n // gcd_v, d // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    • วงกลมถูกแบ่งออกเป็น <b>{d} ส่วน</b> เท่าๆ กัน (ตัวส่วนคือ {d})<br>
+                    • <b style="color:#3498db;">รูปที่ 1</b> ระบายสีไป {n1} ส่วน เขียนเป็นเศษส่วนได้ {draw_frac(n1, d)}<br>
+                    • <b style="color:#e67e22;">รูปที่ 2</b> ระบายสีไป {n2} ส่วน เขียนเป็นเศษส่วนได้ {draw_frac(n2, d)}
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: นำเศษส่วนมาบวกกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เมื่อ "ตัวส่วน" เท่ากันแล้ว ให้นำ "ตัวเศษ" (เลขด้านบน) มาบวกกันได้เลย</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1, d)} + {draw_frac(n2, d)} = {draw_frac(f"{n1} + {n2}", d)} = <b>{draw_frac(sum_n, d)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 2: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{sum_n} ÷ {gcd_v}", f"{d} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+                elif prob_style == 2:
+                    # แบบที่ 2: แถบสี่เหลี่ยม (ตัวส่วนไม่เท่ากัน)
+                    d1 = random.choice([2, 3, 4])
+                    m = random.choice([2, 3])
+                    d2 = d1 * m
+                    n1 = random.randint(1, d1-1)
+                    n2 = random.randint(1, d2-1)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; padding: 25px; background: #faf8f5; border-radius: 12px; border: 2px solid #dcd1c4; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        <div style="text-align:center;">{draw_svg_rect(n1, d1, "#1abc9c")}<br><b style="color:#1abc9c;">แถบ A</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">+</div>
+                        <div style="text-align:center;">{draw_svg_rect(n2, d2, "#9b59b6")}<br><b style="color:#9b59b6;">แถบ B</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
+                    </div>
+                    """
+                    q = f"จากแถบเศษส่วนต่อไปนี้ จงหาผลบวกของส่วนที่ระบายสี<br><span style='font-size:14px; color:#e74c3c;'>(⭐ สังเกต: แถบทั้งสองถูกแบ่งเป็นช่องไม่เท่ากัน)</span><br>{q_html}"
+                    
+                    n1_new = n1 * m
+                    sum_n = n1_new + n2
+                    gcd_v = math.gcd(sum_n, d2)
+                    ans_n, ans_d = sum_n // gcd_v, d2 // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    • <b style="color:#1abc9c;">แถบ A</b> ถูกแบ่ง {d1} ช่อง ระบายสี {n1} ช่อง = {draw_frac(n1, d1)}<br>
+                    • <b style="color:#9b59b6;">แถบ B</b> ถูกแบ่ง {d2} ช่อง ระบายสี {n2} ช่อง = {draw_frac(n2, d2)}<br>
+                    • จะเห็นว่าขนาดช่องไม่เท่ากัน ต้องทำ <b style="color:#1abc9c;">แถบ A</b> ให้มีช่องเล็กๆ เท่ากับแถบ B ก่อน!
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: ทำตัวส่วนให้เท่ากัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ <b style='color:#e74c3c;'>{m}</b> มาคูณทั้งเศษและส่วนของ {draw_frac(n1, d1)} เพื่อให้ส่วนกลายเป็น {d2}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {draw_frac(f"{n1} × <b style='color:#e74c3c;'>{m}</b>", f"{d1} × <b style='color:#e74c3c;'>{m}</b>")} = <b style='color:#1abc9c;'>{draw_frac(n1_new, d2)}</b><br><br>
+                    👉 <b>ขั้นที่ 2: นำเศษส่วนมาบวกกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1_new, d2)} + {draw_frac(n2, d2)} = {draw_frac(f"{n1_new} + {n2}", d2)} = <b>{draw_frac(sum_n, d2)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 3: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{sum_n} ÷ {gcd_v}", f"{d2} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+                else:
+                    # แบบที่ 3: ตารางสมมาตร (ตัวเลขล้วน ตัวส่วนไม่เท่ากัน)
+                    d1 = random.choice([3, 4, 5])
+                    n1 = random.randint(1, d1-1)
+                    m = random.choice([2, 3, 4])
+                    d2 = d1 * m
+                    n2 = random.randint(1, d2-1)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
+                        <div style="flex: 1; border: 3px solid #2980b9; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #2980b9; font-size: 18px;">กล่อง A</b><hr style="border-top: 2px dashed #2980b9;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n1, d1)}</div>
+                        </div>
+                        <div style="flex: 1; border: 3px solid #f39c12; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #f39c12; font-size: 18px;">กล่อง B</b><hr style="border-top: 2px dashed #f39c12;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n2, d2)}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; background: #e8f8f5; padding: 15px; border-radius: 8px; border: 2px solid #1abc9c; font-size: 22px;">
+                        จงหาผลลัพธ์ของ &nbsp; <b>A <span style="color:#e74c3c;">+</span> B</b>
+                    </div>
+                    """
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br>{q_html}"
+                    
+                    n1_new = n1 * m
+                    sum_n = n1_new + n2
+                    gcd_v = math.gcd(sum_n, d2)
+                    ans_n, ans_d = sum_n // gcd_v, d2 // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: จัดรูปสมการ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำค่าจากกล่องมาเขียนบวกกัน: {draw_frac(n1, d1)} <b style='color:#e74c3c;'>+</b> {draw_frac(n2, d2)}<br><br>
+                    👉 <b>ขั้นที่ 2: ทำตัวส่วนให้เท่ากัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>สังเกตว่าตัวส่วนคือ {d1} และ {d2} เราต้องทำ {d1} ให้กลายเป็น {d2} โดยการคูณด้วย {m}</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {draw_frac(f"{n1} × <b style='color:#e74c3c;'>{m}</b>", f"{d1} × <b style='color:#e74c3c;'>{m}</b>")} = <b style='color:#2980b9;'>{draw_frac(n1_new, d2)}</b><br><br>
+                    👉 <b>ขั้นที่ 3: นำเศษส่วนมาบวกกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1_new, d2)} + {draw_frac(n2, d2)} = {draw_frac(f"{n1_new} + {n2}", d2)} = <b>{draw_frac(sum_n, d2)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 4: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{sum_n} ÷ {gcd_v}", f"{d2} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+
+
+            elif actual_sub_t == "การลบเศษส่วน":
+                import math
+                # สุ่มรูปแบบโจทย์ (1: วงกลมแบ่งส่วน, 2: แถบสี่เหลี่ยม, 3: ตารางเงื่อนไขสมมาตร)
+                prob_style = random.choice([1, 2, 3])
+                
+                # ฟังก์ชันช่วยวาดตัวเลขเศษส่วน
+                def draw_frac(n, d):
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
+                
+                # ฟังก์ชันวาดวงกลมเศษส่วน (มีเส้นแบ่งส่วนชัดเจน)
+                def draw_svg_pie(n, d, color="#e74c3c"):
+                    if d == 1 or n == d:
+                        return f'<svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="{color}" stroke="#2c3e50" stroke-width="2"/></svg>'
+                    if n == 0:
+                        return f'<svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="#ecf0f1" stroke="#2c3e50" stroke-width="2"/></svg>'
+                    
+                    svg = '<svg width="80" height="80" viewBox="0 0 80 80">'
+                    svg += '<circle cx="40" cy="40" r="38" fill="#ecf0f1" stroke="#2c3e50" stroke-width="2"/>'
+                    for i in range(d):
+                        start_a = i * (360 / d)
+                        end_a = (i + 1) * (360 / d)
+                        r1 = math.radians(start_a - 90)
+                        r2 = math.radians(end_a - 90)
+                        x1 = 40 + 38 * math.cos(r1)
+                        y1 = 40 + 38 * math.sin(r1)
+                        x2 = 40 + 38 * math.cos(r2)
+                        y2 = 40 + 38 * math.sin(r2)
+                        fill = color if i < n else "none"
+                        la = 1 if (end_a - start_a) > 180 else 0
+                        svg += f'<path d="M 40 40 L {x1} {y1} A 38 38 0 {la} 1 {x2} {y2} Z" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += '</svg>'
+                    return svg
+
+                # ฟังก์ชันวาดแถบสี่เหลี่ยมเศษส่วน
+                def draw_svg_rect(n, d, color="#f39c12"):
+                    svg = f'<svg width="120" height="40" viewBox="0 0 120 40">'
+                    w = 120 / d
+                    for i in range(d):
+                        fill = color if i < n else "#ecf0f1"
+                        svg += f'<rect x="{i*w}" y="0" width="{w}" height="40" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += '</svg>'
+                    return svg
+
+                if prob_style == 1:
+                    # แบบที่ 1: แผนภาพวงกลม (ตัวส่วนเท่ากัน) ลบกัน
+                    d = random.choice([4, 6, 8, 10, 12])
+                    n1 = random.randint(2, d-1)
+                    n2 = random.randint(1, n1-1) # ให้ n2 น้อยกว่า n1 เสมอ จะได้ลบกันไม่ติดลบ
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        <div style="text-align:center;">{draw_svg_pie(n1, d, "#3498db")}<br><b style="color:#3498db;">รูปที่ 1 (ตัวตั้ง)</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">-</div>
+                        <div style="text-align:center;">{draw_svg_pie(n2, d, "#e74c3c")}<br><b style="color:#e74c3c;">รูปที่ 2 (ตัวลบ)</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
+                    </div>
+                    """
+                    q = f"จากภาพวงกลมที่ถูกแบ่งเป็นส่วนเท่าๆ กัน ถ้านำส่วนที่ระบายสีมาหักล้างกัน (ลบกัน) จะเขียนเป็นเศษส่วนได้อย่างไร?<br>{q_html}"
+                    
+                    diff_n = n1 - n2
+                    gcd_v = math.gcd(diff_n, d)
+                    ans_n, ans_d = diff_n // gcd_v, d // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    • วงกลมถูกแบ่งออกเป็น <b>{d} ส่วน</b> เท่าๆ กัน (ตัวส่วนคือ {d})<br>
+                    • <b style="color:#3498db;">รูปที่ 1</b> ระบายสีไป {n1} ส่วน เขียนเป็นเศษส่วนได้ {draw_frac(n1, d)}<br>
+                    • <b style="color:#e74c3c;">รูปที่ 2</b> ระบายสีไป {n2} ส่วน เขียนเป็นเศษส่วนได้ {draw_frac(n2, d)}
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: นำเศษส่วนมาลบกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>เมื่อ "ตัวส่วน" เท่ากันแล้ว ให้นำ "ตัวเศษ" (เลขด้านบน) มาลบกันได้เลย</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1, d)} <b style='color:#e74c3c;'>-</b> {draw_frac(n2, d)} = {draw_frac(f"{n1} - {n2}", d)} = <b>{draw_frac(diff_n, d)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 2: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{diff_n} ÷ {gcd_v}", f"{d} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+                elif prob_style == 2:
+                    # แบบที่ 2: แถบสี่เหลี่ยม (ตัวส่วนไม่เท่ากัน)
+                    d1 = random.choice([2, 3, 4])
+                    n1 = random.randint(1, d1-1)
+                    m = random.choice([2, 3, 4])
+                    d2 = d1 * m
+                    
+                    n1_new = n1 * m # จำนวนช่องถ้าย่อยเป็นชิ้นเล็ก
+                    n2 = random.randint(1, n1_new - 1) # ตัวลบต้องน้อยกว่าตัวตั้ง
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; padding: 25px; background: #faf8f5; border-radius: 12px; border: 2px solid #dcd1c4; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        <div style="text-align:center;">{draw_svg_rect(n1, d1, "#1abc9c")}<br><b style="color:#1abc9c;">แถบ A (ตัวตั้ง)</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #e74c3c;">-</div>
+                        <div style="text-align:center;">{draw_svg_rect(n2, d2, "#f39c12")}<br><b style="color:#f39c12;">แถบ B (ตัวลบ)</b></div>
+                        <div style="font-size: 35px; font-weight: bold; color: #2c3e50;">= &nbsp;?</div>
+                    </div>
+                    """
+                    q = f"จากแถบเศษส่วนต่อไปนี้ จงหาผลลบของส่วนที่ระบายสี<br><span style='font-size:14px; color:#e74c3c;'>(⭐ สังเกต: แถบทั้งสองถูกแบ่งเป็นช่องไม่เท่ากัน)</span><br>{q_html}"
+                    
+                    diff_n = n1_new - n2
+                    gcd_v = math.gcd(diff_n, d2)
+                    ans_n, ans_d = diff_n // gcd_v, d2 // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    • <b style="color:#1abc9c;">แถบ A</b> ถูกแบ่ง {d1} ช่อง ระบายสี {n1} ช่อง = {draw_frac(n1, d1)}<br>
+                    • <b style="color:#f39c12;">แถบ B</b> ถูกแบ่ง {d2} ช่อง ระบายสี {n2} ช่อง = {draw_frac(n2, d2)}<br>
+                    • จะเห็นว่าขนาดช่องไม่เท่ากัน ต้องทำ <b style="color:#1abc9c;">แถบ A</b> ให้มีช่องเล็กๆ เท่ากับแถบ B ก่อนถึงจะลบกันได้!
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: ทำตัวส่วนให้เท่ากัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ <b style='color:#e74c3c;'>{m}</b> มาคูณทั้งเศษและส่วนของ {draw_frac(n1, d1)} เพื่อให้ส่วนกลายเป็น {d2}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {draw_frac(f"{n1} × <b style='color:#e74c3c;'>{m}</b>", f"{d1} × <b style='color:#e74c3c;'>{m}</b>")} = <b style='color:#1abc9c;'>{draw_frac(n1_new, d2)}</b><br><br>
+                    👉 <b>ขั้นที่ 2: นำเศษส่วนมาลบกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1_new, d2)} <b style='color:#e74c3c;'>-</b> {draw_frac(n2, d2)} = {draw_frac(f"{n1_new} - {n2}", d2)} = <b>{draw_frac(diff_n, d2)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 3: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{diff_n} ÷ {gcd_v}", f"{d2} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+                else:
+                    # แบบที่ 3: ตารางสมมาตร (ตัวเลขล้วน ตัวส่วนไม่เท่ากัน)
+                    d1 = random.choice([3, 4, 5])
+                    n1 = random.randint(1, d1-1)
+                    m = random.choice([2, 3, 4])
+                    d2 = d1 * m
+                    
+                    n1_new = n1 * m
+                    n2 = random.randint(1, n1_new - 1) # เพื่อให้ A - B ไม่ติดลบ
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
+                        <div style="flex: 1; border: 3px solid #2980b9; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #2980b9; font-size: 18px;">กล่อง A</b><hr style="border-top: 2px dashed #2980b9;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n1, d1)}</div>
+                        </div>
+                        <div style="flex: 1; border: 3px solid #f39c12; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #f39c12; font-size: 18px;">กล่อง B</b><hr style="border-top: 2px dashed #f39c12;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n2, d2)}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; background: #f9ebea; padding: 15px; border-radius: 8px; border: 2px solid #e74c3c; font-size: 22px;">
+                        จงหาผลลัพธ์ของ &nbsp; <b>A <span style="color:#e74c3c;">-</span> B</b>
+                    </div>
+                    """
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br>{q_html}"
+                    
+                    diff_n = n1_new - n2
+                    gcd_v = math.gcd(diff_n, d2)
+                    ans_n, ans_d = diff_n // gcd_v, d2 // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: จัดรูปสมการ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำค่าจากกล่องมาเขียนลบกัน: {draw_frac(n1, d1)} <b style='color:#e74c3c;'>-</b> {draw_frac(n2, d2)}<br><br>
+                    👉 <b>ขั้นที่ 2: ทำตัวส่วนให้เท่ากัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>สังเกตว่าตัวส่วนคือ {d1} และ {d2} เราต้องทำ {d1} ให้กลายเป็น {d2} โดยการคูณด้วย {m}</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {draw_frac(f"{n1} × <b style='color:#e74c3c;'>{m}</b>", f"{d1} × <b style='color:#e74c3c;'>{m}</b>")} = <b style='color:#2980b9;'>{draw_frac(n1_new, d2)}</b><br><br>
+                    👉 <b>ขั้นที่ 3: นำเศษส่วนมาลบกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1_new, d2)} <b style='color:#e74c3c;'>-</b> {draw_frac(n2, d2)} = {draw_frac(f"{n1_new} - {n2}", d2)} = <b>{draw_frac(diff_n, d2)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 4: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{diff_n} ÷ {gcd_v}", f"{d2} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+
+
+            elif actual_sub_t == "การคูณเศษส่วน":
+                import math
+                # สุ่มรูปแบบโจทย์ (1: ตารางพื้นที่ซ้อนทับ, 2: เศษส่วนคูณจำนวนเต็ม, 3: ตารางเงื่อนไขสมมาตร)
+                prob_style = random.choice([1, 2, 3])
+                
+                # ฟังก์ชันช่วยวาดตัวเลขเศษส่วน
+                def draw_frac(n, d):
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
+                
+                # ฟังก์ชันวาดตารางพื้นที่ซ้อนทับ (Area Model)
+                def draw_svg_grid(n1, d1, n2, d2):
+                    w, h = 120, 120
+                    cw, ch = w/d1, h/d2
+                    svg = f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}">'
+                    for row in range(d2):
+                        for col in range(d1):
+                            if col < n1 and row < n2:
+                                fill = "#2ecc71" # พื้นที่ซ้อนทับ (คำตอบ)
+                            elif col < n1:
+                                fill = "#a9dfbf" # แนวตั้งอย่างเดียว
+                            elif row < n2:
+                                fill = "#f9e79f" # แนวนอนอย่างเดียว
+                            else:
+                                fill = "#ecf0f1" # ไม่ถูกระบาย
+                            svg += f'<rect x="{col*cw}" y="{row*ch}" width="{cw}" height="{ch}" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += '</svg>'
+                    return svg
+
+                if prob_style == 1:
+                    # แบบที่ 1: แผนภาพตารางซ้อนทับ (Visual Math)
+                    d1 = random.choice([3, 4, 5])
+                    n1 = random.randint(1, d1-1)
+                    d2 = random.choice([3, 4, 5])
+                    n2 = random.randint(1, d2-1)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        <div style="text-align:center;">
+                            {draw_svg_grid(n1, d1, n2, d2)}<br>
+                            <span style="font-size:14px; color:#7f8c8d;">(พื้นที่สีเขียวเข้มคือส่วนที่ทับซ้อนกัน)</span>
+                        </div>
+                    </div>
+                    """
+                    q = f"จากแผนภาพ แสดงตารางแนวตั้งที่ระบายสี {draw_frac(n1, d1)} และแนวนอนระบายสี {draw_frac(n2, d2)} <br>พื้นที่ส่วนที่ระบายสีทับซ้อนกันเขียนเป็นประโยคสัญลักษณ์และหาคำตอบได้อย่างไร?<br>{q_html}"
+                    
+                    ans_n_raw = n1 * n2
+                    ans_d_raw = d1 * d2
+                    gcd_v = math.gcd(ans_n_raw, ans_d_raw)
+                    ans_n, ans_d = ans_n_raw // gcd_v, ans_d_raw // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ (Area Model):</b><br>
+                    • <b>แนวตั้ง</b> แบ่งเป็น {d1} ช่อง ระบายสี {n1} ช่อง = {draw_frac(n1, d1)}<br>
+                    • <b>แนวนอน</b> แบ่งเป็น {d2} ช่อง ระบายสี {n2} ช่อง = {draw_frac(n2, d2)}<br>
+                    • <b>พื้นที่ทับซ้อนกัน (สีเขียวเข้ม)</b> คือผลลัพธ์ของ <b>การคูณ</b>
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: ตั้งสมการคูณเศษส่วน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ประโยคสัญลักษณ์: {draw_frac(n1, d1)} <b style='color:#e74c3c;'>×</b> {draw_frac(n2, d2)} = ?<br><br>
+                    👉 <b>ขั้นที่ 2: นำเศษคูณเศษ และ ส่วนคูณส่วน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>การคูณเศษส่วน <b>ไม่ต้อง</b> ทำตัวส่วนให้เท่ากัน นำบนคูณบน ล่างคูณล่างได้เลย!</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>ตัวเศษ (บน):</b> {n1} × {n2} = {ans_n_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>ตัวส่วน (ล่าง):</b> {d1} × {d2} = {ans_d_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้ผลลัพธ์คือ: <b>{draw_frac(ans_n_raw, ans_d_raw)}</b> <i>(ซึ่งตรงกับตารางที่มีช่องทั้งหมด {ans_d_raw} ช่อง และทับซ้อนกัน {ans_n_raw} ช่องพอดี!)</i><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 3: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{ans_n_raw} ÷ {gcd_v}", f"{ans_d_raw} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+                elif prob_style == 2:
+                    # แบบที่ 2: เศษส่วน คูณ จำนวนเต็ม (ตารางสมมาตร)
+                    d1 = random.choice([4, 5, 6, 8, 10])
+                    n1 = random.randint(1, d1-1)
+                    mult_val = random.randint(2, 12)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
+                        <div style="flex: 1; border: 3px solid #1abc9c; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #1abc9c; font-size: 18px;">กล่อง A</b><hr style="border-top: 2px dashed #1abc9c;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n1, d1)}</div>
+                        </div>
+                        <div style="flex: 1; border: 3px solid #e67e22; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #e67e22; font-size: 18px;">กล่อง B</b><hr style="border-top: 2px dashed #e67e22;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px; font-weight:bold;">{mult_val}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; background: #fdf2e9; padding: 15px; border-radius: 8px; border: 2px solid #d35400; font-size: 22px;">
+                        จงหาผลลัพธ์ของ &nbsp; <b>A <span style="color:#e74c3c;">×</span> B</b>
+                    </div>
+                    """
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br>{q_html}"
+                    
+                    ans_n_raw = n1 * mult_val
+                    ans_d_raw = d1
+                    gcd_v = math.gcd(ans_n_raw, ans_d_raw)
+                    ans_n, ans_d = ans_n_raw // gcd_v, ans_d_raw // gcd_v
+                    
+                    # ถ้าเศษเกินส่วน ให้ทำเป็นจำนวนคละ
+                    if ans_n > ans_d and ans_d != 1:
+                        whole = ans_n // ans_d
+                        rem = ans_n % ans_d
+                        if rem == 0:
+                            ans_text = str(whole)
+                        else:
+                            ans_text = f"{whole}{draw_frac(rem, ans_d)}"
+                    else:
+                        ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    💡 <b>หลักการคูณเศษส่วนกับจำนวนเต็ม:</b><br>
+                    จำนวนเต็มทุกตัว มี <b>"ส่วนเป็น 1"</b> ซ่อนอยู่เสมอ ดังนั้น {mult_val} ก็คือ {draw_frac(mult_val, 1)}
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: จัดรูปสมการใหม่</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1, d1)} <b style='color:#e74c3c;'>×</b> <b>{mult_val}</b> &nbsp;&nbsp;➔&nbsp;&nbsp; {draw_frac(n1, d1)} <b style='color:#e74c3c;'>×</b> {draw_frac(mult_val, 1)}<br><br>
+                    👉 <b>ขั้นที่ 2: นำบนคูณบน และ ล่างคูณล่าง</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>ตัวเศษ:</b> {n1} × {mult_val} = {ans_n_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>ตัวส่วน:</b> {d1} × 1 = {ans_d_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้ผลลัพธ์คือ: <b>{draw_frac(ans_n_raw, ans_d_raw)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 3: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{ans_n_raw} ÷ {gcd_v}", f"{ans_d_raw} ÷ {gcd_v}")} = <b>{draw_frac(ans_n, ans_d) if ans_d != 1 else ans_n}</b><br><br>"""
+                    
+                    if ans_n > ans_d and ans_d != 1:
+                        sol += f"""👉 <b>ขั้นที่ 4: แปลงเศษเกินเป็นจำนวนคละ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำ {ans_n} ตั้ง หารด้วย {ans_d} จะได้ <b>{whole}</b> เศษ <b>{rem}</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;เขียนเป็นจำนวนคละได้: <b>{ans_text}</b><br><br>"""
+                        
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+                else:
+                    # แบบที่ 3: เศษส่วน คูณ เศษส่วน (ตารางสมมาตร)
+                    d1 = random.choice([3, 4, 5, 6])
+                    n1 = random.randint(1, d1-1)
+                    d2 = random.choice([3, 4, 5, 6])
+                    n2 = random.randint(1, d2-1)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
+                        <div style="flex: 1; border: 3px solid #2980b9; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #2980b9; font-size: 18px;">กล่อง A</b><hr style="border-top: 2px dashed #2980b9;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n1, d1)}</div>
+                        </div>
+                        <div style="flex: 1; border: 3px solid #8e44ad; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #8e44ad; font-size: 18px;">กล่อง B</b><hr style="border-top: 2px dashed #8e44ad;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n2, d2)}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; background: #f5eef8; padding: 15px; border-radius: 8px; border: 2px solid #9b59b6; font-size: 22px;">
+                        จงหาผลลัพธ์ของ &nbsp; <b>A <span style="color:#e74c3c;">×</span> B</b>
+                    </div>
+                    """
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br>{q_html}"
+                    
+                    ans_n_raw = n1 * n2
+                    ans_d_raw = d1 * d2
+                    gcd_v = math.gcd(ans_n_raw, ans_d_raw)
+                    ans_n, ans_d = ans_n_raw // gcd_v, ans_d_raw // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: จัดรูปสมการ</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำค่าจากกล่องมาเขียนคูณกัน: {draw_frac(n1, d1)} <b style='color:#e74c3c;'>×</b> {draw_frac(n2, d2)}<br><br>
+                    👉 <b>ขั้นที่ 2: นำบนคูณบน และ ล่างคูณล่าง</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>การคูณเศษส่วน ไม่ต้องทำส่วนให้เท่ากัน!</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>ตัวเศษ:</b> {n1} × {n2} = {ans_n_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>ตัวส่วน:</b> {d1} × {d2} = {ans_d_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้ผลลัพธ์คือ: <b>{draw_frac(ans_n_raw, ans_d_raw)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 3: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{ans_n_raw} ÷ {gcd_v}", f"{ans_d_raw} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+
+
+            elif actual_sub_t == "การหารเศษส่วน":
+                import math
+                # สุ่มรูปแบบโจทย์ (1: ภาพจำลองการแบ่งพื้นที่, 2: ตารางสมมาตร A/B, 3: ภาพจำลองแบ่งวงกลม)
+                prob_style = random.choice([1, 2, 3])
+                
+                # ฟังก์ชันช่วยวาดตัวเลขเศษส่วน
+                def draw_frac(n, d):
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
+                
+                # ฟังก์ชันวาดภาพพื้นที่ถูกแบ่ง (สี่เหลี่ยม)
+                def draw_svg_div_rect(n, d, m):
+                    w, h = 120, 120
+                    cw, ch = w/d, h/m
+                    svg = f'<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}">'
+                    for row in range(m):
+                        for col in range(d):
+                            if col < n and row == 0:
+                                fill = "#2ecc71" # พื้นที่คำตอบ (เขียวเข้ม)
+                            elif col < n:
+                                fill = "#a9dfbf" # พื้นที่ตัวตั้งเดิม (เขียวอ่อน)
+                            else:
+                                fill = "#ecf0f1" # พื้นที่ว่าง
+                            svg += f'<rect x="{col*cw}" y="{row*ch}" width="{cw}" height="{ch}" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
+                    svg += '</svg>'
+                    return svg
+
+                # ฟังก์ชันวาดภาพวงกลมถูกแบ่ง
+                def draw_svg_circles(w_count, d):
+                    svg = "<div style='display:flex; justify-content:center; flex-wrap:wrap; gap:10px;'>"
+                    for _ in range(w_count):
+                        svg += f'<svg width="70" height="70" viewBox="0 0 70 70">'
+                        svg += '<circle cx="35" cy="35" r="33" fill="#fcf3cf" stroke="#f39c12" stroke-width="2"/>'
+                        for i in range(d):
+                            angle = math.radians(i * (360 / d) - 90)
+                            x2 = 35 + 33 * math.cos(angle)
+                            y2 = 35 + 33 * math.sin(angle)
+                            svg += f'<line x1="35" y1="35" x2="{x2}" y2="{y2}" stroke="#f39c12" stroke-width="1.5"/>'
+                        svg += '</svg>'
+                    svg += "</div>"
+                    return svg
+
+                if prob_style == 1:
+                    # แบบที่ 1: เศษส่วน หาร จำนวนเต็ม (Visual Area Model)
+                    d1 = random.choice([3, 4, 5])
+                    n1 = random.randint(1, d1-1)
+                    m = random.choice([2, 3, 4]) # จำนวนเต็มที่นำมาหาร
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: center; align-items: center; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        <div style="text-align:center;">
+                            {draw_svg_div_rect(n1, d1, m)}<br>
+                            <span style="font-size:14px; color:#7f8c8d;">(พื้นที่สีเขียวเข้ม 1 แถว คือผลลัพธ์ของการถูกแบ่ง)</span>
+                        </div>
+                    </div>
+                    """
+                    q = f"จากแผนภาพ มีพื้นที่ระบายสีอยู่ {draw_frac(n1, d1)} ถ้านำพื้นที่ระบายสีนี้มา <b>แบ่งออกเป็น {m} ส่วนเท่าๆ กัน</b><br>พื้นที่ส่วนที่ถูกแบ่ง (สีเขียวเข้ม) จะเขียนเป็นเศษส่วนได้อย่างไร?<br>{q_html}"
+                    
+                    ans_n_raw = n1
+                    ans_d_raw = d1 * m
+                    gcd_v = math.gcd(ans_n_raw, ans_d_raw)
+                    ans_n, ans_d = ans_n_raw // gcd_v, ans_d_raw // gcd_v
+                    ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    • พื้นที่เดิมมี {draw_frac(n1, d1)} (แถบแนวตั้งสีเขียว)<br>
+                    • การนำมา <b>"แบ่ง"</b> คือการ <b>"หาร"</b> ด้วย {m} ซึ่งทำให้เกิดช่องเล็กๆ รวมทั้งหมด {ans_d_raw} ช่อง<br>
+                    • พื้นที่ 1 ส่วนที่ถูกแบ่ง (สีเขียวเข้ม) มี {n1} ช่อง จึงมีค่าเท่ากับ {draw_frac(n1, ans_d_raw)}
+                    </div>
+                    <b>วิธีทำด้วยการคำนวณ:</b><br>
+                    👉 <b>ขั้นที่ 1: ตั้งประโยคสัญลักษณ์</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1, d1)} <b style='color:#e74c3c;'>÷</b> <b>{m}</b> = ?<br><br>
+                    👉 <b>ขั้นที่ 2: เปลี่ยนหารเป็นคูณ กลับเศษเป็นส่วน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>จำนวนเต็ม {m} มีส่วนเป็น 1 ซ่อนอยู่ ({draw_frac(m, 1)}) เมื่อกลับเศษเป็นส่วนจะได้ {draw_frac(1, m)}</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• เปลี่ยนเป็น: {draw_frac(n1, d1)} <b style='color:#27ae60;'>×</b> <b style='color:#e67e22;'>{draw_frac(1, m)}</b><br><br>
+                    👉 <b>ขั้นที่ 3: นำบนคูณบน ล่างคูณล่าง</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวเศษ: {n1} × 1 = {ans_n_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• ตัวส่วน: {d1} × {m} = {ans_d_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้ผลลัพธ์คือ: <b>{draw_frac(ans_n_raw, ans_d_raw)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 4: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{ans_n_raw} ÷ {gcd_v}", f"{ans_d_raw} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+                elif prob_style == 2:
+                    # แบบที่ 2: เศษส่วน หาร เศษส่วน (ตารางสมมาตร)
+                    d1 = random.choice([3, 4, 5, 7])
+                    n1 = random.randint(1, d1-1)
+                    d2 = random.choice([3, 4, 5, 8])
+                    n2 = random.randint(1, d2-1)
+                    
+                    q_html = f"""
+                    <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
+                        <div style="flex: 1; border: 3px solid #2980b9; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #2980b9; font-size: 18px;">ตัวตั้ง (A)</b><hr style="border-top: 2px dashed #2980b9;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n1, d1)}</div>
+                        </div>
+                        <div style="flex: 1; border: 3px solid #e74c3c; border-radius: 8px; padding: 15px; background: white; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                            <b style="color: #e74c3c; font-size: 18px;">ตัวหาร (B)</b><hr style="border-top: 2px dashed #e74c3c;">
+                            <div style="font-size: 26px; margin-top:15px; margin-bottom:5px;">{draw_frac(n2, d2)}</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; background: #fdedec; padding: 15px; border-radius: 8px; border: 2px solid #c0392b; font-size: 22px;">
+                        จงหาผลลัพธ์ของ &nbsp; <b>A <span style="color:#e74c3c;">÷</span> B</b>
+                    </div>
+                    """
+                    q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br>{q_html}"
+                    
+                    ans_n_raw = n1 * d2
+                    ans_d_raw = d1 * n2
+                    gcd_v = math.gcd(ans_n_raw, ans_d_raw)
+                    ans_n, ans_d = ans_n_raw // gcd_v, ans_d_raw // gcd_v
+                    
+                    # แปลงเป็นจำนวนคละถ้าจำเป็น
+                    if ans_n > ans_d and ans_d != 1:
+                        w = ans_n // ans_d
+                        r = ans_n % ans_d
+                        ans_text = f"{w}{draw_frac(r, ans_d)}" if r != 0 else str(w)
+                    else:
+                        ans_text = str(ans_n) if ans_d == 1 else draw_frac(ans_n, ans_d)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: ตั้งประโยคสัญลักษณ์</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{draw_frac(n1, d1)} <b style='color:#e74c3c;'>÷</b> {draw_frac(n2, d2)}<br><br>
+                    👉 <b>ขั้นที่ 2: เปลี่ยนหารเป็นคูณ กลับเศษเป็นส่วน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ท่องจำ: "ตัวหน้าเหมือนเดิม เปลี่ยนหารเป็นคูณ กลับเศษเป็นส่วนตัวหลัง!"</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• เปลี่ยนสมการเป็น: {draw_frac(n1, d1)} <b style='color:#27ae60;'>×</b> <b style='color:#e67e22;'>{draw_frac(d2, n2)}</b><br><br>
+                    👉 <b>ขั้นที่ 3: นำเศษคูณเศษ และ ส่วนคูณส่วน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {n1} × {d2} = {ans_n_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {d1} × {n2} = {ans_d_raw}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้ผลลัพธ์คือ: <b>{draw_frac(ans_n_raw, ans_d_raw)}</b><br><br>
+                    """
+                    if gcd_v > 1:
+                        sol += f"""👉 <b>ขั้นที่ 4: ทำให้เป็นเศษส่วนอย่างต่ำ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{ans_n_raw} ÷ {gcd_v}", f"{ans_d_raw} ÷ {gcd_v}")} = <b>{draw_frac(ans_n, ans_d) if ans_d != 1 else ans_n}</b><br><br>"""
+                        
+                    if ans_n > ans_d and ans_d != 1:
+                        sol += f"""👉 <b>ขั้นที่ 5: แปลงเศษเกินเป็นจำนวนคละ</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;นำ {ans_n} ตั้ง หารด้วย {ans_d} จะได้ <b>{ans_n // ans_d}</b> เศษ <b>{ans_n % ans_d}</b><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;เขียนเป็นจำนวนคละได้: <b>{ans_text}</b><br><br>"""
+                        
+                    sol += f"<b>ตอบ: {ans_text}</b></span>"
+
+                else:
+                    # แบบที่ 3: จำนวนเต็ม หาร เศษส่วน (Visual Circles)
+                    w_count = random.randint(2, 4)
+                    d = random.choice([3, 4, 5, 6])
+                    
+                    q_html = f"""
+                    <div style="padding: 20px; background: #fdfaf0; border-radius: 12px; border: 2px dashed #f1c40f; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
+                        {draw_svg_circles(w_count, d)}
+                    </div>
+                    """
+                    q = f"ถ้ามีพิซซ่าอยู่ <b>{w_count} ถาด</b> นำมาแบ่งเป็นชิ้นย่อยๆ ชิ้นละ <b>{draw_frac(1, d)}</b> ถาด<br>จะได้พิซซ่าทั้งหมดกี่ชิ้น? (ประโยคสัญลักษณ์: {w_count} ÷ {draw_frac(1, d)})<br>{q_html}"
+                    
+                    ans_n_raw = w_count * d
+                    ans_d_raw = 1
+                    ans_text = str(ans_n_raw)
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์จากภาพ:</b><br>
+                    • พิซซ่า 1 ถาด ถูกตัดเป็น {d} ชิ้น<br>
+                    • ถ้ามีพิซซ่า {w_count} ถาด ก็จะนำจำนวนถาดไปคูณกับจำนวนชิ้นในแต่ละถาดได้เลย! ({w_count} × {d})
+                    </div>
+                    <b>วิธีทำด้วยการคำนวณ:</b><br>
+                    👉 <b>ขั้นที่ 1: ตั้งประโยคสัญลักษณ์</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<b>{w_count}</b> <b style='color:#e74c3c;'>÷</b> {draw_frac(1, d)} = ?<br><br>
+                    👉 <b>ขั้นที่ 2: เปลี่ยนหารเป็นคูณ กลับเศษเป็นส่วน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• เปลี่ยนสมการเป็น: <b>{w_count}</b> <b style='color:#27ae60;'>×</b> <b style='color:#e67e22;'>{draw_frac(d, 1)}</b><br><br>
+                    👉 <b>ขั้นที่ 3: หาผลลัพธ์</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>ส่วนเป็น 1 ไม่ต้องนำมาเขียน สามารถนำ {w_count} มาคูณ {d} ได้เลย</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {w_count} × {d} = <b>{ans_text}</b><br><br>
+                    <b>ตอบ: {ans_text} ชิ้น</b></span>"""
+
+
+
             elif actual_sub_t == "การบวกทศนิยม":
                 # สุ่มรูปแบบโจทย์ (1: ตารางร้อย (Visual), 2: กล่องสมมาตร, 3: ป้ายราคาสินค้า)
                 prob_style = random.choice([1, 2, 3])

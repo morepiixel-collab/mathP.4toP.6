@@ -34,8 +34,8 @@ st.markdown("""
 
 st.markdown("""
 <div class="main-header">
-    <h1>🎓 Math Worksheet Pro <span style="font-size: 20px; background: #e74c3c; color: #fff; padding: 5px 15px; border-radius: 20px; vertical-align: middle;">ประถมปลาย ป.4 - ป.5</span></h1>
-    <p>ระบบสร้างโจทย์คณิตศาสตร์และสมการ (ฉบับปรับปรุงเฉพาะ ป.4-ป.5)</p>
+    <h1>🎓 Math Worksheet Pro <span style="font-size: 20px; background: #e74c3c; color: #fff; padding: 5px 15px; border-radius: 20px; vertical-align: middle;">ประถมปลาย ป.4</span></h1>
+    <p>ระบบสร้างโจทย์คณิตศาสตร์และสมการ (ฉบับปรับปรุงเฉพาะ ป.4)</p>
 </div>
 """, unsafe_allow_html=True)
 

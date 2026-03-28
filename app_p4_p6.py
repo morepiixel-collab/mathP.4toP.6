@@ -86,7 +86,9 @@ def draw_p4_parallelogram_rhombus_svg(shape_type, sides, unit="ซม."):
 
     # 🎯 เพิ่มขีดสัญลักษณ์ด้านเท่า
     if shape_type == "rhombus": # ขนมเปียกปูน (1 ขีดทุกด้าน)
-        sides_to_tick = [(tl, tr, 0), (tr, br, 70), (br, bl, 0), (bl, tl, 70)]
+        # 🛠️ แก้ไข: เปลี่ยนค่ามุมหมุนของด้านเอียง (tr, br, 70 -> 310) และ (bl, tl, 70 -> 310) 
+        # เพื่อให้ขีดสีแดงเอียงทำมุมตั้งฉากกับด้านเอียง เหมือนกับแนวเส้นสีเขียว
+        sides_to_tick = [(tl, tr, 0), (tr, br, 310), (br, bl, 0), (bl, tl, 310)]
         for p1, p2, angle in sides_to_tick:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
             svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
@@ -97,16 +99,19 @@ def draw_p4_parallelogram_rhombus_svg(shape_type, sides, unit="ซม."):
             svg += f'<line x1="{mx-2}" y1="{my-6}" x2="{mx-2}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/>'
             svg += f'<line x1="{mx+2}" y1="{my-6}" x2="{mx+2}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/>'
         # คู่ซ้าย-ขวา (1 ขีดเอียง)
+        # 🛠️ แก้ไข: เปลี่ยนค่ามุมหมุนของด้านเอียง (70 -> 310) เพื่อให้ขีดสีฟ้าเอียงทำมุมตั้งฉากกับด้านเอียง 
+        # เหมือนกับแนวเส้นสีเขียว
         for p1, p2 in [(tr, br), (bl, tl)]:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
-            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#3498db" stroke-width="2" stroke-linecap="round" transform="rotate(70, {mx}, {my})"/>'
+            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#3498db" stroke-width="2" stroke-linecap="round" transform="rotate(310, {mx}, {my})"/>'
 
     # วางตัวเลขกำกับ
     if shape_type == "rhombus":
         svg += f'<text x="{cx}" y="{cy + 85}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
     else:
+        # 🛠️ แก้ไข (วงสีฟ้า): ขยับตัวเลขบอกความยาวด้านเอียงออกมาทางขวามากขึ้น (x="{cx + 105}" -> x="{cx + 135}")
         svg += f'<text x="{cx}" y="{cy + 85}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
-        svg += f'<text x="{cx + 105}" y="{cy}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
+        svg += f'<text x="{cx + 135}" y="{cy}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
 
     svg += '</svg>'
     return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">

@@ -1587,7 +1587,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
 
-elif actual_sub_t == "การบวกและการลบทศนิยม":
+            elif actual_sub_t == "การบวกและการลบทศนิยม":
                 op = random.choice(["+", "-"])
                 dp1, dp2 = random.choice([1, 2, 3]), random.choice([1, 2, 3])
                 if op == "+": a, b = round(random.uniform(1.0, 500.0), dp1), round(random.uniform(1.0, 500.0), dp2)

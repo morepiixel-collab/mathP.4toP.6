@@ -981,6 +981,38 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: ความยาวรอบรูปคือ {peri:,} {units}</b></span>"""
 
 
+
+            elif actual_sub_t == "การหาความยาวรอบรูปสามเหลี่ยม":
+                unit = random.choice(["ซม.", "ม.", "หน่วย"])
+                # สุ่มประเภทของสามเหลี่ยมเพื่อเพิ่มความหลากหลาย
+                tri_mode = random.choice(["equilateral", "isosceles", "scalene"])
+                
+                if tri_mode == "equilateral":
+                    side = random.randint(15, 150)
+                    peri = side * 3
+                    svg = draw_p4_triangle_perimeter_svg("equilateral", [side], unit)
+                    q = f"รูปสามเหลี่ยมที่กำหนดให้เป็น<b>รูปสามเหลี่ยมด้านเท่า</b> (มีสัญลักษณ์ขีดบอกความยาวเท่ากันทุกด้าน) จงหาความยาวรอบรูป<br>{svg}"
+                    sol = f"<b>วิธีทำ:</b> เนื่องจากเป็นรูปสามเหลี่ยมด้านเท่า ด้านทุกด้านจะยาวเท่ากัน<br>➔ {side} + {side} + {side} (หรือ {side} × 3) = <b>{peri} {unit}</b>"
+                
+                elif tri_mode == "isosceles":
+                    base = random.randint(20, 100)
+                    leg = random.randint(50, 150)
+                    peri = base + (leg * 2)
+                    svg = draw_p4_triangle_perimeter_svg("isosceles", [base, leg], unit)
+                    q = f"รูปสามเหลี่ยมที่กำหนดให้มีด้านยาวเท่ากันสองด้าน (สัญลักษณ์ขีดสีแดง) จงหาความยาวรอบรูป<br>{svg}"
+                    sol = f"<b>วิธีทำ:</b> มีด้านฐานยาว {base} และด้านประกอบมุมยอดยาวเท่ากัน 2 ด้าน คือด้านละ {leg}<br>➔ {base} + {leg} + {leg} = <b>{peri} {unit}</b>"
+                
+                else: # ด้านไม่เท่า
+                    s1 = random.randint(30, 80)
+                    s2 = random.randint(40, 90)
+                    s3 = random.randint(50, 100)
+                    peri = s1 + s2 + s3
+                    svg = draw_p4_triangle_perimeter_svg("scalene", [s1, s2, s3], unit)
+                    q = f"จonหาความยาวรอบรูปของรูปสามเหลี่ยมที่มีความยาวแต่ละด้านตามที่กำหนดให้<br>{svg}"
+                    sol = f"<b>วิธีทำ:</b> นำความยาวของด้านทั้งสามด้านมาบวกกัน<br>➔ {s1} + {s2} + {s3} = <b>{peri} {unit}</b>"
+
+
+
             elif actual_sub_t == "การหาพื้นที่รูปสี่เหลี่ยมมุมฉาก":
                 is_square = random.choice([True, False])
                 if is_square:

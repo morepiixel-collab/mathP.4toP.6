@@ -805,12 +805,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 is_square = random.choice([True, False])
                 units = random.choice(["ซม.", "ม.", "มม.", "นิ้ว", "วา"])
                 
-                # ฟังก์ชันวาดสี่เหลี่ยมสไตล์ข้อสอบ (มีสัญลักษณ์มุมฉากและขีดด้านเท่า)
+                # ฟังก์ชันวาดสี่เหลี่ยมสไตล์ข้อสอบ (ขยาย Canvas ป้องกันข้อความแหว่ง)
                 def draw_exam_rect(w_real, h_real, w_text, h_text, is_sq):
-                    # กำหนดขนาดวาด (Fixed canvas size 300x200)
-                    svg_w, svg_h = 300, 200
-                    draw_w = 140 if is_sq else 200
-                    draw_h = 140 if is_sq else 100
+                    # 🛠️ ขยายขนาด Canvas ให้กว้างและสูงขึ้น (450x250)
+                    svg_w, svg_h = 450, 250
+                    draw_w = 160 if is_sq else 240
+                    draw_h = 160 if is_sq else 120
                     ox = (svg_w - draw_w) / 2
                     oy = (svg_h - draw_h) / 2
                     
@@ -819,14 +819,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     svg += f'<rect x="{ox}" y="{oy}" width="{draw_w}" height="{draw_h}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
                     
                     # วาดสัญลักษณ์มุมฉาก 4 มุม
-                    s = 10 # ขนาดสัญลักษณ์มุมฉาก
+                    s = 12 # ขนาดสัญลักษณ์มุมฉาก
                     svg += f'<polyline points="{ox},{oy+s} {ox+s},{oy+s} {ox+s},{oy}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += f'<polyline points="{ox+draw_w-s},{oy} {ox+draw_w-s},{oy+s} {ox+draw_w},{oy+s}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += f'<polyline points="{ox},{oy+draw_h-s} {ox+s},{oy+draw_h-s} {ox+s},{oy+draw_h}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += f'<polyline points="{ox+draw_w-s},{oy+draw_h} {ox+draw_w-s},{oy+draw_h-s} {ox+draw_w},{oy+draw_h-s}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
                     
                     # ขีดแสดงความยาวด้านเท่ากัน
-                    tick_len = 6
+                    tick_len = 8
                     mid_top_x, mid_top_y = ox + draw_w/2, oy
                     mid_bot_x, mid_bot_y = ox + draw_w/2, oy + draw_h
                     mid_l_x, mid_l_y = ox, oy + draw_h/2
@@ -839,19 +839,19 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         svg += f'<line x1="{mid_l_x-tick_len}" y1="{mid_l_y}" x2="{mid_l_x+tick_len}" y2="{mid_l_y}" stroke="#e74c3c" stroke-width="2"/>'
                         svg += f'<line x1="{mid_r_x-tick_len}" y1="{mid_r_y}" x2="{mid_r_x+tick_len}" y2="{mid_r_y}" stroke="#e74c3c" stroke-width="2"/>'
                     else:
-                        # 1 ขีดด้านกว้าง(น้ำเงิน), 2 ขีดด้านยาว(แดง)
-                        svg += f'<line x1="{mid_top_x-3}" y1="{mid_top_y-tick_len}" x2="{mid_top_x-3}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
-                        svg += f'<line x1="{mid_top_x+3}" y1="{mid_top_y-tick_len}" x2="{mid_top_x+3}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        # 1 ขีดด้านกว้าง(น้ำเงิน), 2 ขีดด้านยาว(แดง) แนวนอนคือด้านยาว
+                        svg += f'<line x1="{mid_top_x-4}" y1="{mid_top_y-tick_len}" x2="{mid_top_x-4}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_top_x+4}" y1="{mid_top_y-tick_len}" x2="{mid_top_x+4}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
                         
-                        svg += f'<line x1="{mid_bot_x-3}" y1="{mid_bot_y-tick_len}" x2="{mid_bot_x-3}" y2="{mid_bot_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
-                        svg += f'<line x1="{mid_bot_x+3}" y1="{mid_bot_y-tick_len}" x2="{mid_bot_x+3}" y2="{mid_bot_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_bot_x-4}" y1="{mid_bot_y-tick_len}" x2="{mid_bot_x-4}" y2="{mid_bot_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
+                        svg += f'<line x1="{mid_bot_x+4}" y1="{mid_bot_y-tick_len}" x2="{mid_bot_x+4}" y2="{mid_bot_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
                         
                         svg += f'<line x1="{mid_l_x-tick_len}" y1="{mid_l_y}" x2="{mid_l_x+tick_len}" y2="{mid_l_y}" stroke="#3498db" stroke-width="2"/>'
                         svg += f'<line x1="{mid_r_x-tick_len}" y1="{mid_r_y}" x2="{mid_r_x+tick_len}" y2="{mid_r_y}" stroke="#3498db" stroke-width="2"/>'
 
-                    # ข้อความกำกับความยาว (ด้านล่าง และ ด้านขวา)
-                    svg += f'<text x="{mid_bot_x}" y="{mid_bot_y + 25}" font-family="Sarabun" font-size="16" font-weight="bold" fill="#2c3e50" text-anchor="middle">{w_text}</text>'
-                    svg += f'<text x="{mid_r_x + 15}" y="{mid_r_y + 5}" font-family="Sarabun" font-size="16" font-weight="bold" fill="#2c3e50" text-anchor="start">{h_text}</text>'
+                    # ข้อความกำกับความยาว (ขยับออกห่างกรอบนิดหน่อย และขยาย Canvas ทำให้ตัวหนังสือไม่แหว่ง)
+                    svg += f'<text x="{mid_bot_x}" y="{mid_bot_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{w_text}</text>'
+                    svg += f'<text x="{mid_r_x + 15}" y="{mid_r_y + 6}" font-family="Sarabun" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="start">{h_text}</text>'
                     
                     svg += '</svg>'
                     
@@ -902,7 +902,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 นำมาบวกกันก่อน: {min(w,h)} + {max(w,h)} = <b>{w+h}</b><br>
                     👉 นำผลบวกไปคูณ 2: 2 × {w+h} = <b>{peri:,}</b><br><br>
                     <b>ตอบ: ความยาวรอบรูปคือ {peri:,} {units}</b></span>"""
-
 
 
             elif actual_sub_t == "การหาพื้นที่รูปสี่เหลี่ยมมุมฉาก":

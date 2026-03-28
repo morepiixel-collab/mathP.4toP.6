@@ -1423,6 +1423,38 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
 
+            elif actual_sub_t == "การหาพื้นที่รูปสามเหลี่ยม (พื้นฐาน)":
+                unit = random.choice(["ซม.", "ม.", "วา"])
+                tri_type = random.choice(["right", "isosceles", "scalene"])
+                
+                # 🎯 สุ่มตัวเลข: บังคับให้ ฐาน เป็นเลขคู่เสมอ เพื่อให้ ป.4 หาร 2 แล้วลงตัว (ไม่ติดทศนิยม)
+                base = random.randint(6, 30) * 2 
+                height = random.randint(8, 45)
+                area = (base * height) // 2
+                
+                svg = draw_p4_triangle_area_svg(tri_type, base, height, unit)
+                
+                # เปลี่ยนคำบรรยายโจทย์ตามประเภทรูป
+                if tri_type == "right":
+                    q = f"พิจารณารูป<b>สามเหลี่ยมมุมฉาก</b>ที่กำหนดให้ จงหา<b>พื้นที่</b>ของรูปสามเหลี่ยมนี้<br>{svg}"
+                else:
+                    q = f"พิจารณารูป<b>สามเหลี่ยม</b>ที่กำหนดให้ (มีเส้นประบอกความสูง) จงหา<b>พื้นที่</b>ของรูปสามเหลี่ยมนี้<br>{svg}"
+                
+                sol = f"""<span style='color:#2c3e50;'>
+                <div style='background-color:#e8f8f5; border-left:4px solid #1abc9c; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                💡 <b>สูตรการหาพื้นที่รูปสามเหลี่ยม:</b><br>
+                <b>พื้นที่</b> = &frac12; × ความยาวฐาน × ความสูง<br>
+                <i>(หรือนำ ฐาน คูณ สูง แล้วหารด้วย 2)</i>
+                </div>
+                <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                👉 <b>ขั้นที่ 1:</b> จากรูป ระบุความยาวฐาน = <b style="color:#2980b9;">{base} {unit}</b> และ ความสูง = <b style="color:#e74c3c;">{height} {unit}</b><br>
+                👉 <b>ขั้นที่ 2:</b> แทนค่าในสูตร ➔ &frac12; × {base} × {height}<br>
+                👉 <b>ขั้นที่ 3:</b> จับคู่หาร 2 ให้ง่ายขึ้น ➔ (ครึ่งหนึ่งของ {base} คือ {base//2})<br>
+                👉 <b>ขั้นที่ 4:</b> คำนวณผลคูณ ➔ {base//2} × {height} = <b>{area:,}</b><br><br>
+                <b>ตอบ: พื้นที่ของรูปสามเหลี่ยมนี้คือ {area:,} ตาราง{unit.replace('.','')}</b></span>"""
+
+
+
             elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":
                 # สุ่มเลขเศษเกิน
                 den = random.randint(3, 12)

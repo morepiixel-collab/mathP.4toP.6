@@ -70,6 +70,67 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
 import math
 import random
 
+def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, unit="ซม."):
+    svg_w, svg_h = 450, 250
+    cx, cy = 225, 120
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+    
+    if shape_type == "rhombus":
+        # 📐 ขนมเปียกปูน: ใช้สัดส่วน 3-4-5 ให้ด้านเท่ากันเป๊ะ (dx=60, h=80 -> ด้านจะยาว 100 พอดี)
+        v_height = 80
+        dx = 60
+        v_base = 100
+    else:
+        # 📐 ด้านขนาน: สุ่มความกว้างฐาน และความเอียง (เพื่อให้แต่ละข้อหน้าตาไม่ซ้ำกัน)
+        v_height = random.randint(75, 95)
+        v_base = random.randint(130, 170)
+        dx = random.randint(35, 55)
+
+    # คำนวณพิกัด 4 มุม (สมมาตรกึ่งกลางหน้าจอ)
+    top_y = cy - v_height/2
+    bot_y = cy + v_height/2
+    
+    tl = (cx - v_base/2 + dx/2, top_y)
+    tr = (cx + v_base/2 + dx/2, top_y)
+    bl = (cx - v_base/2 - dx/2, bot_y)
+    br = (cx + v_base/2 - dx/2, bot_y)
+    
+    pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
+    
+    # ระบายสีฟ้าอ่อนด้านใน เพื่อสื่อถึงการหา "พื้นที่"
+    svg += f'<polygon points="{pts}" fill="#ebf5fb" stroke="#2c3e50" stroke-width="2.5"/>'
+    
+    # 🎯 เส้นส่วนสูง (เส้นประสีแดง) ลากจากมุมซ้ายบนลงมาตั้งฉากกับฐาน
+    svg += f'<line x1="{tl[0]}" y1="{tl[1]}" x2="{tl[0]}" y2="{bot_y}" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="6,4"/>'
+    
+    # 🎯 สัญลักษณ์มุมฉากที่ฐาน (สีแดง)
+    s = 12
+    svg += f'<polyline points="{tl[0]},{bot_y-s} {tl[0]+s},{bot_y-s} {tl[0]+s},{bot_y}" fill="none" stroke="#e74c3c" stroke-width="2.5"/>'
+
+    # 🎯 สัญลักษณ์ด้านเท่า (เฉพาะขนมเปียกปูน) เพื่อย้ำให้เด็กรู้ว่าเป็นขนมเปียกปูน
+    if shape_type == "rhombus":
+        sides_to_tick = [(tl, tr, 0), (tr, br, 53), (br, bl, 0), (bl, tl, 53)]
+        for p1, p2, angle in sides_to_tick:
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+
+    # 🎯 วางตัวเลข (ฐานสีน้ำเงิน, สูงสีแดง)
+    svg += f'<text x="{cx}" y="{bot_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">ฐาน {base_val} {unit}</text>'
+    
+    # ขยับตัวเลขความสูงให้เยื้องมาทางขวาของเส้นประเล็กน้อย จะได้อ่านง่าย
+    svg += f'<text x="{tl[0] + 12}" y="{cy + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#e74c3c">สูง {height_val} {unit}</text>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+        <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            {svg}
+        </div></div>'''
+
+
+
+import math
+import random
+
 def draw_p4_triangle_area_svg(tri_type, base_val, height_val, unit="ซม."):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 120 # ขยับจุดศูนย์กลางแกน Y ขึ้นนิดหน่อยเพื่อให้มีที่วางตัวเลขฐาน

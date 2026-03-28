@@ -187,7 +187,7 @@ def draw_p4_grid_area_solution_svg(rects, unit="ตารางหน่วย")
             <div style="text-align:center; font-weight:bold; font-size:16px; color:#8e44ad; margin-bottom:10px;">ภาพอธิบาย: การแบ่งรูปเพื่อคำนวณพื้นที่</div>
             {svg}
         </div></div>'''
-    def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, unit="ซม."):
+def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, unit="ซม."):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 120
     svg = f'<svg width="{svg_w}" height="{svg_h}">'

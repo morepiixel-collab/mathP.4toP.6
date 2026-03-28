@@ -1007,10 +1007,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 นำความยาวของด้านทั้งสามด้าน (รวมด้านที่ประกอบมุมฉากและด้านเอียง) มาบวกกัน<br>
                     👉 {a} + {b} + {c} = <b>{peri} {unit}</b><br><br>
                     <b>ตอบ: ความยาวรอบรูปคือ {peri} {unit}</b></span>"""
-                
-                # --- บล็อก equilateral, isosceles, scalene เดิมที่ผมเคยให้ไว้ (คงไว้เหมือนเดิม) ---
-                elif tri_mode == "equilateral":
-                    # ... (ก๊อปปี้จากของเดิม) ...
+            
 
 
 

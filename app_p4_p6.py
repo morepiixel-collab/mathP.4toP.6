@@ -1126,7 +1126,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 rand_main = random.choice(list(curriculum_db[grade].keys()))
                 actual_sub_t = random.choice(curriculum_db[grade][rand_main])
 
-            # ================= หมวด ป.4 และ ป.5 =================
+            # ================= หมวด ป.4 =================
             if actual_sub_t == "การอ่านและการเขียนตัวเลข":
                 num = random.randint(100000, 999999) if not is_challenge else random.randint(1000000, 99999999)
                 thai_text = generate_thai_number_text(str(num))

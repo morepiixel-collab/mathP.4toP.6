@@ -573,6 +573,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"จงเขียนคำอ่าน <b>\"{thai_text}\"</b> เป็นตัวเลขฮินดูอารบิก"
                     sol = f"<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>👉 แปลงจากคำอ่านเป็นตัวเลขทีละหลัก และอย่าลืมใส่เครื่องหมายจุลภาค (,)<br><b>ตอบ: {num:,}</b></span>"
 
+
+
             elif actual_sub_t == "หลัก ค่าประจำหลัก และรูปกระจาย":
                 num = random.randint(100000, 9999999) if not is_challenge else random.randint(10000000, 999999999)
                 num_str = str(num)
@@ -591,6 +593,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"จากจำนวน <b>{num:,}</b> เลขโดด <b>{target_digit}</b> (ตัวที่ขีดเส้นใต้) อยู่ในหลักใด และมีค่าเท่าใด?<br><span style='font-size:24px;'>{num_str[:target_idx]}<u>{target_digit}</u>{num_str[target_idx+1:]}</span>"
                     sol = f"<span style='color:#2c3e50;'><b>ตอบ: หลัก{place} มีค่า {val:,}</b></span>"
 
+
+
             elif actual_sub_t == "การเปรียบเทียบและเรียงลำดับ":
                 digits = random.randint(5, 7)
                 base, limit = 10**(digits-1), 10**digits - 1
@@ -602,6 +606,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 ans_list = " &nbsp; | &nbsp; ".join([f"{x:,}" for x in sorted_nums])
                 q = f"จงเรียงลำดับจำนวนต่อไปนี้จาก <b>{mode_text}</b>ให้ถูกต้อง<br><br><span style='font-size:22px; letter-spacing:1px;'>{q_list}</span>"
                 sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans_list}</b></span>"
+
+
 
             elif actual_sub_t == "ค่าประมาณเป็นจำนวนเต็มสิบ เต็มร้อย เต็มพัน":
                 target = random.choice(["สิบ", "ร้อย", "พัน"])
@@ -617,6 +623,9 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     ans = round_base + 1000 if check_val >= 5 else round_base
                 q = f"จงหาค่าประมาณเป็น<b>จำนวนเต็ม{target}</b> ของ <b>{num:,}</b>"
                 sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans:,}</b></span>"
+
+
+                
             elif actual_sub_t in ["การบวก (แบบตั้งหลัก)", "การลบ (แบบตั้งหลัก)", "การคูณ (แบบตั้งหลัก)"]:
                 if actual_sub_t == "การบวก (แบบตั้งหลัก)":
                     a, b = random.randint(100000, 999999), random.randint(100000, 999999)
@@ -632,6 +641,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 table_key = generate_vertical_table_html(a, b, op, result=ans, is_key=True)
                 q = f"จงหาผลลัพธ์ของ <b>{a:,} {op} {b:,}</b><br>{table_html}"
                 sol = f"<span style='color:#2c3e50;'>{table_key}</span>"
+
+
 
             elif actual_sub_t in ["การหารยาวแบบลงตัว", "การหารยาวแบบไม่ลงตัว"]:
                 divisor = random.randint(2, 9) if not is_challenge else random.randint(11, 99)
@@ -652,6 +663,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 q = f"จงหาผลหารโดยวิธีหารยาว<br>{table_html}"
                 ans_txt = f"{quotient:,}" if remainder == 0 else f"{quotient:,} เศษ {remainder:,}"
                 sol = f"<span style='color:#2c3e50;'>{table_key}<br><b>ตอบ: {ans_txt}</b></span>"
+
+
 
             elif actual_sub_t == "การบอกชนิดของมุม":
                 l_pool = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -676,6 +689,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 q = f"จากรูป มุม <b>{angle_name_display}</b> ที่มีขนาด <b>{angle}°</b> คือมุมชนิดใด?<br>{svg_html}<span style='font-size:18px; color:#7f8c8d;'>(มุมแหลม, มุมฉาก, มุมป้าน, มุมตรง, มุมกลับ)</span>"
                 sol = f"<span style='color:#2c3e50;'><b>ตอบ: {angle_type}</b></span>"
 
+
+
             elif actual_sub_t == "การวัดขนาดของมุม (ไม้โปรแทรกเตอร์)":
                 l_pool = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
                 p1, v, p2 = random.sample(l_pool, 3)
@@ -698,6 +713,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     
                     q = f"มุมบนเส้นตรงรวมกันได้ 180 องศา ถ้ามุมหนึ่งกาง <b>{180-ans}°</b> จงหาขนาดของมุม <b>x</b> ที่เหลือ?"
                     sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans}°</b></span>"
+
+
 
             elif actual_sub_t == "การสร้างมุมตามขนาดที่กำหนด":
                 # 🚫 ระบบคัดกรองคำต้องห้ามสำหรับเด็ก

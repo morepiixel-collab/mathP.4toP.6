@@ -1403,7 +1403,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;คิดเป็นเงิน = <b style='color:#27ae60;'>{ans:,}</b> บาท<br><br>
                     <b>ตอบ: จะต้องจ่ายเงินทั้งหมด {ans:,} บาท</b></span>"""
 
-    elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":
+            elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":
                 den = random.randint(3, 12)
                 whole = random.randint(1, 9)
                 rem = random.randint(1, den - 1)

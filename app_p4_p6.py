@@ -731,19 +731,27 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 hat_v = f"<span style='position:relative; display:inline-block;'>{v}<span style='position:absolute; top:-12px; left:50%; transform:translateX(-50%); color:#e74c3c; font-weight:normal; font-size:22px;'>^</span></span>"
                 angle_name_display = f"{p1}{hat_v}{p2}"
 
-                target_deg = random.choice([45, 60, 75, 120, 135, 150])
+                # 💡 สุ่มมุมองศาแบบละเอียด (20 ถึง 160 องศา) เพื่อให้ได้ตัวเลขเช่น 32, 47, 59
+                target_deg = random.randint(20, 160)
                 
-                # 📐 SVG สำหรับโจทย์ (มีแค่เส้นฐาน)
-                svg = f'''<div style="text-align:center; margin:15px 0;">
-                    <svg width="560" height="200">
-                        <line x1="230" y1="140" x2="430" y2="140" stroke="#34495e" stroke-width="2.5"/>
-                        <circle cx="230" cy="140" r="4" fill="#2c3e50"/>
-                        <text x="225" y="170" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{v}</text>
-                        <text x="445" y="145" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{p2}</text>
-                    </svg>
+                # 📐 SVG สำหรับโจทย์ (จัดกึ่งกลางและมีกรอบจางๆ ให้ดูเป็นข้อสอบมาตรฐานแข่งขัน)
+                svg = f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+                    <div style="border: 1px solid #bdc3c7; border-radius: 8px; padding: 20px; background-color: #fdfefe; box-shadow: 2px 2px 5px rgba(0,0,0,0.05);">
+                        <svg width="400" height="150">
+                            <line x1="50" y1="100" x2="350" y2="100" stroke="#ecf0f1" stroke-width="1.5" stroke-dasharray="4,4"/>
+                            <line x1="200" y1="20" x2="200" y2="130" stroke="#ecf0f1" stroke-width="1.5" stroke-dasharray="4,4"/>
+                            
+                            <line x1="200" y1="100" x2="330" y2="100" stroke="#34495e" stroke-width="2.5"/>
+                            <circle cx="200" cy="100" r="4" fill="#2c3e50"/>
+                            <circle cx="330" cy="100" r="3" fill="#2c3e50"/>
+                            
+                            <text x="195" y="125" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{v}</text>
+                            <text x="345" y="105" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{p2}</text>
+                        </svg>
+                    </div>
                 </div>'''
                 
-                # 📐 SVG สำหรับเฉลย (มีไม้โปรแทรกเตอร์โปร่งใส + เส้นลากมุมสีแดง + ส่วนโค้งมุม)
+                # 📐 SVG สำหรับเฉลย (ไม้โปรแทรกเตอร์โปร่งใส + เส้นลากมุมสีแดง + ส่วนโค้งมุม)
                 cx, cy = 280, 220
                 r_out, r_in = 140, 100
                 svg_sol = '<div style="text-align:center; margin:15px 0;"><svg width="560" height="260">'
@@ -764,9 +772,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 # วาดแขนของมุมตามองศาเป้าหมาย
                 rad = math.radians(target_deg)
                 end_x, end_y = cx + 180 * math.cos(rad), cy - 180 * math.sin(rad)
-                svg_sol += f'<line x1="{cx}" y1="{cy}" x2="{cx+180}" y2="{cy}" stroke="#34495e" stroke-width="3"/>'
-                svg_sol += f'<line x1="{cx}" y1="{cy}" x2="{end_x}" y2="{end_y}" stroke="#e74c3c" stroke-width="3.5" stroke-linecap="round"/>'
-                svg_sol += f'<circle cx="{cx}" cy="{cy}" r="5" fill="#2c3e50"/><circle cx="{cx+180}" cy="{cy}" r="4" fill="#2c3e50"/><circle cx="{end_x}" cy="{end_y}" r="5" fill="#e74c3c"/>'
+                svg_sol += f'<line x1="{cx}" y1="{cy}" x2="{cx+180}" y2="{cy}" stroke="#34495e" stroke-width="2.5"/>'
+                
+                # 🎯 ปรับลดขนาดเส้นสีแดงลงเหลือ 1.5 
+                svg_sol += f'<line x1="{cx}" y1="{cy}" x2="{end_x}" y2="{end_y}" stroke="#e74c3c" stroke-width="1.5" stroke-linecap="round"/>'
+                svg_sol += f'<circle cx="{cx}" cy="{cy}" r="4" fill="#2c3e50"/><circle cx="{cx+180}" cy="{cy}" r="3" fill="#2c3e50"/><circle cx="{end_x}" cy="{end_y}" r="4" fill="#e74c3c"/>'
                 
                 # ใส่ตัวอักษรกำกับจุด
                 svg_sol += f'<text x="{cx-5}" y="{cy+20}" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{v}</text>'

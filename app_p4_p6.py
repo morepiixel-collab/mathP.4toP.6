@@ -917,7 +917,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
             elif actual_sub_t == "การบวกเศษส่วน":
-                import math
+                
                 # สุ่มรูปแบบโจทย์ (1: วงกลมแบ่งส่วน, 2: แถบสี่เหลี่ยม, 3: ตารางเงื่อนไข)
                 prob_style = random.choice([1, 2, 3])
                 
@@ -1090,7 +1090,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
             elif actual_sub_t == "การลบเศษส่วน":
-                import math
+                
                 # สุ่มรูปแบบโจทย์ (1: วงกลมแบ่งส่วน, 2: แถบสี่เหลี่ยม, 3: ตารางเงื่อนไขสมมาตร)
                 prob_style = random.choice([1, 2, 3])
                 
@@ -1264,7 +1264,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
             elif actual_sub_t == "การคูณเศษส่วน":
-                import math
+                
                 # สุ่มรูปแบบโจทย์ (1: ตารางพื้นที่ซ้อนทับ, 2: เศษส่วนคูณจำนวนเต็ม, 3: ตารางเงื่อนไขสมมาตร)
                 prob_style = random.choice([1, 2, 3])
                 
@@ -1446,7 +1446,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
             elif actual_sub_t == "การหารเศษส่วน":
-                import math
+                
                 # สุ่มรูปแบบโจทย์ (1: ภาพจำลองการแบ่งพื้นที่, 2: ตารางสมมาตร A/B, 3: ภาพจำลองแบ่งวงกลม)
                 prob_style = random.choice([1, 2, 3])
                 

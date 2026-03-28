@@ -2890,84 +2890,84 @@ def create_page(grade, sub_t, questions, is_key=False, q_margin="20px", ws_heigh
         
     return html + "</body></html>"
 
-# ==========================================
-# 4. Streamlit UI (Sidebar & Result Grouping)
-# ==========================================
-st.sidebar.markdown("## ⚙️ พารามิเตอร์การสร้าง")
-
-selected_grade = st.sidebar.selectbox("📚 เลือกระดับชั้น:", ["ป.4", "ป.5"])
-main_topics_list = list(curriculum_db[selected_grade].keys())
-main_topics_list.append("🌟 โหมดพิเศษ (สุ่มทุกเรื่อง)")
-
-selected_main = st.sidebar.selectbox("📂 เลือกหัวข้อหลัก:", main_topics_list)
-
-if selected_main == "🌟 โหมดพิเศษ (สุ่มทุกเรื่อง)":
-    selected_sub = "แบบทดสอบรวมปลายภาค"
-    st.sidebar.info("💡 โหมดนี้จะสุ่มดึงโจทย์จากทุกเรื่องในชั้นเรียนนี้มายำรวมกัน")
-else:
-    selected_sub = st.sidebar.selectbox("📝 เลือกหัวข้อย่อย:", curriculum_db[selected_grade][selected_main])
-
-num_input = st.sidebar.number_input("🔢 จำนวนข้อ:", min_value=1, max_value=100, value=10)
-
-st.sidebar.markdown("---")
-is_challenge = st.sidebar.toggle("🔥 โหมดชาเลนจ์ (ท้าทาย)", value=False)
-if is_challenge:
-    st.sidebar.warning("เปิดโหมดชาเลนจ์แล้ว! ตัวเลขจะยากขึ้นและโจทย์จะท้าทายกว่าเดิม")
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 📏 ตั้งค่าหน้ากระดาษ")
-spacing_level = st.sidebar.select_slider(
-    "↕️ ความสูงของพื้นที่ทดเลข:", 
-    options=["แคบ", "ปานกลาง", "กว้าง", "กว้างพิเศษ"], 
-    value="ปานกลาง"
-)
-
-if spacing_level == "แคบ": q_margin, ws_height = "15px", "100px"
-elif spacing_level == "ปานกลาง": q_margin, ws_height = "20px", "180px"
-elif spacing_level == "กว้าง": q_margin, ws_height = "30px", "280px"
-else: q_margin, ws_height = "40px", "400px"
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 🎨 ตั้งค่าแบรนด์")
-brand_name = st.sidebar.text_input("🏷️ ชื่อแบรนด์ / ผู้สอน:", value="บ้านทีเด็ด")
-
-if st.sidebar.button("🚀 สั่งสร้างใบงาน ป.4-ป.5", type="primary", use_container_width=True):
-    with st.spinner("กำลังออกแบบรูปภาพและสร้างเฉลยแบบ Step-by-Step..."):
-        
-        qs = generate_questions_logic(selected_grade, selected_main, selected_sub, num_input, is_challenge)
-        
-        html_w = create_page(selected_grade, selected_sub, qs, is_key=False, q_margin=q_margin, ws_height=ws_height, brand_name=brand_name)
-        html_k = create_page(selected_grade, selected_sub, qs, is_key=True, q_margin=q_margin, ws_height=ws_height, brand_name=brand_name)
-        
-        st.session_state['worksheet_html'] = html_w
-        st.session_state['answerkey_html'] = html_k
-        
-        ebook_body = f'\n<div class="a4-wrapper">{extract_body(html_w)}</div>\n<div class="a4-wrapper">{extract_body(html_k)}</div>\n'
-        
-        full_ebook_html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet"><style>@page {{ size: A4; margin: 15mm; }} @media screen {{ body {{ font-family: 'Sarabun', sans-serif; background-color: #525659; display: flex; flex-direction: column; align-items: center; padding: 40px 0; margin: 0; }} .a4-wrapper {{ width: 210mm; min-height: 297mm; background: white; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); padding: 15mm; box-sizing: border-box; }} }} @media print {{ body {{ font-family: 'Sarabun', sans-serif; background: transparent; padding: 0; display: block; margin: 0; }} .a4-wrapper {{ width: 100%; min-height: auto; margin: 0; padding: 0; box-shadow: none; page-break-after: always; }} }} .header {{ text-align: center; border-bottom: 2px solid #333; margin-bottom: 10px; padding-bottom: 10px; }} .q-box {{ margin-bottom: {q_margin}; padding: 10px 15px; page-break-inside: avoid; font-size: 20px; line-height: 1.6; }} .workspace {{ height: {ws_height}; border: 2px dashed #bdc3c7; border-radius: 8px; margin: 15px 0; padding: 10px; color: #95a5a6; font-size: 16px; background-color: #fafbfc; }} .ans-line {{ margin-top: 10px; border-bottom: 1px dotted #999; width: 80%; height: 30px; font-weight: bold; font-size: 20px; display: flex; align-items: flex-end; padding-bottom: 5px; }} .sol-text {{ color: #333; font-size: 18px; display: block; margin-top: 15px; padding: 15px; background-color: #f1f8ff; border-left: 4px solid #3498db; border-radius: 4px; line-height: 1.6; }} .page-footer {{ text-align: right; font-size: 14px; color: #95a5a6; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }} </style></head><body>{ebook_body}</body></html>"""
-
-        filename_base = f"BaanTded_P4_P5_{selected_grade}_{int(time.time())}"
-        st.session_state['ebook_html'] = full_ebook_html
-        st.session_state['filename_base'] = filename_base
-        
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-            zip_file.writestr(f"{filename_base}_Full_EBook.html", full_ebook_html.encode('utf-8'))
-            zip_file.writestr(f"{filename_base}_Worksheet.html", html_w.encode('utf-8'))
-            zip_file.writestr(f"{filename_base}_AnswerKey.html", html_k.encode('utf-8'))
-        st.session_state['zip_data'] = zip_buffer.getvalue()
-
-if 'ebook_html' in st.session_state:
-    st.success(f"✅ สร้างใบงานสำเร็จ! ลิขสิทธิ์โดย {brand_name}")
-    c1, c2 = st.columns(2)
-    with c1:
-        st.download_button("📄 โหลดเฉพาะโจทย์", data=st.session_state['worksheet_html'], file_name=f"{st.session_state['filename_base']}_Worksheet.html", mime="text/html", use_container_width=True)
-        st.download_button("🔑 โหลดเฉพาะเฉลย", data=st.session_state['answerkey_html'], file_name=f"{st.session_state['filename_base']}_AnswerKey.html", mime="text/html", use_container_width=True)
-    with c2:
-        st.download_button("📚 โหลดรวมเล่ม E-Book", data=st.session_state['ebook_html'], file_name=f"{st.session_state['filename_base']}_Full_EBook.html", mime="text/html", use_container_width=True)
-        st.download_button("🗂️ โหลดแพ็กเกจ (.zip)", data=st.session_state['zip_data'], file_name=f"{st.session_state['filename_base']}.zip", mime="application/zip", use_container_width=True)
-    st.markdown("---")
-    components.html(st.session_state['ebook_html'], height=800, scrolling=True)
+                # ==========================================
+                # 4. Streamlit UI (Sidebar & Result Grouping)
+                # ==========================================
+                st.sidebar.markdown("## ⚙️ พารามิเตอร์การสร้าง")
+                
+                selected_grade = st.sidebar.selectbox("📚 เลือกระดับชั้น:", ["ป.4", "ป.5"])
+                main_topics_list = list(curriculum_db[selected_grade].keys())
+                main_topics_list.append("🌟 โหมดพิเศษ (สุ่มทุกเรื่อง)")
+                
+                selected_main = st.sidebar.selectbox("📂 เลือกหัวข้อหลัก:", main_topics_list)
+                
+                if selected_main == "🌟 โหมดพิเศษ (สุ่มทุกเรื่อง)":
+                    selected_sub = "แบบทดสอบรวมปลายภาค"
+                    st.sidebar.info("💡 โหมดนี้จะสุ่มดึงโจทย์จากทุกเรื่องในชั้นเรียนนี้มายำรวมกัน")
+                else:
+                    selected_sub = st.sidebar.selectbox("📝 เลือกหัวข้อย่อย:", curriculum_db[selected_grade][selected_main])
+                
+                num_input = st.sidebar.number_input("🔢 จำนวนข้อ:", min_value=1, max_value=100, value=10)
+                
+                st.sidebar.markdown("---")
+                is_challenge = st.sidebar.toggle("🔥 โหมดชาเลนจ์ (ท้าทาย)", value=False)
+                if is_challenge:
+                    st.sidebar.warning("เปิดโหมดชาเลนจ์แล้ว! ตัวเลขจะยากขึ้นและโจทย์จะท้าทายกว่าเดิม")
+                
+                st.sidebar.markdown("---")
+                st.sidebar.markdown("### 📏 ตั้งค่าหน้ากระดาษ")
+                spacing_level = st.sidebar.select_slider(
+                    "↕️ ความสูงของพื้นที่ทดเลข:", 
+                    options=["แคบ", "ปานกลาง", "กว้าง", "กว้างพิเศษ"], 
+                    value="ปานกลาง"
+                )
+                
+                if spacing_level == "แคบ": q_margin, ws_height = "15px", "100px"
+                elif spacing_level == "ปานกลาง": q_margin, ws_height = "20px", "180px"
+                elif spacing_level == "กว้าง": q_margin, ws_height = "30px", "280px"
+                else: q_margin, ws_height = "40px", "400px"
+                
+                st.sidebar.markdown("---")
+                st.sidebar.markdown("### 🎨 ตั้งค่าแบรนด์")
+                brand_name = st.sidebar.text_input("🏷️ ชื่อแบรนด์ / ผู้สอน:", value="บ้านทีเด็ด")
+                
+                if st.sidebar.button("🚀 สั่งสร้างใบงาน ป.4-ป.5", type="primary", use_container_width=True):
+                    with st.spinner("กำลังออกแบบรูปภาพและสร้างเฉลยแบบ Step-by-Step..."):
+                        
+                        qs = generate_questions_logic(selected_grade, selected_main, selected_sub, num_input, is_challenge)
+                        
+                        html_w = create_page(selected_grade, selected_sub, qs, is_key=False, q_margin=q_margin, ws_height=ws_height, brand_name=brand_name)
+                        html_k = create_page(selected_grade, selected_sub, qs, is_key=True, q_margin=q_margin, ws_height=ws_height, brand_name=brand_name)
+                        
+                        st.session_state['worksheet_html'] = html_w
+                        st.session_state['answerkey_html'] = html_k
+                        
+                        ebook_body = f'\n<div class="a4-wrapper">{extract_body(html_w)}</div>\n<div class="a4-wrapper">{extract_body(html_k)}</div>\n'
+                        
+                        full_ebook_html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet"><style>@page {{ size: A4; margin: 15mm; }} @media screen {{ body {{ font-family: 'Sarabun', sans-serif; background-color: #525659; display: flex; flex-direction: column; align-items: center; padding: 40px 0; margin: 0; }} .a4-wrapper {{ width: 210mm; min-height: 297mm; background: white; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); padding: 15mm; box-sizing: border-box; }} }} @media print {{ body {{ font-family: 'Sarabun', sans-serif; background: transparent; padding: 0; display: block; margin: 0; }} .a4-wrapper {{ width: 100%; min-height: auto; margin: 0; padding: 0; box-shadow: none; page-break-after: always; }} }} .header {{ text-align: center; border-bottom: 2px solid #333; margin-bottom: 10px; padding-bottom: 10px; }} .q-box {{ margin-bottom: {q_margin}; padding: 10px 15px; page-break-inside: avoid; font-size: 20px; line-height: 1.6; }} .workspace {{ height: {ws_height}; border: 2px dashed #bdc3c7; border-radius: 8px; margin: 15px 0; padding: 10px; color: #95a5a6; font-size: 16px; background-color: #fafbfc; }} .ans-line {{ margin-top: 10px; border-bottom: 1px dotted #999; width: 80%; height: 30px; font-weight: bold; font-size: 20px; display: flex; align-items: flex-end; padding-bottom: 5px; }} .sol-text {{ color: #333; font-size: 18px; display: block; margin-top: 15px; padding: 15px; background-color: #f1f8ff; border-left: 4px solid #3498db; border-radius: 4px; line-height: 1.6; }} .page-footer {{ text-align: right; font-size: 14px; color: #95a5a6; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }} </style></head><body>{ebook_body}</body></html>"""
+                
+                        filename_base = f"BaanTded_P4_P5_{selected_grade}_{int(time.time())}"
+                        st.session_state['ebook_html'] = full_ebook_html
+                        st.session_state['filename_base'] = filename_base
+                        
+                        zip_buffer = io.BytesIO()
+                        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+                            zip_file.writestr(f"{filename_base}_Full_EBook.html", full_ebook_html.encode('utf-8'))
+                            zip_file.writestr(f"{filename_base}_Worksheet.html", html_w.encode('utf-8'))
+                            zip_file.writestr(f"{filename_base}_AnswerKey.html", html_k.encode('utf-8'))
+                        st.session_state['zip_data'] = zip_buffer.getvalue()
+                
+                if 'ebook_html' in st.session_state:
+                    st.success(f"✅ สร้างใบงานสำเร็จ! ลิขสิทธิ์โดย {brand_name}")
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        st.download_button("📄 โหลดเฉพาะโจทย์", data=st.session_state['worksheet_html'], file_name=f"{st.session_state['filename_base']}_Worksheet.html", mime="text/html", use_container_width=True)
+                        st.download_button("🔑 โหลดเฉพาะเฉลย", data=st.session_state['answerkey_html'], file_name=f"{st.session_state['filename_base']}_AnswerKey.html", mime="text/html", use_container_width=True)
+                    with c2:
+                        st.download_button("📚 โหลดรวมเล่ม E-Book", data=st.session_state['ebook_html'], file_name=f"{st.session_state['filename_base']}_Full_EBook.html", mime="text/html", use_container_width=True)
+                        st.download_button("🗂️ โหลดแพ็กเกจ (.zip)", data=st.session_state['zip_data'], file_name=f"{st.session_state['filename_base']}.zip", mime="application/zip", use_container_width=True)
+                    st.markdown("---")
+                    components.html(st.session_state['ebook_html'], height=800, scrolling=True)
 
 
             

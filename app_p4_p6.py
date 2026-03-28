@@ -67,6 +67,77 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
 
 
 
+
+import math
+import random
+
+def draw_p4_real_life_geo_svg(scenario, shape_type, sides, unit="ม."):
+    svg_w, svg_h = 450, 250
+    cx, cy = 225, 125
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+    
+    # กำหนดความกว้างและความยาวบนหน้าจอ
+    if shape_type == "square":
+        v_length = 140
+        v_width = 140
+        disp_l, disp_w = sides[0], sides[0]
+    else:
+        w_val, l_val = sides[0], sides[1]
+        ratio = w_val / l_val
+        v_length = 180
+        v_width = v_length * ratio
+        if v_width < 70: v_width = 70
+        if v_width > 150: 
+            v_width = 150
+            v_length = v_width / ratio
+        disp_w, disp_l = sides[0], sides[1]
+
+    tl = (cx - v_length/2, cy - v_width/2)
+    tr = (cx + v_length/2, cy - v_width/2)
+    bl = (cx - v_length/2, cy + v_width/2)
+    br = (cx + v_length/2, cy + v_width/2)
+    
+    pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
+    
+    # 🎨 ตกแต่งสีสันและลวดลายตามสถานการณ์
+    if scenario == "fence":
+        # สนามหญ้า + ล้อมรั้ว (เน้นเส้นรอบขอบ)
+        svg += f'<polygon points="{pts}" fill="#d5f5e3" stroke="#27ae60" stroke-width="4"/>'
+        # วาดเส้นประจำลองรั้วด้านนอกนิดๆ
+        svg += f'<rect x="{tl[0]-5}" y="{tl[1]-5}" width="{v_length+10}" height="{v_width+10}" fill="none" stroke="#e67e22" stroke-width="2.5" stroke-dasharray="8,4"/>'
+    elif scenario == "tile":
+        # ปูกระเบื้อง (เน้นพื้นที่ด้านใน)
+        # สร้าง Pattern ตารางกระเบื้องจำลอง
+        svg += f'''
+        <defs>
+            <pattern id="tilePattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <rect width="20" height="20" fill="#fdfefe" stroke="#d5d8dc" stroke-width="1"/>
+            </pattern>
+        </defs>
+        '''
+        svg += f'<polygon points="{pts}" fill="url(#tilePattern)" stroke="#34495e" stroke-width="3"/>'
+        # ระบายสีทับบางๆ ให้ดูละมุน
+        svg += f'<polygon points="{pts}" fill="#f5cba7" fill-opacity="0.3" stroke="none"/>'
+
+    # 🎯 วางตัวเลขความยาวกำกับ (สีเข้มอ่านง่าย)
+    text_color = "#2c3e50"
+    if shape_type == "square":
+        svg += f'<text x="{cx}" y="{bl[1] + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="{text_color}">ด้านละ {disp_l} {unit}</text>'
+    else:
+        svg += f'<text x="{cx}" y="{bl[1] + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="{text_color}">ยาว {disp_l} {unit}</text>'
+        # ขยับตัวเลขด้านกว้างไม่ให้ทับรั้ว
+        svg += f'<text x="{tr[0] + 15}" y="{cy + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="{text_color}">กว้าง {disp_w} {unit}</text>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+        <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            {svg}
+        </div></div>'''
+
+
+
+
+
 import math
 import random
 

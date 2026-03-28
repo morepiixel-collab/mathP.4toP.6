@@ -2328,7 +2328,7 @@ else:
                         <div style="font-size: 30px; font-weight: bold; color: #7f8c8d; display:flex; align-items:center;">+</div>
                         <div style="background: #8e44ad; color: white; padding: 15px 25px; border-radius: 8px; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">
                             <div style="font-size: 16px;">{item2[0]}</div>
-                            <div style="font-size: 24px; font-weight: bold;">฿ {p2_str}</div>
+                            <div style="font-size: 24px; font-weight: bold;">&#3647; {p2_str}</div>
                             <div style="position: absolute; left: -10px; top: 20px; width: 20px; height: 20px; background: white; border-radius: 50%;"></div>
                         </div>
                     </div>

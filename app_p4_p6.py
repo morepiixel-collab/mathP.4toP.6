@@ -67,99 +67,57 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
 
 
 
-import math
-import random
-
 def draw_p4_parallelogram_rhombus_svg(shape_type, sides, unit="วา"):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 125
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
     if shape_type == "rhombus":
-        # 📐 สี่เหลี่ยมขนมเปียกปูน: สุ่มองศาความเอียงให้แต่ละข้อดูไม่ซ้ำกัน (35, 45, 55 หรือ 65 องศา)
-        v_side = 90 # ความยาวด้าน (คงที่บนหน้าจอ)
-        angle_deg = random.choice([35, 45, 55, 65]) 
-        rad = math.radians(angle_deg)
-        
-        dx = v_side * math.cos(rad)
-        dy = v_side * math.sin(rad)
-        
-        # คำนวณพิกัด 4 มุม
-        tl = (cx - v_side/2 + dx/2, cy - dy/2)
-        tr = (cx + v_side/2 + dx/2, cy - dy/2)
-        bl = (cx - v_side/2 - dx/2, cy + dy/2)
-        br = (cx + v_side/2 - dx/2, cy + dy/2)
+        # 📐 สี่เหลี่ยมขนมเปียกปูน: ปรับสูตรคำนวณพิกัดใหม่ให้ด้านทั้ง 4 ยาว 120 pixels เท่ากันเป๊ะ!
+        tl, tr = (cx - 30, cy - 52), (cx + 90, cy - 52)
+        bl, br = (cx - 90, cy + 52), (cx + 30, cy + 52)
         
         pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
         svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
         
-        # 🎯 คำนวณองศาขีดให้ตั้งฉากกับด้านเอียงแบบ 100%
-        tick_angle = math.degrees(math.atan2(-dy, dx)) + 90
-        
-        sides_to_tick = [(tl, tr, 0), (tr, br, tick_angle), (br, bl, 0), (bl, tl, tick_angle)]
-        for p1, p2, ang in sides_to_tick:
+        # 🎯 ขีด 1 ขีดทุกด้านให้ "ตั้งฉาก" กับเส้นขอบพอดี
+        # ด้านบน-ล่างเป็นแนวนอน (0 องศา) / ด้านข้างเอียง (-60 องศา)
+        sides_to_tick = [(tl, tr, 0), (tr, br, -60), (br, bl, 0), (bl, tl, -60)]
+        for p1, p2, angle in sides_to_tick:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
-            svg += f'<line x1="{mx}" y1="{my-8}" x2="{mx}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({ang}, {mx}, {my})"/>'
-            
-        svg += f'<text x="{cx}" y="{bl[1] + 35}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+            svg += f'<line x1="{mx}" y1="{my-8}" x2="{mx}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+        
+        # วางตัวเลขให้ตรงกึ่งกลางของฐานด้านล่างพอดีเป๊ะ
+        svg += f'<text x="{cx - 30}" y="{cy + 85}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
 
     else: 
-        # 📐 สี่เหลี่ยมด้านขนาน: ปรับสัดส่วนรูปภาพตามตัวเลขในโจทย์!
-        actual_base, actual_side = sides[0], sides[1]
-        ratio = actual_base / actual_side
-        ratio = max(0.8, min(ratio, 2.5)) # บังคับไม่ให้รูปยาวทะลุจอ
-        
-        v_side = 75
-        v_base = v_side * ratio
-        
-        # ถ้ารูปกว้างไป ให้ย่อขนาดลงมา
-        if v_base > 180:
-            scale = 180 / v_base
-            v_base *= scale
-            v_side *= scale
-            
-        # สุ่มองศาเอียงเล็กน้อยให้มีความหลากหลาย
-        angle_deg = random.choice([40, 50, 60])
-        rad = math.radians(angle_deg)
-        dx = v_side * math.cos(rad)
-        dy = v_side * math.sin(rad)
-        
-        tl = (cx - v_base/2 + dx/2, cy - dy/2)
-        tr = (cx + v_base/2 + dx/2, cy - dy/2)
-        bl = (cx - v_base/2 - dx/2, cy + dy/2)
-        br = (cx + v_base/2 - dx/2, cy + dy/2)
+        # 📐 สี่เหลี่ยมด้านขนาน: ฐานยาว 160 pixels, ด้านเอียงยาว 90 pixels
+        tl, tr = (cx - 57.5, cy - 39), (cx + 102.5, cy - 39)
+        bl, br = (cx - 102.5, cy + 39), (cx + 57.5, cy + 39)
         
         pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
         svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
         
-        # 🎯 ขีดคู่ขนานแนวนอน (บน-ล่าง)
+        # คู่บน-ล่าง (แนวนอน, 2 ขีด)
         for p1, p2 in [(tl, tr), (br, bl)]:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
             svg += f'<line x1="{mx-3}" y1="{my-8}" x2="{mx-3}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>'
             svg += f'<line x1="{mx+3}" y1="{my-8}" x2="{mx+3}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>'
-            
-        # 🎯 ขีดเดี่ยวด้านเอียง (ซ้าย-ขวา) คำนวณตั้งฉาก
-        tick_angle = math.degrees(math.atan2(-dy, dx)) + 90
+        
+        # คู่ซ้าย-ขวา (เอียง, 1 ขีด) ปรับมุมขีดให้ตั้งฉากกับเส้นเอียง (-60 องศา)
         for p1, p2 in [(tr, br), (bl, tl)]:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
-            svg += f'<line x1="{mx}" y1="{my-8}" x2="{mx}" y2="{my+8}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round" transform="rotate({tick_angle}, {mx}, {my})"/>'
+            svg += f'<line x1="{mx}" y1="{my-8}" x2="{mx}" y2="{my+8}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round" transform="rotate(-60, {mx}, {my})"/>'
 
-        # 🎯 ขยับตัวเลขด้านข้างไม่ให้ทับเส้น
-        mid_right_x = (tr[0] + br[0]) / 2
-        mid_right_y = (tr[1] + br[1]) / 2
-        txt_offset = 25 if angle_deg < 50 else 18 # ถ้ารูปเอียงมาก ดันเลขออกไปไกลหน่อย
-        
-        svg += f'<text x="{cx}" y="{bl[1] + 35}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
-        svg += f'<text x="{mid_right_x + txt_offset}" y="{mid_right_y + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
+        # 🎯 ขยับตัวเลขให้อ่านง่าย: ตัวเลขด้านล่างอยู่กึ่งกลางฐาน / ตัวเลขด้านข้างขยับออกไปพ้นแนวเส้น
+        svg += f'<text x="{cx - 22.5}" y="{cy + 75}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+        svg += f'<text x="{cx + 100}" y="{cy + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
 
     svg += '</svg>'
     return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
         <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             {svg}
         </div></div>'''
-
-
-
 
 
 def draw_angle_svg(angle_type, degree):

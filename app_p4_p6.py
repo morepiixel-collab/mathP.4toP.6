@@ -126,6 +126,84 @@ def draw_p4_kite_svg(sides, unit="ซม."):
 
 
 
+def draw_p4_rectangle_area_svg(shape_type, sides, unit="ซม."):
+    svg_w, svg_h = 450, 250
+    cx, cy = 225, 125
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+    
+    if shape_type == "square":
+        # 📐 สี่เหลี่ยมจัตุรัส: ขนาดคงที่ สมมาตรเป๊ะ
+        v_side = 120 
+        tl = (cx - v_side/2, cy - v_side/2)
+        tr = (cx + v_side/2, cy - v_side/2)
+        bl = (cx - v_side/2, cy + v_side/2)
+        br = (cx + v_side/2, cy + v_side/2)
+        
+        pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
+        # ระบายสีฟ้าอ่อนด้านใน เพื่อสื่อถึงการหา "พื้นที่"
+        svg += f'<polygon points="{pts}" fill="#ebf5fb" stroke="#2c3e50" stroke-width="2.5"/>'
+        
+        # 🎯 สัญลักษณ์ 1 ขีดทุกด้าน
+        sides_to_tick = [(tl, tr, 0), (tr, br, 90), (br, bl, 0), (bl, tl, 90)]
+        for p1, p2, angle in sides_to_tick:
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+            
+        # ตัวเลขความยาวด้าน (เขียนแค่ด้านเดียวเพราะเท่ากันหมด)
+        svg += f'<text x="{cx}" y="{bl[1] + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+
+    else: 
+        # 📐 สี่เหลี่ยมผืนผ้า: ไดนามิก ยืดหดตามสัดส่วน กว้าง:ยาว
+        w_val, l_val = sides[0], sides[1] # กว้าง, ยาว
+        ratio = w_val / l_val # อัตราส่วน
+        
+        v_length = 200 # ความยาวคงที่บนหน้าจอ
+        v_width = v_length * ratio # ความกว้างปรับตามสัดส่วน
+        
+        # คุมขนาดไม่ให้ผอมเกินไปหรืออ้วนทะลุจอ
+        if v_width < 60: v_width = 60
+        if v_width > 140: 
+            v_width = 140
+            v_length = v_width / ratio
+
+        tl = (cx - v_length/2, cy - v_width/2)
+        tr = (cx + v_length/2, cy - v_width/2)
+        bl = (cx - v_length/2, cy + v_width/2)
+        br = (cx + v_length/2, cy + v_width/2)
+        
+        pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
+        svg += f'<polygon points="{pts}" fill="#ebf5fb" stroke="#2c3e50" stroke-width="2.5"/>'
+        
+        # 🎯 สัญลักษณ์ขีด (บน-ล่าง 2 ขีด, ซ้าย-ขวา 1 ขีด)
+        for p1, p2 in [(tl, tr), (br, bl)]: # แนวนอน 2 ขีด
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx-3}" y1="{my-6}" x2="{mx-3}" y2="{my+6}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>'
+            svg += f'<line x1="{mx+3}" y1="{my-6}" x2="{mx+3}" y2="{my+6}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>'
+            
+        for p1, p2 in [(tr, br), (bl, tl)]: # แนวตั้ง 1 ขีด
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx-6}" y1="{my}" x2="{mx+6}" y2="{my}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round"/>'
+
+        # วางตัวเลข (ด้านยาวอยู่ล่าง, ด้านกว้างอยู่ขวา)
+        svg += f'<text x="{cx}" y="{bl[1] + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[1]} {unit}</text>'
+        svg += f'<text x="{tr[0] + 15}" y="{cy + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[0]} {unit}</text>'
+
+    # 🎯 สัญลักษณ์มุมฉาก (วาดให้ทั้งจัตุรัสและผืนผ้า)
+    s = 12 # ขนาดของสัญลักษณ์มุมฉาก
+    svg += f'<polyline points="{tl[0]},{tl[1]+s} {tl[0]+s},{tl[1]+s} {tl[0]+s},{tl[1]}" fill="none" stroke="#2c3e50" stroke-width="2"/>'
+    svg += f'<polyline points="{tr[0]-s},{tr[1]} {tr[0]-s},{tr[1]+s} {tr[0]},{tr[1]+s}" fill="none" stroke="#2c3e50" stroke-width="2"/>'
+    svg += f'<polyline points="{br[0]},{br[1]-s} {br[0]-s},{br[1]-s} {br[0]-s},{br[1]}" fill="none" stroke="#2c3e50" stroke-width="2"/>'
+    svg += f'<polyline points="{bl[0]+s},{bl[1]} {bl[0]+s},{bl[1]-s} {bl[0]},{bl[1]-s}" fill="none" stroke="#2c3e50" stroke-width="2"/>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+        <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            {svg}
+        </div></div>'''
+
+
+
+
 def draw_p4_parallelogram_rhombus_svg(shape_type, sides, unit="วา"):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 125

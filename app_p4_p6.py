@@ -617,7 +617,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     ans = round_base + 1000 if check_val >= 5 else round_base
                 q = f"จงหาค่าประมาณเป็น<b>จำนวนเต็ม{target}</b> ของ <b>{num:,}</b>"
                 sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans:,}</b></span>"
-    elif actual_sub_t in ["การบวก (แบบตั้งหลัก)", "การลบ (แบบตั้งหลัก)", "การคูณ (แบบตั้งหลัก)"]:
+            elif actual_sub_t in ["การบวก (แบบตั้งหลัก)", "การลบ (แบบตั้งหลัก)", "การคูณ (แบบตั้งหลัก)"]:
                 if actual_sub_t == "การบวก (แบบตั้งหลัก)":
                     a, b = random.randint(100000, 999999), random.randint(100000, 999999)
                     op, ans = "+", a + b

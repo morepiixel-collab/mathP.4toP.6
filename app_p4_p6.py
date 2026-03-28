@@ -3127,6 +3127,697 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;• {int(price_per_person*100)} ÷ 100 = <b>{price_per_person:.2f}</b><br><br>
                     <b>ตอบ: จะต้องจ่ายคนละ {price_per_person:.2f} บาท</b></span>"""
 
+
+
+
+elif actual_sub_t == "การแก้สมการ (บวก/ลบ)":
+                var = random.choice(["A", "B", "x", "y", "ก", "ข"])
+                # สุ่มรูปแบบโจทย์: ตัวแปรบวก, ตัวแปรลบ, และ ตัวตั้งลบด้วยตัวแปร (ใหม่)
+                scenario = random.choice(["var_plus", "var_minus", "minus_var"])
+                
+                if scenario == "var_plus":
+                    a = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
+                    ans = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
+                    c = ans + a
+                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{var} + {a:,} = {c:,}</b>"
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>+{a:,}</b> ทิ้งไป<br>โดยใช้วิธีตรงข้าม คือนำ <b>{a:,}</b> มา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้างของสมการ</div>"""
+                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>{explain_box}👉 {var} + {a:,} <b style='color:#e74c3c;'>- {a:,}</b> = {c:,} <b style='color:#e74c3c;'>- {a:,}</b><br>👉 {var} = <b>{ans:,}</b><br><b>ตอบ: {ans:,}</b></span>"
+                
+                elif scenario == "var_minus":
+                    a = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
+                    c = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
+                    ans = c + a
+                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{var} - {a:,} = {c:,}</b>"
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด:</b> เราต้องการให้ <b>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b>-{a:,}</b> ทิ้งไป<br>โดยใช้วิธีตรงข้าม คือนำ <b>{a:,}</b> มา <b style='color:#27ae60;'>บวกเข้า</b> ทั้งสองข้างของสมการ</div>"""
+                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>{explain_box}👉 {var} - {a:,} <b style='color:#27ae60;'>+ {a:,}</b> = {c:,} <b style='color:#27ae60;'>+ {a:,}</b><br>👉 {var} = <b>{ans:,}</b><br><b>ตอบ: {ans:,}</b></span>"
+                
+                else: # minus_var (ตัวแปรติดลบ)
+                    ans = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
+                    c = random.randint(1000, 9999) if not is_challenge else random.randint(15000, 50000)
+                    a = ans + c
+                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b> : <b>{a:,} - {var} = {c:,}</b>"
+                    
+                    explain_box = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px; line-height:1.5;'>
+                    💡 <b>หลักการคิด (ตัวแปรติดลบ):</b> หน้าตัวแปรมีเครื่องหมายลบ (<b>-{var}</b>) เราต้องทำให้ตัวแปรเป็น <b>บวก</b> ก่อน<br>
+                    โดยนำ <b>{var}</b> มา <b style='color:#27ae60;'>บวกเข้า</b> ทั้งสองข้าง แล้วค่อยกำจัดตัวเลขในขั้นตอนถัดไปครับ
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>
+                    {explain_box}
+                    👉 <b>ขั้นที่ 1 (ทำให้ตัวแปรเป็นบวก):</b> นำ <b>{var}</b> มา <b style='color:#27ae60;'>บวกเข้า</b> ทั้งสองข้าง<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{a:,} - {var} <b style='color:#27ae60;'>+ {var}</b> = {c:,} <b style='color:#27ae60;'>+ {var}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> &nbsp; {a:,} = {c:,} + {var}<br><br>
+                    👉 <b>ขั้นที่ 2 (กำจัดตัวเลข):</b> นำ <b>{c:,}</b> มา <b style='color:#e74c3c;'>ลบออก</b> ทั้งสองข้าง<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{a:,} <b style='color:#e74c3c;'>- {c:,}</b> = {c:,} + {var} <b style='color:#e74c3c;'>- {c:,}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> &nbsp; {ans:,} = {var}<br>
+                    <b>ตอบ: {ans:,}</b></span>"""
+
+
+
+
+
+            elif actual_sub_t == "การแก้สมการ (คูณ/หาร)":
+                var = random.choice(["x", "y", "a", "m"])
+                scenario = random.choice(["mult", "div", "mult_add"])
+                
+                # ฟังก์ชันตัดฝั่งตัวแปร (ขยับเลข 1 มาอยู่ข้างๆ)
+                def frac_cancel_left(num, variable):
+                    top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:super; margin-left:2px;'>1</span></span>{variable}"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+
+                # ฟังก์ชันตัดฝั่งตัวเลข (ขยับผลลัพธ์มาอยู่ข้างๆ ตามลูกศรสีแดง)
+                def frac_cancel_right(top_val, bot_val, result_val):
+                    top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{top_val}</span><span style='font-size:14px; color:#e74c3c; font-weight:bold; vertical-align:super; margin-left:2px;'>{result_val}</span></span>"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{bot_val}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+
+                if scenario == "mult":
+                    a, ans = random.randint(4, 15), random.randint(3, 12)
+                    b = a * ans
+                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} = {b}</b>"
+                    sol = f"<span style='color:#2c3e50;'>👉 นำ {a} มาหารทั้งสองข้าง (ใช้สูตรคูณ<b>แม่ {a}</b> ในการตัดทอน):<br><br>&nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(a, var)} = {frac_cancel_right(b, a, ans)}<br><br>👉 <b>{var} = {ans}</b></span>"
+                elif scenario == "div":
+                    a, ans = random.randint(3, 9), random.randint(5, 20)
+                    c = a * ans
+                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{var} ÷ {a} = {ans}</b>"
+                    cancel_v_a = f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{var}</span><span style='text-decoration: line-through; text-decoration-color: #e74c3c;'>{a}</span><span style='font-size:10px; color:#e74c3c; vertical-align:sub; margin-left:1px;'>1</span></span>"
+                    sol = f"<span style='color:#2c3e50;'>👉 นำ {a} มาคูณทั้งสองข้าง (ใช้สูตรคูณ<b>แม่ {a}</b> ในการตัดทอน):<br><br>&nbsp;&nbsp;&nbsp;&nbsp;{cancel_v_a} <b style='color:#27ae60;'>× <span style='text-decoration: line-through; text-decoration-color: #e74c3c;'>{a}</span><span style='font-size:10px; color:#e74c3c; vertical-align:super; margin-left:1px;'>1</span></b> = {ans} <b style='color:#27ae60;'>× {a}</b><br><br>👉 <b>{var} = {c}</b></span>"
+                else: # mult_add
+                    a, ans, b = random.randint(2, 6), random.randint(3, 10), random.randint(1, 15)
+                    c = (a * ans) + b
+                    q = f"จงแก้สมการเพื่อหาค่าของ <b>{var}</b>: <b>{a}{var} + {b} = {c}</b>"
+                    explain_box = f"<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>💡 <b>ทำไมต้องกำจัด +{b} ก่อนกำจัด {a} ?</b><br>เวลาแก้สมการที่มีหลายขั้นตอน ให้คิดว่าเรากำลัง <b>\"ปอกเปลือกจากข้างนอกเข้าหาข้างใน\"</b> ดังนั้นเราจึงต้อง <b>กำจัดตัวที่อยู่ไกลตัวแปร หรือ ตัวที่อยู่วงนอกก่อนเสมอ</b> แล้วค่อยจัดการตัวที่ติดแน่นกับตัวแปรครับ!</div>"
+                    sol = f"<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>{explain_box}👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{b}</b> มา <b>ลบออก</b> ทั้งสองข้าง ➔ {a}{var} = {c-b}<br><br>👉 <b>ขั้นที่ 2:</b> นำ {a} มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ {a} ตัดทอน):<br>&nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(a, var)} = {frac_cancel_right(c-b, a, ans)}<br><br>👉 <b>{var} = {ans}</b><br><b>ตอบ: {ans}</b></span>"
+
+
+
+
+
+            elif actual_sub_t == "สมการและตัวไม่ทราบค่าจากชีวิตประจำวัน":
+                scenario_type = random.choice(["shopping", "saving", "sharing", "comparing"])
+                var = random.choice(["x", "y", "ก", "n"])
+                
+                # ฟังก์ชันช่วยวาดการตัดทอน
+                def frac_cancel_left(num, variable):
+                    top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:super; margin-left:2px;'>1</span></span>{variable}"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+                
+                def frac_cancel_right(top_val, bot_val, result_val):
+                    top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{top_val}</span><span style='font-size:14px; color:#e74c3c; font-weight:bold; vertical-align:super; margin-left:2px;'>{result_val}</span></span>"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{bot_val}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+
+                if scenario_type == "shopping":
+                    item, p_u, cnt = random.choice(["ขนม", "สมุด", "ตุ๊กตา"]), random.randint(12, 35), random.randint(3, 9)
+                    total = p_u * cnt
+                    q = f"แม่ซื้อ <b>{item}</b> จำนวน <b>{cnt}</b> ชิ้น จ่ายเงินไปทั้งหมด <b>{total}</b> บาท ราคาชิ้นละกี่บาท (ให้ <b>{var}</b> แทนราคาต่อชิ้น)"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    👉 <b>ทำไมต้องใช้เครื่องหมาย คูณ (×) ?</b><br>
+                    โจทย์บอกว่าซื้อ {item} หลายชิ้น ชิ้นละเท่าๆ กัน การเพิ่มขึ้นทีละเท่าๆ กันต้องใช้ <b>"การคูณ"</b><br>
+                    • (จำนวนชิ้น <b style='color:#2980b9;'>{cnt}</b>) × (ราคาต่อชิ้น <b style='color:#e67e22;'>{var}</b>) = ราคาสินค้าทั้งหมด<br>
+                    • เขียนในรูปพีชคณิตคือ <b style='color:#2980b9;'>{cnt}</b><b style='color:#e67e22;'>{var}</b><br><br>
+                    👉 <b>ทำไมต้องใช้เครื่องหมาย เท่ากับ (=) ?</b><br>
+                    เพราะราคาสินค้าทั้งหมดที่เราคำนวณได้ ต้อง <b>เท่ากับ</b> เงินที่จ่ายไปจริง คือ <b style='color:#27ae60;'>{total}</b> บาท<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#2980b9;'>{cnt}</b><b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{total}</b></span></b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการเพื่อหาค่า {var}:</b><br>
+                    👉 <b>เป้าหมาย:</b> ทำให้ <b style='color:#e67e22;'>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b style='color:#2980b9;'>{cnt}</b> ที่คูณอยู่ทิ้งไป<br>
+                    👉 นำ <b style='color:#e74c3c;'>{cnt}</b> มา <b>หารออก</b> ทั้งสองข้างของสมการ (ใช้สูตรคูณ <b>แม่ {cnt}</b> ตัดทอน):<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(cnt, var)} = {frac_cancel_right(total, cnt, p_u)}<br><br>
+                    👉 <b>{var} = {p_u}</b><br>
+                    <b>ตอบ: {item}ราคาชิ้นละ {p_u} บาท</b></span>"""
+
+                elif scenario_type == "saving":
+                    init, d_s, days = random.randint(100, 400), random.randint(10, 30), random.randint(5, 12)
+                    total = init + (d_s * days)
+                    q = f"เดิมมีเงิน <b>{init}</b> บาท ออมเพิ่มวันละเท่าๆ กัน <b>{days}</b> วัน ทำให้มีเงินรวม <b>{total}</b> บาท ออมวันละกี่บาท (ให้ <b>{var}</b> แทนเงินออมต่อวัน)"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    👉 <b>หาเงินที่ออมเพิ่ม (ทำไมใช้ คูณ ×):</b><br>
+                    ออมวันละ <b style='color:#e67e22;'>{var}</b> บาท ซ้ำๆ กัน <b style='color:#2980b9;'>{days}</b> วัน แปลว่ามีเงินเพิ่มขึ้น <b style='color:#2980b9;'>{days}</b> × <b style='color:#e67e22;'>{var}</b> = <b><b style='color:#2980b9;'>{days}</b><b style='color:#e67e22;'>{var}</b></b> บาท<br><br>
+                    👉 <b>หาเงินรวม (ทำไมใช้ บวก +):</b><br>
+                    คำว่า "ออมเพิ่ม" จากเงินเดิมที่มีอยู่ <b style='color:#9b59b6;'>{init}</b> บาท แปลว่าต้องเอามา <b>รวมกัน (+)</b><br>
+                    • (เงินเดิม <b style='color:#9b59b6;'>{init}</b>) + (เงินที่ออมเพิ่ม <b style='color:#2980b9;'>{days}</b><b style='color:#e67e22;'>{var}</b>) = (เงินรวม <b style='color:#27ae60;'>{total}</b>)<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#9b59b6;'>{init}</b> + <b style='color:#2980b9;'>{days}</b><b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{total}</b></span></b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการแบบ 2 ขั้นตอน (กำจัดตัวที่อยู่วงนอกก่อนเสมอ):</b><br>
+                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{init}</b> มา <b>ลบออก</b> ทั้งสองข้าง เพื่อหักเงินเดิมออกไปก่อน<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{init} - <b style='color:#e74c3c;'>{init}</b> + {days}{var} = {total} - <b style='color:#e74c3c;'>{init}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> &nbsp; {days}{var} = {total-init}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{days}</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้สูตรคูณ <b>แม่ {days}</b> ตัดทอน):<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(days, var)} = {frac_cancel_right(total-init, days, d_s)}<br><br>
+                    👉 <b>{var} = {d_s}</b><br>
+                    <b>ตอบ: ออมเงินวันละ {d_s} บาท</b></span>"""
+
+                elif scenario_type == "sharing":
+                    total_c, eat, fnds = random.randint(60, 150), random.randint(10, 30), random.randint(2, 6)
+                    per = (total_c - eat) // fnds
+                    total_c = (per * fnds) + eat
+                    q = f"มีขนมทั้งหมด <b>{total_c}</b> ชิ้น กินเองไป <b>{eat}</b> ชิ้น ที่เหลือแบ่งให้เพื่อน <b>{fnds}</b> คน คนละเท่าๆ กัน เพื่อนได้รับกี่ชิ้น (ให้ <b>{var}</b> แทนจำนวนที่เพื่อนได้รับ)"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    โจทย์ข้อนี้ต้องมองย้อนกลับว่า <b>"ขนมทั้งหมดมาจากไหน?"</b><br><br>
+                    👉 <b>ส่วนที่ 1: ขนมที่อยู่กับเพื่อน (ทำไมใช้ คูณ ×):</b><br>
+                    เพื่อน <b style='color:#2980b9;'>{fnds}</b> คน ได้คนละ <b style='color:#e67e22;'>{var}</b> ชิ้น แปลว่าขนมอยู่กับเพื่อน <b style='color:#2980b9;'>{fnds}</b> × <b style='color:#e67e22;'>{var}</b> = <b><b style='color:#2980b9;'>{fnds}</b><b style='color:#e67e22;'>{var}</b></b> ชิ้น<br><br>
+                    👉 <b>ส่วนที่ 2: รวมกลับเป็นขนมทั้งหมด (ทำไมใช้ บวก +):</b><br>
+                    ถ้าเอาขนมของเพื่อน มารวมคืน <b>(+)</b> กับขนมที่กินเองไป <b style='color:#c0392b;'>{eat}</b> ชิ้น <br>
+                    จะต้อง <b>เท่ากับ (=)</b> ขนมทั้งหมดที่มีตอนแรกคือ <b style='color:#27ae60;'>{total_c}</b> ชิ้น<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#2980b9;'>{fnds}</b><b style='color:#e67e22;'>{var}</b> + <b style='color:#c0392b;'>{eat}</b> = <b style='color:#27ae60;'>{total_c}</b></span></b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการแบบ 2 ขั้นตอน (กำจัดตัวที่อยู่วงนอกก่อนเสมอ):</b><br>
+                    👉 <b>ขั้นที่ 1:</b> นำ <b style='color:#e74c3c;'>{eat}</b> มา <b>ลบออก</b> ทั้งสองข้าง เพื่อหักส่วนที่กินไปออกก่อน<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{fnds}{var} + {eat} - <b style='color:#e74c3c;'>{eat}</b> = {total_c} - <b style='color:#e74c3c;'>{eat}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> &nbsp; {fnds}{var} = {total_c-eat}<br><br>
+                    👉 <b>ขั้นที่ 2:</b> นำ <b style='color:#e74c3c;'>{fnds}</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้สูตรคูณ <b>แม่ {fnds}</b> ตัดทอน):<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(fnds, var)} = {frac_cancel_right(total_c-eat, fnds, per)}<br><br>
+                    👉 <b>{var} = {per}</b><br>
+                    <b>ตอบ: เพื่อนได้รับขนมคนละ {per} ชิ้น</b></span>"""
+
+                else: # comparing
+                    s_v, diff = random.randint(100, 400), random.randint(50, 200)
+                    l_v = s_v + diff
+                    q = f"ก้องมีเงิน <b>{l_v}</b> บาท ซึ่งก้องมีเงิน<b>มากกว่า</b>เก่งอยู่ <b>{diff}</b> บาท เก่งมีเงินกี่บาท (ให้ <b>{var}</b> แทนเงินของเก่ง)"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    โจทย์เปรียบเทียบระหว่าง ก้อง (คนมีเงินมาก) และ เก่ง (คนมีเงินน้อย)<br><br>
+                    👉 <b>ทำไมต้องใช้เครื่องหมาย บวก (+) ?</b><br>
+                    ถ้าเราอยากให้เงินของเก่ง (<b style='color:#e67e22;'>{var}</b>) มีปริมาณเท่ากับก้อง เราต้อง <b>บวกเพิ่ม</b> ส่วนต่าง (<b style='color:#2980b9;'>{diff}</b>) เข้าไป<br>
+                    • (เงินคนน้อย <b style='color:#e67e22;'>{var}</b>) + (ส่วนต่าง <b style='color:#2980b9;'>{diff}</b>) = (เงินคนมาก <b style='color:#27ae60;'>{l_v}</b>)<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#e67e22;'>{var}</b> + <b style='color:#2980b9;'>{diff}</b> = <b style='color:#27ae60;'>{l_v}</b></span></b>
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการ:</b><br>
+                    👉 <b>เป้าหมาย:</b> ทำให้ <b style='color:#e67e22;'>{var}</b> อยู่ตัวเดียว จึงต้องกำจัด <b style='color:#2980b9;'>+{diff}</b> ทิ้งไป<br>
+                    👉 นำ <b style='color:#e74c3c;'>{diff}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ:<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{var} + {diff} - <b style='color:#e74c3c;'>{diff}</b> = {l_v} - <b style='color:#e74c3c;'>{diff}</b><br><br>
+                    👉 <b>{var} = {s_v}</b><br>
+                    <b>ตอบ: เก่งมีเงิน {s_v} บาท</b></span>"""
+
+
+
+                    
+            elif actual_sub_t == "สมการเชิงตรรกะและตาชั่งปริศนา":
+                icon_sets = [
+                    ("🍎", "🍌", "🍇", "ผลไม้"),
+                    ("🐶", "🐱", "🐰", "สัตว์เลี้ยง"),
+                    ("🍔", "🍟", "🥤", "อาหาร"),
+                    ("⚽", "🏀", "⚾", "กีฬา"),
+                    ("🚀", "🛸", "🌍", "อวกาศ")
+                ]
+                i1, i2, i3, theme = random.choice(icon_sets)
+                puzzle_type = random.choice([1, 2, 3])
+                
+                if puzzle_type == 1:
+                    val1 = random.randint(5, 20)
+                    val2 = random.randint(3, 15)
+                    val3 = random.randint(2, 12)
+                    eq1_res = val1 + val1
+                    eq2_res = val1 + val2
+                    eq3_res = val2 + val3
+                    ans = val1 + val2 + val3
+                    
+                    q_html = f"""
+                    <div style='background-color: #fcfcfc; padding: 20px; border-radius: 8px; border: 2px dashed #95a5a6; width: 85%; margin: 15px auto; box-shadow: 2px 2px 5px rgba(0,0,0,0.05);'>
+                        <table style='margin: 0 auto; font-size: 28px; border-collapse: collapse; background-color: transparent;'>
+                            <tr><td style='text-align:right; padding:8px; border:none;'>{i1} + {i1}</td><td style='padding:8px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:8px; border:none; color:#2c3e50;'><b>{eq1_res}</b></td></tr>
+                            <tr><td style='text-align:right; padding:8px; border:none;'>{i1} + {i2}</td><td style='padding:8px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:8px; border:none; color:#2c3e50;'><b>{eq2_res}</b></td></tr>
+                            <tr><td style='text-align:right; padding:8px; border:none;'>{i2} + {i3}</td><td style='padding:8px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:8px; border:none; color:#2c3e50;'><b>{eq3_res}</b></td></tr>
+                            <tr><td colspan='3' style='border-top: 3px double #34495e; padding-top: 15px; text-align:center; border:none; border-top: 3px double #7f8c8d;'>{i1} + {i2} + {i3} = <b style='color:#e74c3c;'>?</b></td></tr>
+                        </table>
+                    </div>
+                    """
+                    q = f"จงหาค่าของปริศนา <b>หมวด{theme}</b> ต่อไปนี้ (แบบฝึกหัดตรรกะพื้นฐาน)<br>{q_html}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์ปริศนา (คิดทีละบรรทัด):</b><br>
+                    เวลาแก้ปริศนาภาพ ให้เริ่มจากบรรทัดที่มี <b>"รูปเหมือนกันทั้งหมด"</b> ก่อน เพื่อหาค่าเริ่มต้น!
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>บรรทัดที่ 1:</b> {i1} + {i1} = {eq1_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ของ 2 สิ่งเหมือนกันบวกกันได้ {eq1_res} แสดงว่า 1 สิ่งคือ {eq1_res} ÷ 2 = <b>{val1}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i1} = {val1}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 2:</b> {i1} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เรารู้แล้วว่า {i1} คือ {val1} จะได้สมการ: {val1} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แก้สมการโดยนำ {val1} ไปลบออก: {i2} = {eq2_res} - {val1} = <b>{val2}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i2} = {val2}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 3:</b> {i2} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เรารู้แล้วว่า {i2} คือ {val2} จะได้สมการ: {val2} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แก้สมการโดยนำ {val2} ไปลบออก: {i3} = {eq3_res} - {val2} = <b>{val3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i3} = {val3}</b><br><br>
+                    
+                    👉 <b>คำถาม:</b> {i1} + {i2} + {i3} = ?<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่ารูปภาพด้วยตัวเลข: {val1} + {val2} + {val3} = <b>{ans}</b><br>
+                    <b>ตอบ: {ans}</b></span>"""
+
+                elif puzzle_type == 2:
+                    val1 = random.randint(3, 10)
+                    val2 = random.randint(2, 8)
+                    val3 = random.randint(2, 6)
+                    eq1_res = val1 * 3
+                    eq2_res = val1 + (val2 * 2)
+                    eq3_res = val2 + (val3 * 2)
+                    ans = val1 + (val2 * val3) 
+                    
+                    q_html = f"""
+                    <div style='background-color: #fdfefe; padding: 20px; border-radius: 8px; border: 2px solid #d0d3d4; width: 90%; margin: 15px auto; box-shadow: 3px 3px 10px rgba(0,0,0,0.08);'>
+                        <table style='margin: 0 auto; font-size: 26px; border-collapse: collapse; background-color: transparent;'>
+                            <tr><td style='text-align:right; padding:6px; border:none;'>{i1} + {i1} + {i1}</td><td style='padding:6px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:6px; border:none; color:#2c3e50;'><b>{eq1_res}</b></td></tr>
+                            <tr><td style='text-align:right; padding:6px; border:none;'>{i1} + {i2} + {i2}</td><td style='padding:6px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:6px; border:none; color:#2c3e50;'><b>{eq2_res}</b></td></tr>
+                            <tr><td style='text-align:right; padding:6px; border:none;'>{i2} + {i3} + {i3}</td><td style='padding:6px; border:none; color:#2c3e50;'>=</td><td style='text-align:left; padding:6px; border:none; color:#2c3e50;'><b>{eq3_res}</b></td></tr>
+                            <tr><td colspan='3' style='border-top: 3px double #7f8c8d; padding-top: 15px; text-align:center; border-bottom:none; border-left:none; border-right:none;'>{i1} + {i2} <b style='color:#e74c3c;'>×</b> {i3} = <b style='color:#e74c3c;'>?</b></td></tr>
+                        </table>
+                    </div>
+                    """
+                    q = f"จงหาค่าของปริศนา <b>หมวด{theme}</b> ต่อไปนี้ <br><span style='color:#e74c3c; font-size:14px;'>(⭐ แนวข้อสอบแข่งขัน: สังเกตเครื่องหมายในบรรทัดสุดท้ายให้ดี!)</span><br>{q_html}"
+                    
+                    explain_box_step = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขในแต่ละบรรทัดมาได้อย่างไร?</b><br>
+                    • <b>บรรทัดที่ 1:</b> นำผลรวมไป <b>หาร 3</b> จะได้ค่าของ 1 รูป<br>
+                    • <b>บรรทัดที่ 2 และ 3:</b> ให้นำค่าที่รู้แล้วไป <b>แทนค่า</b> ในรูปภาพ จากนั้นนำไป <b>ลบออก</b> จากผลรวมฝั่งขวา จะเหลือค่าของรูปอีก 2 รูปที่ยังไม่ทราบ นำไป <b>หาร 2</b> ก็จะได้ค่าของรูปนั้นครับ
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์ปริศนา (แนวข้อสอบแข่งขัน):</b><br>
+                    ระวัง <b>"ลำดับการคำนวณ (Order of Operations)"</b> ในบรรทัดสุดท้าย (ต้องทำ <b>คูณ</b> ก่อน <b>บวก</b> เสมอ!)
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    {explain_box_step}
+                    👉 <b>บรรทัดที่ 1:</b> {i1} + {i1} + {i1} = {eq1_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ของเหมือนกัน 3 ชิ้นรวมได้ {eq1_res} ➔ 1 ชิ้นคือ {eq1_res} ÷ 3 = <b>{val1}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุป: <b style='color:#2980b9;'>{i1} = {val1}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 2:</b> {i1} + {i2} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่า {i1} เป็น {val1} จะได้: {val1} + {i2} + {i2} = {eq2_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {val1} ไปลบออก ➔ {i2} + {i2} = {eq2_res} - {val1} = <b>{eq2_res - val1}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{i2} สองชิ้นรวมได้ {eq2_res - val1} ➔ 1 ชิ้นคือ {eq2_res - val1} ÷ 2 = <b>{val2}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุป: <b style='color:#8e44ad;'>{i2} = {val2}</b><br><br>
+                    
+                    👉 <b>บรรทัดที่ 3:</b> {i2} + {i3} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่า {i2} เป็น {val2} จะได้: {val2} + {i3} + {i3} = {eq3_res}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {val2} ไปลบออก ➔ {i3} + {i3} = {eq3_res} - {val2} = <b>{eq3_res - val2}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{i3} สองชิ้นรวมได้ {eq3_res - val2} ➔ 1 ชิ้นคือ {eq3_res - val2} ÷ 2 = <b>{val3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุป: <b style='color:#27ae60;'>{i3} = {val3}</b><br><br>
+                    
+                    👉 <b>คำถาม:</b> {i1} + {i2} <b style='color:#e74c3c;'>×</b> {i3} = ?<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;แทนค่ารูปภาพ: {val1} + {val2} <b style='color:#e74c3c;'>×</b> {val3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>(🚨 กฎคณิตศาสตร์: ต้องคำนวณคู่ที่คูณกันก่อนเสมอ!)</i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>({val2} × {val3})</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= {val1} + <b style='color:#e74c3c;'>{val2*val3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;= <b>{ans}</b><br>
+                    <b>ตอบ: {ans}</b></span>"""
+
+                else:
+                    # Type 3: ตาชั่งปริศนา 3 ตาชั่ง (โค้ดเดิมที่ถูกต้องแล้ว ยกมาใส่ได้เลย)
+                    w_c = random.randint(3, 8)     
+                    mult_bc = random.randint(2, 4) 
+                    w_b = w_c * mult_bc            
+                    mult_ab = random.randint(2, 3) 
+                    w_a = w_b * mult_ab            
+                    total_w = w_a + w_b + w_c      
+                    i1_in_i3 = mult_ab * mult_bc   
+                    total_c_parts = i1_in_i3 + mult_bc + 1 
+                    s1_l = i1
+                    s1_r = " ".join([i2] * mult_ab)
+                    s2_l = i2
+                    s2_r = " ".join([i3] * mult_bc)
+                    s3_l = f"{i1} {i2} {i3}"
+                    s3_r = f"<span style='font-size:24px; font-weight:bold; color:#d35400;'>{total_w} กรัม</span>"
+                    
+                    def draw_scale(title, color, left, right):
+                        return f"""
+                        <div style='margin-bottom: 25px;'>
+                            <b style='color:{color}; font-size:18px;'>{title}</b><br>
+                            <div style='display:flex; justify-content:center; align-items:flex-end; gap:10px; margin-top:5px;'>
+                                <div style='border-bottom:4px solid #34495e; padding:5px 15px; min-width:80px; font-size:26px;'>{left}</div>
+                                <div style='font-size:40px; margin-bottom:-20px;'>⚖️</div>
+                                <div style='border-bottom:4px solid #34495e; padding:5px 15px; min-width:80px; font-size:26px;'>{right}</div>
+                            </div>
+                        </div>"""
+                    
+                    q_html = f"""
+                    <div style='background-color: #fcfcfc; padding: 20px 10px; border-radius: 8px; border: 2px solid #bdc3c7; width: 95%; margin: 15px auto; box-shadow: 3px 3px 10px rgba(0,0,0,0.08); text-align:center;'>
+                        {draw_scale("ตาชั่งที่ 1 (สมดุล)", "#2980b9", s1_l, s1_r)}
+                        {draw_scale("ตาชั่งที่ 2 (สมดุล)", "#8e44ad", s2_l, s2_r)}
+                        {draw_scale("ตาชั่งที่ 3 (สมดุล)", "#27ae60", s3_l, s3_r)}
+                    </div>
+                    """
+                    q = f"จากภาพตาชั่งปริศนาทั้ง 3 เครื่องที่อยู่ในสภาวะสมดุล<br>จงหาว่า <b>{i1}, {i2} และ {i3} มีน้ำหนักชิ้นละกี่กรัม ?</b><br>{q_html}"
+                    
+                    explain_box_step4 = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขในขั้นที่ 4 มาจากไหน?</b><br>
+                    • หา {i2}: จากขั้นที่ 1 เรารู้ว่า <b>1 {i2} = {mult_bc} {i3}</b> จึงนำน้ำหนักของ {i3} มาคูณด้วย {mult_bc}<br>
+                    • หา {i1}: จากขั้นที่ 2 เรารู้ว่า <b>1 {i1} = {i1_in_i3} {i3}</b> จึงนำน้ำหนักของ {i3} มาคูณด้วย {i1_in_i3}
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์ปริศนาตาชั่ง (การแทนค่า):</b><br>
+                    ตาชั่งสมดุล หมายถึง <b>ซ้าย = ขวา</b><br>
+                    หลักการคือ <b>"เปลี่ยนของชิ้นใหญ่ ให้กลายเป็นของชิ้นเล็กที่สุด"</b> ({i3})<br>
+                    เพื่อให้ตาชั่งที่ 3 มีแต่ {i3} ล้วนๆ จะได้คำนวณง่ายขึ้นครับ!
+                    </div>
+                    <b>วิธีทำอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: เปลี่ยน {i2} เป็น {i3} (จากตาชั่ง 2)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่ง 2 บอกว่า <b>1 {i2} = {mult_bc} {i3}</b><br><br>
+                    
+                    👉 <b>ขั้นที่ 2: เปลี่ยน {i1} เป็น {i3} (จากตาชั่ง 1)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่ง 1 บอกว่า <b>1 {i1} = {mult_ab} {i2}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เราแทนค่า {i2} ด้วย {i3} จะได้: {mult_ab} × {mult_bc} = <b style='color:#e67e22;'>{i1_in_i3} {i3}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;สรุปคือ <b>1 {i1} = <span style='color:#e67e22;'>{i1_in_i3} {i3}</span></b><br><br>
+                    
+                    👉 <b>ขั้นที่ 3: รวมน้ำหนักในตาชั่งที่ 3</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ตาชั่ง 3 มี: {i1} + {i2} + {i3} = {total_w} กรัม<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เปลี่ยนทุกอย่างให้เป็น {i3}:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {i1} เปลี่ยนเป็น {i1_in_i3} {i3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {i2} เปลี่ยนเป็น {mult_bc} {i3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• {i3} มีอยู่แล้ว 1 {i3}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นับรวมทั้งหมดจะมี {i3} อยู่: {i1_in_i3} + {mult_bc} + 1 = <b style='color:#e74c3c;'>{total_c_parts} ชิ้น</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการ: <b style='color:#e74c3c;'>{total_c_parts}</b> × {i3} = {total_w} กรัม<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น <b>{i3}</b> = {total_w} ÷ {total_c_parts} = <b style='color:#27ae60;'>{w_c} กรัม</b><br><br>
+                    
+                    👉 <b>ขั้นที่ 4: หาค่าที่เหลือ</b><br>
+                    {explain_box_step4}
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>{i2}</b> น้ำหนัก: {w_c} × {mult_bc} = <b style='color:#27ae60;'>{w_b} กรัม</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• <b>{i1}</b> น้ำหนัก: {w_c} × {i1_in_i3} = <b style='color:#27ae60;'>{w_a} กรัม</b><br><br>
+                    <b>ตอบ: {i1} = {w_a} ก., {i2} = {w_b} ก., {i3} = {w_c} ก.</b></span>"""
+
+
+
+            elif actual_sub_t == "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง":
+                prob_type = random.choice([1, 2, 3, 4, 5]) 
+                var = random.choice(["x", "y", "a", "ก", "m", "n"])
+                
+                # ฟังก์ชันช่วยวาดการตัดทอน
+                def frac_cancel_left(num, variable):
+                    top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:super; margin-left:2px;'>1</span></span>{variable}"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{num}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+                
+                def frac_cancel_right(top_val, bot_val, result_val):
+                    top = f"<span style='display:inline-block; position:relative;'><span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{top_val}</span><span style='font-size:14px; color:#e74c3c; font-weight:bold; vertical-align:super; margin-left:2px;'>{result_val}</span></span>"
+                    bottom = f"<span style='text-decoration:line-through; text-decoration-color:#e74c3c;'>{bot_val}</span><span style='font-size:12px; color:#e74c3c; vertical-align:sub; margin-left:2px;'>1</span>"
+                    return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px;'><span style='border-bottom:2px solid #333; padding:0 5px;'>{top}</span><span>{bottom}</span></span>"
+
+                if prob_type == 1:
+                    # Level 1: ผลรวม + ผลต่าง
+                    themes = [
+                        ("ฟาร์มแห่งหนึ่ง", "ไก่", "เป็ด", "ตัว"),
+                        ("สองพี่น้อง", "พี่", "น้อง", "บาท"),
+                        ("ร้านเบเกอรี่", "โดนัท", "เค้ก", "ชิ้น")
+                    ]
+                    place, item1, item2, unit = random.choice(themes)
+                    smaller = random.randint(30, 150)
+                    diff = random.randint(15, 60)
+                    larger = smaller + diff
+                    total = smaller + larger
+                    
+                    q = f"ที่{place} มี{item1}และ{item2}รวมกันทั้งหมด <b>{total}</b> {unit} <br>ถ้ามี{item1}มากกว่า{item2}อยู่ <b>{diff}</b> {unit} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#7f8c8d;'>(กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    เรามีของ 2 สิ่งที่ไม่รู้จำนวนเลย จึงต้องแปลงสิ่งหนึ่งให้เป็นตัวแปรเสียก่อน<br><br>
+                    👉 <b>1. กำหนดตัวไม่ทราบค่า:</b><br>
+                    เพื่อให้ง่าย เราจะให้ของที่มี<b>น้อยกว่า</b>เป็นตัวแปรเสมอ ดังนั้นให้ {item2} = <b style='color:#e67e22;'>{var}</b> {unit}<br><br>
+                    👉 <b>2. สร้างจำนวน {item1} (ทำไมต้องใช้ บวก +):</b><br>
+                    โจทย์บอกว่า {item1} มี<b>มากกว่า</b>อยู่ {diff} คำว่า "มากกว่า" แปลว่าต้องเอาไป <b>บวกเพิ่ม</b><br>
+                    จะได้ว่า {item1} = <b style='color:#2980b9;'>{var} + {diff}</b> {unit}<br><br>
+                    👉 <b>3. สร้างสมการ (ทำไมต้องใช้ บวก + และ เท่ากับ =):</b><br>
+                    โจทย์บอกว่าทั้งสองอย่าง <b>"รวมกัน"</b> ได้ {total} คำว่ารวมกันคือต้องจับมา <b>บวกกัน (+)</b> และผลลัพธ์จะต้อง <b>เท่ากับ (=)</b> <b style='color:#27ae60;'>{total}</b><br>
+                    • ({item2}) + ({item1}) = {total}<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#e67e22;'>{var}</b> + (<b style='color:#2980b9;'>{var} + {diff}</b>) = <b style='color:#27ae60;'>{total}</b></span></b>
+                    </div>"""
+                    
+                    explain_box_cancel = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขด้านบนมาจากไหน?</b><br>
+                    เกิดจากการนำ <b>2</b> มา <b>หารออก</b> ทั้งเศษและส่วน (ใช้แม่ 2 ตัดทอน)<br>
+                    • {total - diff} ÷ 2 = {smaller}
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: รวมตัวแปรเข้าด้วยกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: <b style='color:#e67e22;'>{var}</b> บวกกับ <b style='color:#2980b9;'>{var}</b> จะมีค่าเท่ากับ <b>2{var}</b></i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เมื่อรวมตัวแปรแล้ว จะได้สมการใหม่คือ: <b>2{var} + {diff} = {total}</b><br><br>
+                    👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่อยู่ไกลตัวแปร (วงนอก)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ <b style='color:#e74c3c;'>{diff}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;2{var} + {diff} <b style='color:#e74c3c;'>- {diff}</b> = {total} <b style='color:#e74c3c;'>- {diff}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> 2{var} = {total - diff}<br><br>
+                    👉 <b>ขั้นที่ 3: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข 2 เขียนติดกับ {var} แปลว่า "คูณอยู่" จึงต้องนำ <b>2</b> มา <b>หารออก</b> ทั้งสองข้าง<br>
+                    {explain_box_cancel}
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(2, var)} = {frac_cancel_right(total - diff, 2, smaller)}<br><br>
+                    👉 <b>{var} = {smaller}</b><br>
+                    <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
+
+                elif prob_type == 2:
+                    # Level 2: ผลรวม + จำนวนเท่า
+                    themes = [
+                        ("สวนสัตว์", "ลิง", "ช้าง", "ตัว"),
+                        ("ลานจอดรถ", "รถยนต์", "รถจักรยานยนต์", "คัน"),
+                        ("กระปุกออมสิน", "เหรียญสิบ", "เหรียญห้า", "เหรียญ")
+                    ]
+                    place, item1, item2, unit = random.choice(themes)
+                    mult = random.randint(3, 6) 
+                    smaller = random.randint(15, 50)
+                    larger = smaller * mult
+                    total = smaller + larger
+                    
+                    q = f"ใน{place} มี{item1}และ{item2}รวมกันทั้งหมด <b>{total}</b> {unit} <br>ถ้าจำนวน{item1} <b>เป็น {mult} เท่า</b> ของจำนวน{item2} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#e74c3c;'>(⭐ ระดับแข่งขัน: กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    👉 <b>1. กำหนดตัวไม่ทราบค่า:</b><br>
+                    ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit} (คิดเป็น 1 ส่วน)<br><br>
+                    👉 <b>2. สร้างจำนวน {item1} (ทำไมต้องใช้ คูณ ×):</b><br>
+                    โจทย์บอกว่า {item1} เป็น <b>{mult} เท่า</b> ของ{item2} คำว่า "เท่าของ" คือ <b>"การคูณ"</b><br>
+                    จะได้ว่า {item1} มีจำนวน = {mult} × {var} หรือเขียนสั้นๆ ว่า <b style='color:#2980b9;'>{mult}{var}</b> {unit} (คิดเป็น {mult} ส่วน)<br><br>
+                    👉 <b>3. สร้างสมการรวม (ทำไมต้องใช้ บวก + และ เท่ากับ =):</b><br>
+                    นำทั้งสองสิ่งมา <b>"รวมกัน (+)"</b> ต้องมีค่า <b>"เท่ากับ (=)"</b> <b style='color:#27ae60;'>{total}</b><br>
+                    • ({item2}) + ({item1}) = {total}<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#e67e22;'>{var}</b> + <b style='color:#2980b9;'>{mult}{var}</b> = <b style='color:#27ae60;'>{total}</b></span></b>
+                    </div>"""
+                    
+                    explain_box_cancel = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขด้านบนมาจากไหน?</b><br>
+                    เกิดจากการนำ <b>{mult+1}</b> มา <b>หารออก</b> ทั้งเศษและส่วน (ใช้แม่ {mult+1} ตัดทอน)<br>
+                    • {total} ÷ {mult+1} = {smaller}
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: รวมตัวแปรเข้าด้วยกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: <b style='color:#e67e22;'>{var}</b> ตัวเดียว มีความหมายเท่ากับ <b>1{var}</b> เมื่อนำมาบวกกับ <b style='color:#2980b9;'>{mult}{var}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ให้นำตัวเลขข้างหน้ามาบวกกัน (1 + {mult} = {mult+1}) จะรวมกันได้เป็น <b>{mult+1}{var}</b></i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เมื่อยุบรวมแล้ว จะได้สมการใหม่คือ: <b>{mult+1}{var} = {total}</b><br><br>
+                    👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข {mult+1} คูณอยู่กับ {var} จึงต้องนำ <b style='color:#e74c3c;'>{mult+1}</b> มา <b>หารออก</b> ทั้งสองข้าง<br>
+                    {explain_box_cancel}
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult+1, var)} = {frac_cancel_right(total, mult+1, smaller)}<br><br>
+                    👉 <b>{var} = {smaller}</b><br>
+                    <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
+
+                elif prob_type == 3:
+                    # Level 3: ผลต่าง + จำนวนเท่า
+                    themes = [
+                        ("การสะสมแสตมป์", "ก้อง", "เก่ง", "ดวง"),
+                        ("การสอบ", "ปุ๊ก", "ป๊อป", "คะแนน"),
+                        ("โรงงานผลิต", "เสื้อยืด", "กางเกง", "ตัว")
+                    ]
+                    place, item1, item2, unit = random.choice(themes)
+                    mult = random.randint(3, 5) 
+                    smaller = random.randint(25, 80)
+                    larger = smaller * mult
+                    diff = larger - smaller
+                    
+                    q = f"เรื่อง{place} พบว่า {item1} มีจำนวน <b>เป็น {mult} เท่า</b> ของ{item2} <br>และ {item1} มี<b>มากกว่า</b>{item2}อยู่ <b>{diff}</b> {unit} <br>อยากทราบว่ามี <b>{item2}</b> จำนวนกี่{unit}? <br><span style='font-size:14px; color:#e74c3c;'>(🔥 ระดับแข่งขันขั้นสูง: กำหนดให้ {var} แทนจำนวนของ{item2})</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    👉 <b>1. กำหนดตัวไม่ทราบค่า:</b><br>
+                    ให้ {item2} (สิ่งที่มีน้อยกว่า) มีจำนวน = <b style='color:#e67e22;'>{var}</b> {unit}<br><br>
+                    👉 <b>2. สร้างจำนวน {item1} (ใช้ คูณ ×):</b><br>
+                    โจทย์บอกว่า {item1} เป็น <b>{mult} เท่า</b> ของ{item2} คำว่า "เท่าของ" คือ <b>"การคูณ"</b><br>
+                    จะได้ว่า {item1} มีจำนวน = <b style='color:#2980b9;'>{mult}{var}</b> {unit}<br><br>
+                    👉 <b>3. สร้างสมการจากผลต่าง (ทำไมต้องใช้ ลบ -):</b><br>
+                    คำว่า <b>"มากกว่าอยู่"</b> เป็นการเปรียบเทียบเพื่อหา <b>"ผลต่าง"</b> การหาผลต่างในทางคณิตศาสตร์ ต้องนำสิ่งที่มีมากกว่าตั้ง แล้ว <b>ลบ (-)</b> ด้วยสิ่งที่มีน้อยกว่า<br>
+                    • ({item1}) - ({item2}) = ผลต่าง<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#2980b9;'>{mult}{var}</b> - <b style='color:#e67e22;'>{var}</b> = <b style='color:#27ae60;'>{diff}</b></span></b>
+                    </div>"""
+                    
+                    explain_box_cancel = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขด้านบนมาจากไหน?</b><br>
+                    เกิดจากการนำ <b>{mult-1}</b> มา <b>หารออก</b> ทั้งเศษและส่วน (ใช้แม่ {mult-1} ตัดทอน)<br>
+                    • {diff} ÷ {mult-1} = {smaller}
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: ลบตัวแปรออกจากกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: มีอยู่ <b style='color:#2980b9;'>{mult}{var}</b> นำไปลบออก <b style='color:#e67e22;'>1{var}</b> (เอาเลขข้างหน้ามาลบกันคือ {mult} - 1 = {mult-1}) จะเหลือ <b>{mult-1}{var}</b></i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เมื่อลบกันแล้ว จะได้สมการใหม่คือ: <b>{mult-1}{var} = {diff}</b><br><br>
+                    👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เลข {mult-1} คูณอยู่ จึงต้องนำ <b style='color:#e74c3c;'>{mult-1}</b> มา <b>หารออก</b> ทั้งสองข้าง<br>
+                    {explain_box_cancel}
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult-1, var)} = {frac_cancel_right(diff, mult-1, smaller)}<br><br>
+                    👉 <b>{var} = {smaller}</b><br>
+                    <b>ตอบ: มี{item2} จำนวน {smaller} {unit}</b></span>"""
+
+                elif prob_type == 4:
+                    # Level 4: ราคาสินค้า 2 ชนิด
+                    item_pairs = [
+                        ["ปากกา", "สมุด"], ["ดินสอ", "ยางลบ"], ["ไม้บรรทัด", "กล่องดินสอ"],
+                        ["สีไม้", "สมุดวาดเขียน"], ["กรรไกร", "กาวน้ำ"], ["นมสด", "ขนมปัง"]
+                    ]
+                    items = random.choice(item_pairs)
+                    random.shuffle(items)
+                    item1, item2 = items[0], items[1] 
+                    
+                    smaller = random.randint(10, 45)
+                    diff = random.randint(5, 20)     
+                    larger = smaller + diff          
+                    total = smaller + larger         
+                    
+                    q = f"ซื้อ<b>{item1}</b>และ<b>{item2}</b>อย่างละ 1 ชิ้น จ่ายเงินรวมทั้งหมด <b>{total}</b> บาท <br>ถ้า{item1}ราคา<b>แพงกว่า</b>{item2}อยู่ <b>{diff}</b> บาท <br>อยากทราบว่า <b>{item2}</b> ราคาชิ้นละกี่บาท? <br><span style='font-size:14px; color:#7f8c8d;'>(กำหนดให้ {var} แทนราคาของ{item2})</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>แปลภาษาไทย เป็นสมการคณิตศาสตร์:</b><br>
+                    โจทย์ข้อนี้เปรียบเทียบราคาสินค้า 2 ชนิด เราต้องกำหนดราคาให้ชนิดใดชนิดหนึ่งเป็นตัวแปรก่อน<br><br>
+                    👉 <b>1. กำหนดตัวไม่ทราบค่า:</b><br>
+                    ให้ {item2} (ของที่ราคาถูกกว่า) มีราคา = <b style='color:#e67e22;'>{var}</b> บาท<br><br>
+                    👉 <b>2. สร้างราคาของ {item1} (ทำไมต้องใช้ บวก +):</b><br>
+                    โจทย์บอกว่า {item1} <b>แพงกว่า</b> อยู่ {diff} บาท คำว่า "แพงกว่า" แปลว่าต้องเอาไป <b>บวกเพิ่ม</b><br>
+                    จะได้ว่า {item1} ราคา = <b style='color:#2980b9;'>{var} + {diff}</b> บาท<br><br>
+                    👉 <b>3. สร้างสมการรวม (ทำไมต้องใช้ บวก + และ เท่ากับ =):</b><br>
+                    ซื้ออย่างละ 1 ชิ้น <b>"จ่ายเงินรวม"</b> หมายถึงนำราคามา <b>บวกกัน (+)</b> และต้อง <b>เท่ากับ (=)</b> เงินที่จ่ายไปคือ <b style='color:#27ae60;'>{total}</b> บาท<br>
+                    • (ราคา{item2}) + (ราคา{item1}) = {total}<br><br>
+                    🎯 <b>ได้สมการคือ: <span style='font-size:18px;'><b style='color:#e67e22;'>{var}</b> + (<b style='color:#2980b9;'>{var} + {diff}</b>) = <b style='color:#27ae60;'>{total}</b></span></b>
+                    </div>"""
+                    
+                    explain_box_cancel = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขด้านบนมาจากไหน?</b><br>
+                    เกิดจากการนำ <b>2</b> มา <b>หารออก</b> ทั้งเศษและส่วน (ใช้แม่ 2 ตัดทอน)<br>
+                    • {total - diff} ÷ 2 = {smaller}
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: รวมตัวแปรเข้าด้วยกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;💡 <i>อธิบาย: นำราคา <b style='color:#e67e22;'>{var}</b> มาบวกกับ <b style='color:#2980b9;'>{var}</b> จะมีค่าเท่ากับ <b>2{var}</b></i><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;เมื่อยุบรวมตัวแปรแล้ว จะได้สมการใหม่คือ: <b>2{var} + {diff} = {total}</b><br><br>
+                    👉 <b>ขั้นที่ 2: กำจัดตัวเลขที่อยู่ไกลตัวแปร (วงนอก)</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ <b style='color:#e74c3c;'>{diff}</b> มา <b>ลบออก</b> ทั้งสองข้างของสมการ<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;2{var} + {diff} <b style='color:#e74c3c;'>- {diff}</b> = {total} <b style='color:#e74c3c;'>- {diff}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> 2{var} = {total - diff}<br><br>
+                    👉 <b>ขั้นที่ 3: กำจัดตัวเลขที่ติดกับตัวแปร</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ <b>2</b> มา <b>หารออก</b> ทั้งสองข้าง (ใช้แม่ 2 ตัดทอน)<br>
+                    {explain_box_cancel}
+                    &nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(2, var)} = {frac_cancel_right(total - diff, 2, smaller)}<br><br>
+                    👉 <b>{var} = {smaller}</b><br>
+                    <b>ตอบ: {item2} ราคาชิ้นละ {smaller} บาท</b></span>"""
+                
+                else:
+                    # Level 5: ระบบสมการ 2 ตัวแปรแบบซ่อนรูป (โจทย์ออริจินัลของคุณครู) -> เพิ่มตัวคูณในประโยคที่ 2
+                    items = [("สมุด", "เล่ม", "ปากกา", "ด้าม"), ("เสื้อ", "ตัว", "กางเกง", "ตัว"), ("ขนม", "ห่อ", "น้ำผลไม้", "กล่อง")]
+                    item_pair = random.choice(items)
+                    # สุ่มสลับตำแหน่งของสิ่งของ
+                    if random.choice([True, False]):
+                        item1, unit1, item2, unit2 = item_pair
+                    else:
+                        item2, unit2, item1, unit1 = item_pair
+                        
+                    var1, var2 = "x", "y" 
+                    
+                    while True:
+                        mult = random.randint(2, 4)      # จำนวนเท่าของ item1
+                        price1 = random.randint(5, 25)   # x
+                        diff = random.randint(2, 15)     
+                        price2 = (mult * price1) - diff  # y = (mult * x) - diff
+                        if price2 > 0 and price1 != price2: 
+                            break
+                            
+                    total = price1 + price2          # x + y
+                    
+                    # ปรับข้อความ: "ถ้า {item1} {mult} ชิ้น ราคาแพงกว่า {item2} 1 ชิ้น อยู่ {diff} บาท"
+                    q = f"ซื้อ <b>{item1} 1 {unit1}</b> รวมกับ <b>{item2} 1 {unit2}</b> ราคารวมกัน <b>{total}</b> บาท <br>ถ้า <b>{item1} {mult} {unit1}</b> ราคาแพงกว่า <b>{item2} 1 {unit2}</b> อยู่ <b>{diff}</b> บาท <br>อยากทราบว่า <b>{item1} และ {item2} ราคา{unit1}ละกี่บาท?</b> <br><span style='font-size:14px; color:#e74c3c;'>(🏆 โจทย์ปราบเซียน: ให้ใช้ความรู้เรื่องการแทนค่าสมการ)</span>"
+                    
+                    analysis = f"""<div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:10px; margin-bottom:15px; border-radius:4px;'>
+                    🔍 <b>วิเคราะห์ด้วยเทคนิค "การสร้าง 2 สมการแล้วแทนค่า":</b><br>
+                    ข้อนี้มีของ 2 อย่างที่ไม่รู้ราคา ให้ตั้งเป็นตัวแปร 2 ตัว<br>
+                    • ให้ {item1} = <b style='color:#e67e22;'>{var1}</b> บาท<br>
+                    • ให้ {item2} = <b style='color:#2980b9;'>{var2}</b> บาท<br><br>
+                    👉 <b>จากประโยคที่ 1:</b> {item1} 1 {unit1} รวมกับ {item2} 1 {unit2} = {total} บาท<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<b>สมการ ①:</b> <b style='color:#e67e22;'>{var1}</b> + <b style='color:#2980b9;'>{var2}</b> = <b style='color:#27ae60;'>{total}</b><br><br>
+                    👉 <b>จากประโยคที่ 2:</b> {item1} {mult} {unit1} แพงกว่า {item2} 1 {unit2} อยู่ {diff} บาท<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;(แปลว่า ถ้านำราคาของ {item1} จำนวน {mult} ชิ้น มาหักออก {diff} บาท จะเท่ากับราคา {item2} พอดี)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<b>สมการ ②:</b> <b style='color:#e67e22;'>{mult}{var1}</b> - <b style='color:#c0392b;'>{diff}</b> = <b style='color:#2980b9;'>{var2}</b>
+                    </div>"""
+                    
+                    explain_box_cancel = f"""<div style='background-color:#fef9e7; border-left:4px solid #f39c12; padding:10px; margin-bottom:10px; border-radius:4px;'>
+                    💡 <b>ตัวเลขด้านบนมาจากไหน?</b><br>
+                    เกิดจากการนำ <b>{mult+1}</b> มา <b>หารออก</b> ทั้งเศษและส่วน (ใช้แม่ {mult+1} ตัดทอน)<br>
+                    • {total+diff} ÷ {mult+1} = {price1}
+                    </div>"""
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    {analysis}
+                    <b>วิธีแก้สมการอย่างละเอียด:</b><br>
+                    👉 <b>ขั้นที่ 1: นำสมการ ② ไปแทนค่าในสมการ ①</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จาก <b>สมการ ②</b> เรารู้ว่า <b>{var2}</b> มีค่าเท่ากับ <b>({mult}{var1} - {diff})</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;ดังนั้น ในสมการ ① ตรงไหนที่เป็น <b>{var2}</b> ให้เปลี่ยนเป็น <b>({mult}{var1} - {diff})</b> แทน<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{var1} + <b>({mult}{var1} - {diff})</b> = {total}<br><br>
+                    
+                    👉 <b>ขั้นที่ 2: รวมตัวแปร {var1} เข้าด้วยกัน</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ 1{var1} บวกกับ {mult}{var1} จะได้ {mult+1}{var1}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้สมการ: <b>{mult+1}{var1} - {diff} = {total}</b><br><br>
+                    
+                    👉 <b>ขั้นที่ 3: กำจัดตัวเลข (แก้สมการหา {var1})</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ <b style='color:#27ae60;'>{diff}</b> มา <b>บวกเข้า</b> ทั้งสองข้างของสมการ เพื่อกำจัดส่วนที่ลบออก:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{mult+1}{var1} - {diff} <b style='color:#27ae60;'>+ {diff}</b> = {total} <b style='color:#27ae60;'>+ {diff}</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>จะได้:</i> {mult+1}{var1} = {total+diff}<br><br>
+                    
+                    &nbsp;&nbsp;&nbsp;&nbsp;• นำ <b style='color:#e74c3c;'>{mult+1}</b> มา <b>หารออก</b> ทั้งสองข้าง (เพื่อทำให้ {var1} เหลือตัวเดียว):<br>
+                    {explain_box_cancel}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{frac_cancel_left(mult+1, var1)} = {frac_cancel_right(total+diff, mult+1, price1)}<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;จะได้ <b>{var1} = {price1}</b> (ราคาของ {item1})<br><br>
+                    
+                    👉 <b>ขั้นที่ 4: หาค่า {var2} (ราคาของ {item2})</b><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;นำ {var1} = {price1} กลับไปแทนในสมการ ①<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{price1} + {var2} = {total}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{var2} = {total} - {price1} = <b>{price2}</b><br><br>
+                    
+                    <b>ตอบ: {item1} ราคาชิ้นละ {price1} บาท, {item2} ราคาชิ้นละ {price2} บาท</b></span>"""
+
+
+                    
+
             elif actual_sub_t == "การบวกและการลบทศนิยม":
                 op = random.choice(["+", "-"])
                 dp1, dp2 = random.choice([1, 2, 3]), random.choice([1, 2, 3])

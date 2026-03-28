@@ -19,7 +19,8 @@ except ImportError:
 # ==========================================
 # ตั้งค่าหน้าเพจ Web App & Professional CSS
 # ==========================================
-st.set_page_config(page_title="Math Generator - Primary 4-5", page_icon="🎓", layout="wide")
+# ลบ P.5 ออกจาก page_title
+st.set_page_config(page_title="Math Generator - Primary 4", page_icon="🎓", layout="wide")
 
 st.markdown("""
 <style>
@@ -60,16 +61,9 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
             <tr><td style='padding: 5px 10px 0 0; border: none; {border_ans} height: 35px;'>{ans_val}</td><td style='border: none;'></td></tr>
         </table></div>"""
 
-
 # ==========================================
 # ส่วนของ Helpers (ฟังก์ชันวาดรูป SVG)
 # ==========================================
-
-
-
-
-import math
-import random
 
 def draw_p4_real_life_geo_svg(scenario, shape_type, sides, unit="ม."):
     svg_w, svg_h = 450, 250
@@ -139,25 +133,16 @@ def draw_p4_real_life_geo_svg(scenario, shape_type, sides, unit="ม."):
             {svg}
         </div></div>'''
 
-
-
-
-
-import math
-import random
-
 def draw_p4_grid_area_svg(shape_pts, unit="ตารางหน่วย"):
-    svg_w, svg_h = 450, 270 # เพิ่มความสูงนิดหน่อยให้มีที่วางคำอธิบาย
+    svg_w, svg_h = 450, 270 
     cols, rows = 14, 8
     cell = 25
     
-    # คำนวณจุดกึ่งกลางในการวาดตาราง
     ox = (svg_w - (cols * cell)) / 2
     oy = (svg_h - (rows * cell)) / 2 - 15 
 
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
 
-    # 1. วาดเส้นตาราง (Grid Lines) เป็นเส้นประสีเทาอ่อน
     for r in range(rows + 1):
         y = oy + r * cell
         svg += f'<line x1="{ox}" y1="{y}" x2="{ox + cols * cell}" y2="{y}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>'
@@ -165,11 +150,9 @@ def draw_p4_grid_area_svg(shape_pts, unit="ตารางหน่วย"):
         x = ox + c * cell
         svg += f'<line x1="{x}" y1="{oy}" x2="{x}" y2="{oy + rows * cell}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>'
 
-    # 2. วาดรูปทรงที่ระบายสี (Fill Color)
     pts_str = " ".join([f"{ox + p[0]*cell},{oy + p[1]*cell}" for p in shape_pts])
     svg += f'<polygon points="{pts_str}" fill="#85c1e9" fill-opacity="0.9" stroke="#2980b9" stroke-width="2.5" stroke-linejoin="round"/>'
 
-    # 3. วาดคำอธิบาย (Legend) ด้านล่างสุด
     leg_y = oy + rows * cell + 25
     svg += f'<rect x="{ox + 30}" y="{leg_y - 15}" width="20" height="20" fill="#85c1e9" fill-opacity="0.9" stroke="#2980b9" stroke-width="1.5"/>'
     svg += f'<text x="{ox + 60}" y="{leg_y}" font-family="Sarabun" font-size="16" font-weight="bold" fill="#2c3e50">กำหนดให้ 1 ช่อง มีพื้นที่ = 1 {unit}</text>'
@@ -185,7 +168,6 @@ def draw_p4_grid_area_solution_svg(rects, unit="ตารางหน่วย")
     cols, rows = 14, 8
     cell = 25
     
-    # คำนวณหาจุดกึ่งกลางของรูปทรงทั้งหมด
     min_x = min(r[0] for r in rects)
     max_x = max(r[0] + r[2] for r in rects)
     min_y = min(r[1] for r in rects)
@@ -202,7 +184,6 @@ def draw_p4_grid_area_solution_svg(rects, unit="ตารางหน่วย")
 
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
 
-    # 1. วาดเส้นตาราง
     for r in range(rows + 1):
         y = oy + r * cell
         svg += f'<line x1="{ox}" y1="{y}" x2="{ox + cols * cell}" y2="{y}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>'
@@ -210,17 +191,14 @@ def draw_p4_grid_area_solution_svg(rects, unit="ตารางหน่วย")
         x = ox + c * cell
         svg += f'<line x1="{x}" y1="{oy}" x2="{x}" y2="{oy + rows * cell}" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="3,3"/>'
 
-    # 2. วาดสี่เหลี่ยมย่อยๆ พร้อมระบายสีแยกส่วน
     for rx, ry, rw, rh, color in rects:
         final_x = ox + (rx + offset_x) * cell
         final_y = oy + (ry + offset_y) * cell
         final_w = rw * cell
         final_h = rh * cell
         
-        # วาดกล่องสี
         svg += f'<rect x="{final_x}" y="{final_y}" width="{final_w}" height="{final_h}" fill="{color}" fill-opacity="0.85" stroke="#2c3e50" stroke-width="2" stroke-linejoin="round"/>'
         
-        # ใส่ตัวเลขพื้นที่กำกับตรงกลางกล่อง
         cx_rect = final_x + final_w/2
         cy_rect = final_y + final_h/2 + 6 
         area_val = rw * rh
@@ -233,28 +211,20 @@ def draw_p4_grid_area_solution_svg(rects, unit="ตารางหน่วย")
             {svg}
         </div></div>'''
 
-
-
-import math
-import random
-
 def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, unit="ซม."):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 120
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
     if shape_type == "rhombus":
-        # 📐 ขนมเปียกปูน: ใช้สัดส่วน 3-4-5 ให้ด้านเท่ากัน (แต่ไม่แสดงขีดสัญลักษณ์แล้ว)
         v_height = 80
         dx = 60
         v_base = 100
     else:
-        # 📐 ด้านขนาน: สุ่มความกว้างฐาน และความเอียง
         v_height = random.randint(75, 95)
         v_base = random.randint(130, 170)
         dx = random.randint(35, 55)
 
-    # คำนวณพิกัด 4 มุม (สมมาตรกึ่งกลางหน้าจอ)
     top_y = cy - v_height/2
     bot_y = cy + v_height/2
     
@@ -265,20 +235,12 @@ def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, uni
     
     pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
     
-    # ระบายสีฟ้าอ่อนด้านใน เพื่อสื่อถึงการหา "พื้นที่"
     svg += f'<polygon points="{pts}" fill="#ebf5fb" stroke="#2c3e50" stroke-width="2.5"/>'
-    
-    # 🎯 เส้นส่วนสูง (เส้นประสีแดง) ลากจากมุมซ้ายบนลงมาตั้งฉากกับฐาน
     svg += f'<line x1="{tl[0]}" y1="{tl[1]}" x2="{tl[0]}" y2="{bot_y}" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="6,4"/>'
-    
-    # 🎯 สัญลักษณ์มุมฉากที่ฐาน (สีแดง) ยืนยันว่าเป็นส่วนสูง
     s = 12
     svg += f'<polyline points="{tl[0]},{bot_y-s} {tl[0]+s},{bot_y-s} {tl[0]+s},{bot_y}" fill="none" stroke="#e74c3c" stroke-width="2.5"/>'
 
-    # 🎯 วางตัวเลข (ฐานสีน้ำเงิน, สูงสีแดง) โฟกัสแค่ 2 จุดนี้เท่านั้น
     svg += f'<text x="{cx}" y="{bot_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">ฐาน {base_val} {unit}</text>'
-    
-    # ขยับตัวเลขความสูงให้เยื้องมาทางขวาของเส้นประเล็กน้อย จะได้อ่านง่าย
     svg += f'<text x="{tl[0] + 12}" y="{cy + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#e74c3c">สูง {height_val} {unit}</text>'
 
     svg += '</svg>'
@@ -287,25 +249,18 @@ def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, uni
             {svg}
         </div></div>'''
 
-
-
-import math
-import random
-
 def draw_p4_triangle_area_svg(tri_type, base_val, height_val, unit="ซม."):
     svg_w, svg_h = 450, 250
-    cx, cy = 225, 120 # ขยับจุดศูนย์กลางแกน Y ขึ้นนิดหน่อยเพื่อให้มีที่วางตัวเลขฐาน
+    cx, cy = 225, 120 
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
 
-    # 📐 ไดนามิก: สุ่มสัดส่วนการวาดให้มีความหลากหลาย ไม่จำเจ
-    v_base = random.randint(140, 200)   # ความยาวฐานบนหน้าจอ
-    v_height = random.randint(90, 130)  # ความสูงบนหน้าจอ
+    v_base = random.randint(140, 200)   
+    v_height = random.randint(90, 130)  
 
     bottom_y = cy + v_height/2
     top_y = cy - v_height/2
 
     if tri_type == "right":
-        # 📐 สามเหลี่ยมมุมฉาก (มุมฉากอยู่ซ้ายล่าง)
         bl = (cx - v_base/2, bottom_y)
         br = (cx + v_base/2, bottom_y)
         top = (bl[0], top_y)
@@ -313,20 +268,16 @@ def draw_p4_triangle_area_svg(tri_type, base_val, height_val, unit="ซม."):
         pts = f"{top[0]},{top[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
         svg += f'<polygon points="{pts}" fill="#e8f8f5" stroke="#2c3e50" stroke-width="2.5"/>'
 
-        # 🎯 สัญลักษณ์มุมฉากสีแดง
         s = 15
         svg += f'<polyline points="{bl[0]},{bl[1]-s} {bl[0]+s},{bl[1]-s} {bl[0]+s},{bl[1]}" fill="none" stroke="#e74c3c" stroke-width="2.5"/>'
 
-        # 🎯 ตัวเลข (ฐานสีน้ำเงิน, สูงสีแดง)
         svg += f'<text x="{cx}" y="{bottom_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">ฐาน {base_val} {unit}</text>'
         svg += f'<text x="{bl[0] - 15}" y="{cy}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#e74c3c">สูง {height_val} {unit}</text>'
 
     else: 
-        # 📐 สามเหลี่ยมมุมแหลม (หน้าจั่ว หรือ ด้านไม่เท่า)
         bl = (cx - v_base/2, bottom_y)
         br = (cx + v_base/2, bottom_y)
 
-        # สุ่มจุดยอด (Top) ให้ตรงกลาง(หน้าจั่ว) หรือ เยื้องไปทางซ้าย/ขวา(ด้านไม่เท่า)
         if tri_type == "isosceles":
             top_x = cx
         else:
@@ -338,16 +289,12 @@ def draw_p4_triangle_area_svg(tri_type, base_val, height_val, unit="ซม."):
         pts = f"{top[0]},{top[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
         svg += f'<polygon points="{pts}" fill="#e8f8f5" stroke="#2c3e50" stroke-width="2.5"/>'
 
-        # 🎯 เส้นส่วนสูง (เส้นประสีแดง)
         svg += f'<line x1="{top_x}" y1="{top_y}" x2="{top_x}" y2="{bottom_y}" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="6,4"/>'
 
-        # 🎯 สัญลักษณ์มุมฉากที่ฐาน
         s = 12
         svg += f'<polyline points="{top_x},{bottom_y-s} {top_x+s},{bottom_y-s} {top_x+s},{bottom_y}" fill="none" stroke="#e74c3c" stroke-width="2.5"/>'
 
-        # 🎯 ตัวเลข
         svg += f'<text x="{cx}" y="{bottom_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">ฐาน {base_val} {unit}</text>'
-        # ตัวเลขความสูง ขยับให้ไม่ทับเส้น
         svg += f'<text x="{top_x + 10}" y="{cy}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#e74c3c">สูง {height_val} {unit}</text>'
 
     svg += '</svg>'
@@ -356,22 +303,15 @@ def draw_p4_triangle_area_svg(tri_type, base_val, height_val, unit="ซม."):
             {svg}
         </div></div>'''
 
-
-
-import math
-import random
-
 def draw_p4_kite_svg(sides, unit="ซม."):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 125
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
-    # 📐 ไดนามิก: สุ่มสัดส่วนของรูปว่าวให้แต่ละข้อดูไม่ซ้ำกัน (แต่สมมาตรซ้าย-ขวา 100%)
-    half_w = random.randint(55, 95)    # ครึ่งความกว้าง (แกน X)
-    top_h = random.randint(30, 50)     # ความสูงส่วนบน (แกน Y)
-    bottom_h = random.randint(65, 105) # ความสูงส่วนล่าง (แกน Y)
+    half_w = random.randint(55, 95)    
+    top_h = random.randint(30, 50)     
+    bottom_h = random.randint(65, 105) 
     
-    # พิกัด 4 มุม (บน, ขวา, ล่าง, ซ้าย)
     top = (cx, cy - top_h)
     right = (cx + half_w, cy)
     bottom = (cx, cy + bottom_h)
@@ -379,33 +319,25 @@ def draw_p4_kite_svg(sides, unit="ซม."):
     
     pts = f"{top[0]},{top[1]} {right[0]},{right[1]} {bottom[0]},{bottom[1]} {left[0]},{left[1]}"
     
-    # วาดตัวรูปสี่เหลี่ยมรูปว่าว
     svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
     
-    # 🎯 ฟังก์ชันคำนวณองศาให้เส้น "ตั้งฉาก" 100%
-    # (ลบ +90 ออกจากของเดิม เพราะเส้นวาดแนวตั้ง การหมุนเท่ากับองศาเส้นขอบจะทำให้มันตั้งฉากพอดี)
     def get_perpendicular_angle(p1, p2):
         return math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0]))
 
-    # 🎯 สัญลักษณ์ 1 ขีดตั้งฉาก สำหรับคู่ประชิดด้านบน (ด้านสั้น) สีน้ำเงิน
     for p1, p2 in [(left, top), (top, right)]:
         mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
         angle = get_perpendicular_angle(p1, p2)
         svg += f'<line x1="{mx}" y1="{my-8}" x2="{mx}" y2="{my+8}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
         
-    # 🎯 สัญลักษณ์ 2 ขีดตั้งฉาก สำหรับคู่ประชิดด้านล่าง (ด้านยาว) สีแดง
     for p1, p2 in [(left, bottom), (right, bottom)]:
         mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
         angle = get_perpendicular_angle(p1, p2)
         svg += f'<line x1="{mx-3}" y1="{my-8}" x2="{mx-3}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
         svg += f'<line x1="{mx+3}" y1="{my-8}" x2="{mx+3}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
 
-    # 🎯 วางตัวเลขให้เยื้องออกจากเส้นเอียง (ไม่ทับเส้น)
-    # ตัวเลขด้านสั้น (ขวาบน)
     mx_top, my_top = (top[0]+right[0])/2, (top[1]+right[1])/2
     svg += f'<text x="{mx_top + 15}" y="{my_top - 10}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[0]} {unit}</text>'
     
-    # ตัวเลขด้านยาว (ขวาล่าง)
     mx_bot, my_bot = (right[0]+bottom[0])/2, (right[1]+bottom[1])/2
     svg += f'<text x="{mx_bot + 15}" y="{my_bot + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
 
@@ -415,16 +347,12 @@ def draw_p4_kite_svg(sides, unit="ซม."):
             {svg}
         </div></div>'''
 
-
-
-
 def draw_p4_rectangle_area_svg(shape_type, sides, unit="ซม."):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 125
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
     if shape_type == "square":
-        # 📐 สี่เหลี่ยมจัตุรัส: ขนาดคงที่ สมมาตรเป๊ะ
         v_side = 120 
         tl = (cx - v_side/2, cy - v_side/2)
         tr = (cx + v_side/2, cy - v_side/2)
@@ -432,27 +360,22 @@ def draw_p4_rectangle_area_svg(shape_type, sides, unit="ซม."):
         br = (cx + v_side/2, cy + v_side/2)
         
         pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
-        # ระบายสีฟ้าอ่อนด้านใน เพื่อสื่อถึงการหา "พื้นที่"
         svg += f'<polygon points="{pts}" fill="#ebf5fb" stroke="#2c3e50" stroke-width="2.5"/>'
         
-        # 🎯 สัญลักษณ์ 1 ขีดทุกด้าน
         sides_to_tick = [(tl, tr, 0), (tr, br, 90), (br, bl, 0), (bl, tl, 90)]
         for p1, p2, angle in sides_to_tick:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
             svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
             
-        # ตัวเลขความยาวด้าน (เขียนแค่ด้านเดียวเพราะเท่ากันหมด)
         svg += f'<text x="{cx}" y="{bl[1] + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
 
     else: 
-        # 📐 สี่เหลี่ยมผืนผ้า: ไดนามิก ยืดหดตามสัดส่วน กว้าง:ยาว
-        w_val, l_val = sides[0], sides[1] # กว้าง, ยาว
-        ratio = w_val / l_val # อัตราส่วน
+        w_val, l_val = sides[0], sides[1] 
+        ratio = w_val / l_val 
         
-        v_length = 200 # ความยาวคงที่บนหน้าจอ
-        v_width = v_length * ratio # ความกว้างปรับตามสัดส่วน
+        v_length = 200 
+        v_width = v_length * ratio 
         
-        # คุมขนาดไม่ให้ผอมเกินไปหรืออ้วนทะลุจอ
         if v_width < 60: v_width = 60
         if v_width > 140: 
             v_width = 140
@@ -466,22 +389,19 @@ def draw_p4_rectangle_area_svg(shape_type, sides, unit="ซม."):
         pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
         svg += f'<polygon points="{pts}" fill="#ebf5fb" stroke="#2c3e50" stroke-width="2.5"/>'
         
-        # 🎯 สัญลักษณ์ขีด (บน-ล่าง 2 ขีด, ซ้าย-ขวา 1 ขีด)
-        for p1, p2 in [(tl, tr), (br, bl)]: # แนวนอน 2 ขีด
+        for p1, p2 in [(tl, tr), (br, bl)]: 
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
             svg += f'<line x1="{mx-3}" y1="{my-6}" x2="{mx-3}" y2="{my+6}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>'
             svg += f'<line x1="{mx+3}" y1="{my-6}" x2="{mx+3}" y2="{my+6}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>'
             
-        for p1, p2 in [(tr, br), (bl, tl)]: # แนวตั้ง 1 ขีด
+        for p1, p2 in [(tr, br), (bl, tl)]: 
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
             svg += f'<line x1="{mx-6}" y1="{my}" x2="{mx+6}" y2="{my}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round"/>'
 
-        # วางตัวเลข (ด้านยาวอยู่ล่าง, ด้านกว้างอยู่ขวา)
         svg += f'<text x="{cx}" y="{bl[1] + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[1]} {unit}</text>'
         svg += f'<text x="{tr[0] + 15}" y="{cy + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[0]} {unit}</text>'
 
-    # 🎯 สัญลักษณ์มุมฉาก (วาดให้ทั้งจัตุรัสและผืนผ้า)
-    s = 12 # ขนาดของสัญลักษณ์มุมฉาก
+    s = 12 
     svg += f'<polyline points="{tl[0]},{tl[1]+s} {tl[0]+s},{tl[1]+s} {tl[0]+s},{tl[1]}" fill="none" stroke="#2c3e50" stroke-width="2"/>'
     svg += f'<polyline points="{tr[0]-s},{tr[1]} {tr[0]-s},{tr[1]+s} {tr[0]},{tr[1]+s}" fill="none" stroke="#2c3e50" stroke-width="2"/>'
     svg += f'<polyline points="{br[0]},{br[1]-s} {br[0]-s},{br[1]-s} {br[0]-s},{br[1]}" fill="none" stroke="#2c3e50" stroke-width="2"/>'
@@ -493,52 +413,41 @@ def draw_p4_rectangle_area_svg(shape_type, sides, unit="ซม."):
             {svg}
         </div></div>'''
 
-
-
-
 def draw_p4_parallelogram_rhombus_svg(shape_type, sides, unit="วา"):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 125
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
     if shape_type == "rhombus":
-        # 📐 สี่เหลี่ยมขนมเปียกปูน: ปรับสูตรคำนวณพิกัดใหม่ให้ด้านทั้ง 4 ยาว 120 pixels เท่ากันเป๊ะ!
         tl, tr = (cx - 30, cy - 52), (cx + 90, cy - 52)
         bl, br = (cx - 90, cy + 52), (cx + 30, cy + 52)
         
         pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
         svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
         
-        # 🎯 ขีด 1 ขีดทุกด้านให้ "ตั้งฉาก" กับเส้นขอบพอดี
-        # ด้านบน-ล่างเป็นแนวนอน (0 องศา) / ด้านข้างเอียง (-60 องศา)
         sides_to_tick = [(tl, tr, 0), (tr, br, -60), (br, bl, 0), (bl, tl, -60)]
         for p1, p2, angle in sides_to_tick:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
             svg += f'<line x1="{mx}" y1="{my-8}" x2="{mx}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
         
-        # วางตัวเลขให้ตรงกึ่งกลางของฐานด้านล่างพอดีเป๊ะ
         svg += f'<text x="{cx - 30}" y="{cy + 85}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
 
     else: 
-        # 📐 สี่เหลี่ยมด้านขนาน: ฐานยาว 160 pixels, ด้านเอียงยาว 90 pixels
         tl, tr = (cx - 57.5, cy - 39), (cx + 102.5, cy - 39)
         bl, br = (cx - 102.5, cy + 39), (cx + 57.5, cy + 39)
         
         pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
         svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
         
-        # คู่บน-ล่าง (แนวนอน, 2 ขีด)
         for p1, p2 in [(tl, tr), (br, bl)]:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
             svg += f'<line x1="{mx-3}" y1="{my-8}" x2="{mx-3}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>'
             svg += f'<line x1="{mx+3}" y1="{my-8}" x2="{mx+3}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round"/>'
         
-        # คู่ซ้าย-ขวา (เอียง, 1 ขีด) ปรับมุมขีดให้ตั้งฉากกับเส้นเอียง (-60 องศา)
         for p1, p2 in [(tr, br), (bl, tl)]:
             mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
             svg += f'<line x1="{mx}" y1="{my-8}" x2="{mx}" y2="{my+8}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round" transform="rotate(-60, {mx}, {my})"/>'
 
-        # 🎯 ขยับตัวเลขให้อ่านง่าย: ตัวเลขด้านล่างอยู่กึ่งกลางฐาน / ตัวเลขด้านข้างขยับออกไปพ้นแนวเส้น
         svg += f'<text x="{cx - 22.5}" y="{cy + 75}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
         svg += f'<text x="{cx + 100}" y="{cy + 5}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
 
@@ -548,46 +457,21 @@ def draw_p4_parallelogram_rhombus_svg(shape_type, sides, unit="วา"):
             {svg}
         </div></div>'''
 
-
-def draw_angle_svg(angle_type, degree):
-    # ... โค้ดเดิมของคุณ ...
-    pass
-
-def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
-    # --- วางฟังก์ชันใหม่ตรงนี้ ---
-    svg_w, svg_h = 450, 250
-    # ... (โค้ดที่ผมให้ไปด้านบน) ...
-    return f'''<div style="...">...</div>'''
-
-def draw_grid_counting_svg(grid_data):
-    # ... ฟังก์ชันอื่นๆ ...
-    pass
-
-
-
-
-import math # อย่าลืม import math ที่บรรทัดบนสุดของไฟล์นะครับ!
-
 def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
     svg_w, svg_h = 450, 250
     cx, cy = 225, 125 
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
     if triangle_type == "right_angled":
-        # 📐 สามเหลี่ยมมุมฉาก (จัดกึ่งกลางสมมาตร)
-        # มุมฉากอยู่ที่ (160, 190), ยอดอยู่ที่ (160, 70), ปลายฐานอยู่ที่ (300, 190)
         p_right, p_top, p_base = (160, 190), (160, 70), (300, 190)
         pts = f"{p_right[0]},{p_right[1]} {p_top[0]},{p_top[1]} {p_base[0]},{p_base[1]}"
         svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
-        # วาดสัญลักษณ์มุมฉาก
         s = 15
         svg += f'<polyline points="{p_right[0]},{p_right[1]-s} {p_right[0]+s},{p_right[1]-s} {p_right[0]+s},{p_right[1]}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
-        # ตัวเลขกำกับ 3 ด้าน
-        svg += f'<text x="150" y="130" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[0]} {unit}</text>' # ด้านสูง
-        svg += f'<text x="230" y="215" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[1]} {unit}</text>' # ฐาน
-        svg += f'<text x="245" y="120" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[2]} {unit}</text>' # ด้านเอียง
+        svg += f'<text x="150" y="130" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[0]} {unit}</text>' 
+        svg += f'<text x="230" y="215" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[1]} {unit}</text>' 
+        svg += f'<text x="245" y="120" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[2]} {unit}</text>' 
     else:
-        # --- สามเหลี่ยมแบบเดิม (หน้าจั่ว/ด้านเท่า/ด้านไม่เท่า) ---
         t, l, r = (cx, cy - 80), (cx - 100, cy + 70), (cx + 100, cy + 70)
         pts = f"{t[0]},{t[1]} {l[0]},{l[1]} {r[0]},{r[1]}"
         svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
@@ -605,7 +489,7 @@ def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
                 svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
             svg += f'<text x="{cx}" y="{cy + 100}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
             svg += f'<text x="{cx - 105}" y="{cy + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[1]} {unit}</text>'
-        else: # scalene
+        else: 
             svg += f'<text x="{cx}" y="{cy + 100}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
             svg += f'<text x="{cx - 105}" y="{cy + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[1]} {unit}</text>'
             svg += f'<text x="{cx + 105}" y="{cy + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[2]} {unit}</text>'
@@ -615,9 +499,6 @@ def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
         <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             {svg}
         </div></div>'''
-
-
-
 
 def generate_decimal_vertical_html(a, b, op, is_key=False):
     str_a, str_b = f"{a:.2f}", f"{b:.2f}"
@@ -847,7 +728,8 @@ def generate_thai_number_text(num_str):
     int_text = read_int(parts[0])
     dec_text = ("จุด" + "".join([thai_nums[int(d)] for d in parts[1]])) if len(parts) > 1 else ""
     return int_text + dec_text
-    # ==========================================
+
+# ==========================================
 # 🌟 ฟังก์ชันวาดรูปภาพ SVG สำหรับเรขาคณิต & สมการ 🌟
 # ==========================================
 def draw_rect_svg(w_val, h_val, w_lbl, h_lbl, fill_color="#eaf2f8"):
@@ -1078,14 +960,14 @@ def draw_protractor_svg(deg1, deg2, p1_name, v_name, p2_name):
     svg += f'<line x1="{cx}" y1="{cy}" x2="{cx+arm_len*math.cos(rad1)}" y2="{cy-arm_len*math.sin(rad1)}" stroke="#e74c3c" stroke-width="1.5" stroke-linecap="round"/><line x1="{cx}" y1="{cy}" x2="{cx+arm_len*math.cos(rad2)}" y2="{cy-arm_len*math.sin(rad2)}" stroke="#e74c3c" stroke-width="1.5" stroke-linecap="round"/>'
     attr = 'font-family="sans-serif" font-size="18" font-weight="bold" fill="#c0392b" text-anchor="middle"'
     svg += f'<text x="{cx}" y="{cy+25}" {attr}>{v_name}</text>'
-    for r, n in [(rad1, p1_name), (rad2, p2_name)]:
+    for r, n in [(rad1, p2_name), (rad2, p1_name)]:
         tx, ty = cx+(arm_len+15)*math.cos(r), cy-(arm_len+15)*math.sin(r)
         ty = ty-4 if math.sin(r)>0.5 else ty+6
         svg += f'<text x="{tx}" y="{ty}" {attr}>{n}</text>'
     return svg + '</svg></div>'
 
 # ==========================================
-# ฐานข้อมูลหลักสูตร (Master Database P.4 - P.5)
+# ฐานข้อมูลหลักสูตร (Master Database ป.4)
 # ==========================================
 curriculum_db = {
     "ป.4": {
@@ -1108,11 +990,10 @@ curriculum_db = {
         ],
         "สมการ": ["การแก้สมการ (บวก/ลบ)", "การแก้สมการ (คูณ/หาร)", "สมการและตัวไม่ทราบค่าจากชีวิตประจำวัน", "สมการเชิงตรรกะและตาชั่งปริศนา", "โจทย์ปัญหาสมการ: ความสัมพันธ์ของ 2 สิ่ง"]
     },
-    
 }
 
 # ==========================================
-# 3. Logic & Dynamic Difficulty Scaling (P.4 - P.5)
+# 3. Logic & Dynamic Difficulty Scaling (P.4)
 # ==========================================
 def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
     questions, seen = [], set()
@@ -1138,8 +1019,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"จงเขียนคำอ่าน <b>\"{thai_text}\"</b> เป็นตัวเลขฮินดูอารบิก"
                     sol = f"<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>👉 แปลงจากคำอ่านเป็นตัวเลขทีละหลัก และอย่าลืมใส่เครื่องหมายจุลภาค (,)<br><b>ตอบ: {num:,}</b></span>"
 
-
-
             elif actual_sub_t == "หลัก ค่าประจำหลัก และรูปกระจาย":
                 num = random.randint(100000, 9999999) if not is_challenge else random.randint(10000000, 999999999)
                 num_str = str(num)
@@ -1158,8 +1037,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"จากจำนวน <b>{num:,}</b> เลขโดด <b>{target_digit}</b> (ตัวที่ขีดเส้นใต้) อยู่ในหลักใด และมีค่าเท่าใด?<br><span style='font-size:24px;'>{num_str[:target_idx]}<u>{target_digit}</u>{num_str[target_idx+1:]}</span>"
                     sol = f"<span style='color:#2c3e50;'><b>ตอบ: หลัก{place} มีค่า {val:,}</b></span>"
 
-
-
             elif actual_sub_t == "การเปรียบเทียบและเรียงลำดับ":
                 digits = random.randint(5, 7)
                 base, limit = 10**(digits-1), 10**digits - 1
@@ -1171,8 +1048,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 ans_list = " &nbsp; | &nbsp; ".join([f"{x:,}" for x in sorted_nums])
                 q = f"จงเรียงลำดับจำนวนต่อไปนี้จาก <b>{mode_text}</b>ให้ถูกต้อง<br><br><span style='font-size:22px; letter-spacing:1px;'>{q_list}</span>"
                 sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans_list}</b></span>"
-
-
 
             elif actual_sub_t == "ค่าประมาณเป็นจำนวนเต็มสิบ เต็มร้อย เต็มพัน":
                 target = random.choice(["สิบ", "ร้อย", "พัน"])
@@ -1189,8 +1064,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 q = f"จงหาค่าประมาณเป็น<b>จำนวนเต็ม{target}</b> ของ <b>{num:,}</b>"
                 sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans:,}</b></span>"
 
-
-                
             elif actual_sub_t in ["การบวก (แบบตั้งหลัก)", "การลบ (แบบตั้งหลัก)", "การคูณ (แบบตั้งหลัก)"]:
                 if actual_sub_t == "การบวก (แบบตั้งหลัก)":
                     a, b = random.randint(100000, 999999), random.randint(100000, 999999)
@@ -1207,13 +1080,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 q = f"จงหาผลลัพธ์ของ <b>{a:,} {op} {b:,}</b><br>{table_html}"
                 sol = f"<span style='color:#2c3e50;'>{table_key}</span>"
 
-
-
             elif actual_sub_t in ["การหารยาวแบบลงตัว", "การหารยาวแบบไม่ลงตัว"]:
                 divisor = random.randint(2, 9) if not is_challenge else random.randint(11, 99)
                 quotient = random.randint(1000, 9999)
                 
-                # 💡 กำหนดเงื่อนไขเศษให้ตรงกับหัวข้อ
                 if actual_sub_t == "การหารยาวแบบลงตัว":
                     remainder = 0
                 else:
@@ -1229,13 +1099,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 ans_txt = f"{quotient:,}" if remainder == 0 else f"{quotient:,} เศษ {remainder:,}"
                 sol = f"<span style='color:#2c3e50;'>{table_key}<br><b>ตอบ: {ans_txt}</b></span>"
 
-
-
             elif actual_sub_t == "การบอกชนิดของมุม":
                 l_pool = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
                 p1, v, p2 = random.sample(l_pool, 3)
                 
-                # 🎨 สร้างสัญลักษณ์มุม (หมวกสีแดง) ไว้บนอักษรตัวกลาง
                 hat_v = f"<span style='position:relative; display:inline-block;'>{v}<span style='position:absolute; top:-12px; left:50%; transform:translateX(-50%); color:#e74c3c; font-weight:normal; font-size:22px;'>^</span></span>"
                 angle_name_display = f"{p1}{hat_v}{p2}"
                 
@@ -1254,13 +1121,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 q = f"จากรูป มุม <b>{angle_name_display}</b> ที่มีขนาด <b>{angle}°</b> คือมุมชนิดใด?<br>{svg_html}<span style='font-size:18px; color:#7f8c8d;'>(มุมแหลม, มุมฉาก, มุมป้าน, มุมตรง, มุมกลับ)</span>"
                 sol = f"<span style='color:#2c3e50;'><b>ตอบ: {angle_type}</b></span>"
 
-
-
             elif actual_sub_t == "การวัดขนาดของมุม (ไม้โปรแทรกเตอร์)":
                 l_pool = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
                 p1, v, p2 = random.sample(l_pool, 3)
                 
-                # 🎨 สร้างสัญลักษณ์มุม (หมวกสีแดง) ไว้บนอักษรตัวกลาง
                 hat_v = f"<span style='position:relative; display:inline-block;'>{v}<span style='position:absolute; top:-12px; left:50%; transform:translateX(-50%); color:#e74c3c; font-weight:normal; font-size:22px;'>^</span></span>"
                 angle_name_display = f"{p1}{hat_v}{p2}"
                 
@@ -1279,10 +1143,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"มุมบนเส้นตรงรวมกันได้ 180 องศา ถ้ามุมหนึ่งกาง <b>{180-ans}°</b> จงหาขนาดของมุม <b>x</b> ที่เหลือ?"
                     sol = f"<span style='color:#2c3e50;'><b>ตอบ: {ans}°</b></span>"
 
-
-
             elif actual_sub_t == "การสร้างมุมตามขนาดที่กำหนด":
-                # 🚫 ระบบคัดกรองคำต้องห้ามสำหรับเด็ก
                 bad_words = ["KUY", "KVY", "FUG", "FUQ", "FUC", "FUK", "SUK", "SUC", "CUM", "DIC", "DIK", "SEX", "ASS", "TIT", "FAP", "GAY", "PEE", "POO", "WTF", "BUM", "DOG", "PIG", "FAT", "SAD", "BAD", "MAD", "DIE", "RIP", "SOB"]
                 
                 while True:
@@ -1292,14 +1153,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     if angle_name not in bad_words and angle_name_rev not in bad_words:
                         break
                         
-                # 🎨 สร้างสัญลักษณ์มุม (หมวกสีแดง) ไว้บนอักษรตัวกลาง
                 hat_v = f"<span style='position:relative; display:inline-block;'>{v}<span style='position:absolute; top:-12px; left:50%; transform:translateX(-50%); color:#e74c3c; font-weight:normal; font-size:22px;'>^</span></span>"
                 angle_name_display = f"{p1}{hat_v}{p2}"
 
-                # 💡 สุ่มมุมองศาแบบละเอียด (20 ถึง 160 องศา) เพื่อให้ได้ตัวเลขเช่น 32, 47, 59
                 target_deg = random.randint(20, 160)
                 
-                # 📐 SVG สำหรับโจทย์ (จัดกึ่งกลางและมีกรอบจางๆ ให้ดูเป็นข้อสอบมาตรฐานแข่งขัน)
                 svg = f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
                     <div style="border: 1px solid #bdc3c7; border-radius: 8px; padding: 20px; background-color: #fdfefe; box-shadow: 2px 2px 5px rgba(0,0,0,0.05);">
                         <svg width="400" height="150">
@@ -1316,12 +1174,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     </div>
                 </div>'''
                 
-                # 📐 SVG สำหรับเฉลย (ไม้โปรแทรกเตอร์โปร่งใส + เส้นลากมุมสีแดง + ส่วนโค้งมุม)
                 cx, cy = 280, 220
                 r_out, r_in = 140, 100
                 svg_sol = '<div style="text-align:center; margin:15px 0;"><svg width="560" height="260">'
                 
-                # วาดไม้โปรแทรกเตอร์สีจางๆ เป็นพื้นหลัง
                 svg_sol += f'<path d="M {cx-r_out-15} {cy} A {r_out+15} {r_out+15} 0 0 1 {cx+r_out+15} {cy} Z" fill="#eef2f5" stroke="#bdc3c7" stroke-width="1.5" opacity="0.6"/>'
                 svg_sol += f'<path d="M {cx-r_out} {cy} A {r_out} {r_out} 0 0 1 {cx+r_out} {cy} Z" fill="none" stroke="#7f8c8d" stroke-width="1" opacity="0.6"/>'
                 svg_sol += f'<line x1="{cx-r_out-15}" y1="{cy}" x2="{cx+r_out+15}" y2="{cy}" stroke="#95a5a6" stroke-width="1.5" opacity="0.6"/>'
@@ -1334,22 +1190,18 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         tx_in, ty_in = cx + (r_in+15)*cos_a, cy - (r_in+15)*sin_a
                         svg_sol += f'<text x="{tx_in}" y="{ty_in+3}" font-family="sans-serif" font-size="9" fill="#7f8c8d" text-anchor="middle" opacity="0.8">{idx}</text>'
 
-                # วาดแขนของมุมตามองศาเป้าหมาย
                 rad = math.radians(target_deg)
                 end_x, end_y = cx + 180 * math.cos(rad), cy - 180 * math.sin(rad)
                 svg_sol += f'<line x1="{cx}" y1="{cy}" x2="{cx+180}" y2="{cy}" stroke="#34495e" stroke-width="2.5"/>'
                 
-                # 🎯 ปรับลดขนาดเส้นสีแดงลงเหลือ 1.5 
                 svg_sol += f'<line x1="{cx}" y1="{cy}" x2="{end_x}" y2="{end_y}" stroke="#e74c3c" stroke-width="1.5" stroke-linecap="round"/>'
                 svg_sol += f'<circle cx="{cx}" cy="{cy}" r="4" fill="#2c3e50"/><circle cx="{cx+180}" cy="{cy}" r="3" fill="#2c3e50"/><circle cx="{end_x}" cy="{end_y}" r="4" fill="#e74c3c"/>'
                 
-                # ใส่ตัวอักษรกำกับจุด
                 svg_sol += f'<text x="{cx-5}" y="{cy+20}" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{v}</text>'
                 svg_sol += f'<text x="{cx+195}" y="{cy+5}" font-family="sans-serif" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{p2}</text>'
                 tx_p1, ty_p1 = cx + 200 * math.cos(rad), cy - 200 * math.sin(rad)
                 svg_sol += f'<text x="{tx_p1}" y="{ty_p1+5}" font-family="sans-serif" font-size="18" font-weight="bold" fill="#e74c3c" text-anchor="middle">{p1}</text>'
                 
-                # วาดเส้นโค้งระบุมุม
                 arc_r = 45
                 arc_end_x, arc_end_y = cx + arc_r * math.cos(rad), cy - arc_r * math.sin(rad)
                 large_arc = 1 if target_deg > 180 else 0
@@ -1364,15 +1216,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 a_type = "มุมแหลม" if target_deg < 90 else "มุมฉาก" if target_deg == 90 else "มุมป้าน"
                 sol = f"<span style='color:#2c3e50;'><b>เฉลย:</b> สร้างมุมกาง {target_deg}° (จัดเป็น <b>{a_type}</b>)<br>{svg_sol}</span>"
 
-
-
             elif actual_sub_t == "การหาความยาวรอบรูปสี่เหลี่ยมมุมฉาก":
                 is_square = random.choice([True, False])
                 units = random.choice(["ซม.", "ม.", "มม.", "นิ้ว", "วา"])
                 
-                # ฟังก์ชันวาดสี่เหลี่ยมสไตล์ข้อสอบ (ขยาย Canvas ป้องกันข้อความแหว่ง)
                 def draw_exam_rect(w_real, h_real, w_text, h_text, is_sq):
-                    # 🛠️ ขยายขนาด Canvas ให้กว้างและสูงขึ้น (450x250)
                     svg_w, svg_h = 450, 250
                     draw_w = 160 if is_sq else 240
                     draw_h = 160 if is_sq else 120
@@ -1380,17 +1228,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     oy = (svg_h - draw_h) / 2
                     
                     svg = f'<svg width="{svg_w}" height="{svg_h}">'
-                    # วาดรูปสี่เหลี่ยม
                     svg += f'<rect x="{ox}" y="{oy}" width="{draw_w}" height="{draw_h}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
                     
-                    # วาดสัญลักษณ์มุมฉาก 4 มุม
-                    s = 12 # ขนาดสัญลักษณ์มุมฉาก
+                    s = 12 
                     svg += f'<polyline points="{ox},{oy+s} {ox+s},{oy+s} {ox+s},{oy}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += f'<polyline points="{ox+draw_w-s},{oy} {ox+draw_w-s},{oy+s} {ox+draw_w},{oy+s}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += f'<polyline points="{ox},{oy+draw_h-s} {ox+s},{oy+draw_h-s} {ox+s},{oy+draw_h}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += f'<polyline points="{ox+draw_w-s},{oy+draw_h} {ox+draw_w-s},{oy+draw_h-s} {ox+draw_w},{oy+draw_h-s}" fill="none" stroke="#2c3e50" stroke-width="1.5"/>'
                     
-                    # ขีดแสดงความยาวด้านเท่ากัน
                     tick_len = 8
                     mid_top_x, mid_top_y = ox + draw_w/2, oy
                     mid_bot_x, mid_bot_y = ox + draw_w/2, oy + draw_h
@@ -1398,13 +1243,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     mid_r_x, mid_r_y = ox + draw_w, oy + draw_h/2
                     
                     if is_sq:
-                        # 1 ขีด ทุกด้าน (สีแดง)
                         svg += f'<line x1="{mid_top_x}" y1="{mid_top_y-tick_len}" x2="{mid_top_x}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
                         svg += f'<line x1="{mid_bot_x}" y1="{mid_bot_y-tick_len}" x2="{mid_bot_x}" y2="{mid_bot_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
                         svg += f'<line x1="{mid_l_x-tick_len}" y1="{mid_l_y}" x2="{mid_l_x+tick_len}" y2="{mid_l_y}" stroke="#e74c3c" stroke-width="2"/>'
                         svg += f'<line x1="{mid_r_x-tick_len}" y1="{mid_r_y}" x2="{mid_r_x+tick_len}" y2="{mid_r_y}" stroke="#e74c3c" stroke-width="2"/>'
                     else:
-                        # 1 ขีดด้านกว้าง(น้ำเงิน), 2 ขีดด้านยาว(แดง) แนวนอนคือด้านยาว
                         svg += f'<line x1="{mid_top_x-4}" y1="{mid_top_y-tick_len}" x2="{mid_top_x-4}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
                         svg += f'<line x1="{mid_top_x+4}" y1="{mid_top_y-tick_len}" x2="{mid_top_x+4}" y2="{mid_top_y+tick_len}" stroke="#e74c3c" stroke-width="2"/>'
                         
@@ -1414,7 +1257,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         svg += f'<line x1="{mid_l_x-tick_len}" y1="{mid_l_y}" x2="{mid_l_x+tick_len}" y2="{mid_l_y}" stroke="#3498db" stroke-width="2"/>'
                         svg += f'<line x1="{mid_r_x-tick_len}" y1="{mid_r_y}" x2="{mid_r_x+tick_len}" y2="{mid_r_y}" stroke="#3498db" stroke-width="2"/>'
 
-                    # ข้อความกำกับความยาว (ขยับออกห่างกรอบนิดหน่อย และขยาย Canvas ทำให้ตัวหนังสือไม่แหว่ง)
                     svg += f'<text x="{mid_bot_x}" y="{mid_bot_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="middle">{w_text}</text>'
                     svg += f'<text x="{mid_r_x + 15}" y="{mid_r_y + 6}" font-family="Sarabun" font-size="18" font-weight="bold" fill="#2c3e50" text-anchor="start">{h_text}</text>'
                     
@@ -1444,12 +1286,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 else:
                     w = random.randint(15, 85)
                     h = w + random.randint(12, 60)
-                    # สลับแกนให้กว้าง-ยาวสุ่มไปมาบ้าง
                     if random.choice([True, False]):
                         w, h = h, w
                         
                     peri = 2 * (w + h)
-                    # กำหนดให้วาดด้านยาวเป็นแกนนอนเสมอเพื่อความสวยงามสมมาตร
                     if w > h:
                         svg = draw_exam_rect(w, h, f"{w} {units}", f"{h} {units}", is_sq=False)
                     else:
@@ -1468,15 +1308,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 นำผลบวกไปคูณ 2: 2 × {w+h} = <b>{peri:,}</b><br><br>
                     <b>ตอบ: ความยาวรอบรูปคือ {peri:,} {units}</b></span>"""
 
-
-
             elif actual_sub_t == "การหาความยาวรอบรูปสามเหลี่ยม":
                 unit = random.choice(["ซม.", "ม.", "วา"])
-                # สุ่มโหมดของสามเหลี่ยม (4 แบบ)
                 tri_mode = random.choice(["equilateral", "isosceles", "scalene", "right_angled"])
                 
                 if tri_mode == "right_angled":
-                    # --- สามเหลี่ยมมุมฉาก ---
                     a, b = random.randint(3, 12)*10, random.randint(3, 12)*10
                     c = int(math.hypot(a, b))
                     peri = a + b + c
@@ -1489,7 +1325,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: ความยาวรอบรูปคือ {peri} {unit}</b></span>"""
                 
                 elif tri_mode == "equilateral":
-                    # --- สามเหลี่ยมด้านเท่า ---
                     side = random.randint(15, 120)
                     peri = side * 3
                     svg = draw_p4_triangle_perimeter_svg("equilateral", [side], unit)
@@ -1503,7 +1338,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: ความยาวรอบรูปคือ {peri} {unit}</b></span>"""
                 
                 elif tri_mode == "isosceles":
-                    # --- สามเหลี่ยมหน้าจั่ว ---
                     base = random.randint(20, 90)
                     leg = random.randint(50, 140)
                     peri = base + (leg * 2)
@@ -1515,18 +1349,15 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 รวมกับฐาน {base} {unit} ➔ {base} + {leg} + {leg} = <b>{peri} {unit}</b><br><br>
                     <b>ตอบ: ความยาวรอบรูปคือ {peri} {unit}</b></span>"""
                 
-                else: # scalene (ด้านไม่เท่า)
+                else: 
                     s1, s2, s3 = random.randint(30, 60), random.randint(40, 70), random.randint(50, 80)
                     peri = s1 + s2 + s3
                     svg = draw_p4_triangle_perimeter_svg("scalene", [s1, s2, s3], unit)
                     q = f"จงหาความยาวรอบรูปของรูปสามเหลี่ยมที่มีความยาวแต่ละด้านตามที่กำหนดให้<br>{svg}"
                     sol = f"<span style='color:#2c3e50;'><b>วิธีทำ:</b> {s1} + {s2} + {s3} = <b>{peri} {unit}</b></span>"
 
-
-
             elif actual_sub_t == "การหาความยาวรอบรูปสี่เหลี่ยมด้านขนานและขนมเปียกปูน":
                 unit = random.choice(["ซม.", "ม.", "วา"])
-                # สุ่มเลือกระหว่าง ด้านขนาน หรือ ขนมเปียกปูน
                 mode = random.choice(["parallelogram", "rhombus"])
                 
                 if mode == "rhombus":
@@ -1546,7 +1377,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 <b>ขั้นที่ 3:</b> หาผลลัพธ์ ➔ {side} × 4 = <b>{peri} {unit}</b><br><br>
                     <b>ตอบ: ความยาวรอบรูปของรูปสี่เหลี่ยมขนมเปียกปูนคือ {peri} {unit}</b></span>"""
                 
-                else: # parallelogram
+                else: 
                     base = random.randint(40, 150)
                     side_slope = random.randint(20, 80)
                     peri = (base + side_slope) * 2
@@ -1565,12 +1396,9 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <i>(หรือใช้สูตร 2 × (กว้าง + ยาว) ➔ 2 × ({base} + {side_slope}) = <b>{peri}</b>)</i><br><br>
                     <b>ตอบ: ความยาวรอบรูปของรูปสี่เหลี่ยมด้านขนานคือ {peri} {unit}</b></span>"""
 
-
             elif actual_sub_t == "การหาความยาวรอบรูปสี่เหลี่ยมรูปว่าว":
-                # เพิ่มความหลากหลายของหน่วย
                 unit = random.choice(["ซม.", "ม.", "นิ้ว", "วา"])
                 
-                # สุ่มความยาวด้าน โดยบังคับให้ด้านล่างยาวกว่าด้านบนเสมอ เพื่อความสมจริง
                 s1 = random.randint(15, 60)
                 s2 = random.randint(s1 + 12, s1 + 80)
                 peri = 2 * (s1 + s2)
@@ -1591,14 +1419,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 <i>(หรือคำนวณจากสูตร: 2 × (ความยาวด้านสั้น + ความยาวด้านยาว) ➔ 2 × ({s1} + {s2}) = <b>{peri}</b>)</i><br><br>
                 <b>ตอบ: ความยาวรอบรูปของรูปสี่เหลี่ยมรูปว่าวนี้คือ {peri} {unit}</b></span>"""
 
-
-
             elif actual_sub_t == "การหาพื้นที่รูปสี่เหลี่ยมมุมฉาก":
                 unit = random.choice(["ซม.", "ม.", "วา"])
                 mode = random.choice(["square", "rectangle"])
                 
                 if mode == "square":
-                    # สุ่มเลขจัตุรัส
                     side = random.randint(12, 45)
                     area = side * side
                     
@@ -1616,8 +1441,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 <b>ขั้นที่ 3:</b> คำนวณผลคูณ ➔ {side} × {side} = <b>{area:,}</b><br><br>
                     <b>ตอบ: พื้นที่ของรูปสี่เหลี่ยมจัตุรัสคือ {area:,} ตาราง{unit.replace('.','')}</b></span>"""
                 
-                else: # rectangle
-                    # สุ่มเลขผืนผ้า (ด้านกว้าง ต้องสั้นกว่า ด้านยาวเสมอ)
+                else: 
                     width = random.randint(10, 35)
                     length = random.randint(width + 5, width + 50)
                     area = width * length
@@ -1636,20 +1460,16 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     👉 <b>ขั้นที่ 3:</b> คำนวณผลคูณ ➔ {width} × {length} = <b>{area:,}</b><br><br>
                     <b>ตอบ: พื้นที่ของรูปสี่เหลี่ยมผืนผ้าคือ {area:,} ตาราง{unit.replace('.','')}</b></span>"""
 
-
-
             elif actual_sub_t == "การหาพื้นที่รูปสามเหลี่ยม (พื้นฐาน)":
                 unit = random.choice(["ซม.", "ม.", "วา"])
                 tri_type = random.choice(["right", "isosceles", "scalene"])
                 
-                # 🎯 สุ่มตัวเลข: บังคับให้ ฐาน เป็นเลขคู่เสมอ เพื่อให้ ป.4 หาร 2 แล้วลงตัว (ไม่ติดทศนิยม)
                 base = random.randint(6, 30) * 2 
                 height = random.randint(8, 45)
                 area = (base * height) // 2
                 
                 svg = draw_p4_triangle_area_svg(tri_type, base, height, unit)
                 
-                # เปลี่ยนคำบรรยายโจทย์ตามประเภทรูป
                 if tri_type == "right":
                     q = f"พิจารณารูป<b>สามเหลี่ยมมุมฉาก</b>ที่กำหนดให้ จงหา<b>พื้นที่</b>ของรูปสามเหลี่ยมนี้<br>{svg}"
                 else:
@@ -1668,13 +1488,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 👉 <b>ขั้นที่ 4:</b> คำนวณผลคูณ ➔ {base//2} × {height} = <b>{area:,}</b><br><br>
                 <b>ตอบ: พื้นที่ของรูปสามเหลี่ยมนี้คือ {area:,} ตาราง{unit.replace('.','')}</b></span>"""
 
-
-
             elif actual_sub_t == "การหาพื้นที่สี่เหลี่ยมด้านขนานและขนมเปียกปูน (พื้นฐาน)":
                 unit = random.choice(["ซม.", "ม.", "วา"])
                 mode = random.choice(["parallelogram", "rhombus"])
                 
-                # สุ่มตัวเลข ฐาน และ สูง
                 base = random.randint(15, 60)
                 height = random.randint(10, base - 2) if base > 12 else random.randint(10, 30)
                 area = base * height
@@ -1697,14 +1514,11 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 👉 <b>ขั้นที่ 3:</b> คำนวณผลคูณ ➔ {base} × {height} = <b>{area:,}</b><br><br>
                 <b>ตอบ: พื้นที่ของรูปสี่เหลี่ยมนี้คือ {area:,} ตาราง{unit.replace('.','')}</b></span>"""
 
-
-
             elif actual_sub_t == "การหาพื้นที่โดยการนับตาราง":
                 unit = random.choice(["ตร.ซม.", "ตร.ม.", "ตารางหน่วย"])
                 shapes_list = ["L", "T", "U", "Plus", "Stair", "Rectangle"]
                 choice = random.choice(shapes_list)
 
-                # กำหนดสีที่จะใช้ในเฉลย
                 c_blue, c_red, c_green = "#3498db", "#e74c3c", "#2ecc71"
 
                 if choice == "Rectangle":
@@ -1759,14 +1573,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     area = col1 + col2 + col3
                     calc_steps = f"แบ่งรูปขั้นบันไดเป็นแท่งแนวตั้ง 3 แท่ง:<br>👉 <b style='color:{c_blue};'>แท่งที่ 1 (สีฟ้า):</b> กว้าง {step_w} × ยาว {3*step_h} = {col1} ช่อง<br>👉 <b style='color:{c_red};'>แท่งที่ 2 (สีแดง):</b> กว้าง {step_w} × ยาว {2*step_h} = {col2} ช่อง<br>👉 <b style='color:{c_green};'>แท่งที่ 3 (สีเขียว):</b> กว้าง {step_w} × ยาว {step_h} = {col3} ช่อง<br>👉 นำพื้นที่มารวมกัน = {col1} + {col2} + {col3} = <b>{area}</b> ช่อง"
 
-                # ขยับรูปโจทย์ให้อยู่กึ่งกลาง
                 max_x = max(p[0] for p in pts)
                 max_y = max(p[1] for p in pts)
                 offset_x = (14 - max_x) // 2
                 offset_y = (8 - max_y) // 2
                 final_pts = [(p[0]+offset_x, p[1]+offset_y) for p in pts]
 
-                # สร้างภาพโจทย์ (สีเดียว) และภาพเฉลย (แยกสี)
                 svg_q = draw_p4_grid_area_svg(final_pts, unit)
                 svg_sol = draw_p4_grid_area_solution_svg(rects, unit)
 
@@ -1782,24 +1594,16 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 {calc_steps}<br><br>
                 <b>ตอบ: พื้นที่ของรูประบายสีคือ {area} {unit}</b></span>"""
 
-
-
-
             elif actual_sub_t == "โจทย์ปัญหาเรขาคณิต (รั้วและพื้นที่ชีวิตจริง)":
-                # สุ่มจาก 6 สถานการณ์ (รอบรูป 3 แบบ, พื้นที่ 3 แบบ)
                 scenario_list = ["fence", "running", "frame", "tile", "carpet", "paint"]
                 scenario = random.choice(scenario_list)
                 shape_type = random.choice(["square", "rectangle"])
                 
                 c_blue, c_red = "#3498db", "#e74c3c"
                 
-                # กำหนดหน่วยตามความสมเหตุสมผล
                 unit = "ซม." if scenario in ["frame", "carpet"] else "ม."
                 
                 if scenario in ["fence", "running", "frame"]:
-                    # ==========================================
-                    # กลุ่มความยาวรอบรูป (Perimeter)
-                    # ==========================================
                     if shape_type == "square":
                         side = random.randint(15, 60)
                         perimeter = side * 4
@@ -1871,9 +1675,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {ans_text}</b></span>"""
 
                 else:
-                    # ==========================================
-                    # กลุ่มพื้นที่ (Area)
-                    # ==========================================
                     if shape_type == "square":
                         side = random.randint(5, 20)
                         area = side * side
@@ -1931,11 +1732,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;คิดเป็นเงิน = <b style='color:#27ae60;'>{ans:,}</b> บาท<br><br>
                     <b>ตอบ: จะต้องจ่ายเงินทั้งหมด {ans:,} บาท</b></span>"""
 
-
-
-
-            elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":
-                # สุ่มเลขเศษเกิน
+elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":
                 den = random.randint(3, 12)
                 whole = random.randint(1, 9)
                 rem = random.randint(1, den - 1)
@@ -1964,19 +1761,14 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 &nbsp;&nbsp;&nbsp;&nbsp;• ตัวส่วนคงเดิมคือ <b>{den}</b><br><br>
                 <b>ตอบ: <span style='font-size:20px;'><b style='color:#e67e22;'>{whole}</b>{draw_frac(f"<b style='color:#e74c3c;'>{rem}</b>", den)}</span></b></span>"""
 
-
-
             elif actual_sub_t == "การอ่านและการเขียนทศนิยม":
-                # สุ่มทศนิยม 2 หรือ 3 ตำแหน่ง
                 val = round(random.uniform(10.01, 99.999), random.choice([2, 3]))
                 val_str = f"{val:.3f}" if len(str(val).split('.')[1]) == 3 else f"{val:.2f}"
                 
-                # แยกหลักต่างๆ
                 whole_part, dec_part = val_str.split('.')
                 
                 q = f"ให้นักเรียนเขียนคำอ่าน และเขียนในรูปกระจายของทศนิยมต่อไปนี้: <b>{val_str}</b>"
                 
-                # ฟังก์ชันเขียนคำอ่าน (แบบย่อสำหรับระบบสุ่ม)
                 reading_map = {"0":"ศูนย์", "1":"หนึ่ง", "2":"สอง", "3":"สาม", "4":"สี่", "5":"ห้า", "6":"หก", "7":"เจ็ด", "8":"แปด", "9":"เก้า"}
                 read_whole = "".join([reading_map[d] for d in whole_part])
                 
@@ -1995,18 +1787,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                 &nbsp;&nbsp;&nbsp;&nbsp;{whole_part[0]}0 + {whole_part[1]} + 0.{dec_part[0]} + 0.0{dec_part[1]} {"+ 0.00" + dec_part[2] if len(dec_part)==3 else ""}<br><br>
                 💡 <i>หมายเหตุ: การกระจายช่วยให้เราเข้าใจว่าเลขแต่ละตัวมีค่าเท่าไหร่ตามตำแหน่งของมัน</i></span>"""
 
-
-
             elif actual_sub_t == "การบวกเศษส่วน":
-                
-                # สุ่มรูปแบบโจทย์ (1: วงกลมแบ่งส่วน, 2: แถบสี่เหลี่ยม, 3: ตารางเงื่อนไข)
                 prob_style = random.choice([1, 2, 3])
                 
-                # ฟังก์ชันช่วยวาดตัวเลขเศษส่วน
                 def draw_frac(n, d):
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
                 
-                # ฟังก์ชันวาดวงกลมเศษส่วน (มีเส้นแบ่งส่วนชัดเจน)
                 def draw_svg_pie(n, d, color="#2ecc71"):
                     if d == 1 or n == d:
                         return f'<svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="{color}" stroke="#2c3e50" stroke-width="2"/></svg>'
@@ -2026,12 +1812,10 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         y2 = 40 + 38 * math.sin(r2)
                         fill = color if i < n else "none"
                         la = 1 if (end_a - start_a) > 180 else 0
-                        # วาดชิ้นส่วนแต่ละชิ้นพร้อมเส้นขอบ
                         svg += f'<path d="M 40 40 L {x1} {y1} A 38 38 0 {la} 1 {x2} {y2} Z" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += '</svg>'
                     return svg
 
-                # ฟังก์ชันวาดแถบสี่เหลี่ยมเศษส่วน (มีเส้นแบ่งช่องชัดเจน)
                 def draw_svg_rect(n, d, color="#9b59b6"):
                     svg = f'<svg width="120" height="40" viewBox="0 0 120 40">'
                     w = 120 / d
@@ -2042,7 +1826,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return svg
 
                 if prob_style == 1:
-                    # แบบที่ 1: แผนภาพวงกลม (ตัวส่วนเท่ากัน)
                     d = random.choice([4, 6, 8, 10, 12])
                     n1 = random.randint(1, d-1)
                     n2 = random.randint(1, d-1)
@@ -2080,7 +1863,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
                 elif prob_style == 2:
-                    # แบบที่ 2: แถบสี่เหลี่ยม (ตัวส่วนไม่เท่ากัน)
                     d1 = random.choice([2, 3, 4])
                     m = random.choice([2, 3])
                     d2 = d1 * m
@@ -2123,7 +1905,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
                 else:
-                    # แบบที่ 3: ตารางสมมาตร (ตัวเลขล้วน ตัวส่วนไม่เท่ากัน)
                     d1 = random.choice([3, 4, 5])
                     n1 = random.randint(1, d1-1)
                     m = random.choice([2, 3, 4])
@@ -2168,18 +1949,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{sum_n} ÷ {gcd_v}", f"{d2} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
-
-
             elif actual_sub_t == "การลบเศษส่วน":
-                
-                # สุ่มรูปแบบโจทย์ (1: วงกลมแบ่งส่วน, 2: แถบสี่เหลี่ยม, 3: ตารางเงื่อนไขสมมาตร)
                 prob_style = random.choice([1, 2, 3])
                 
-                # ฟังก์ชันช่วยวาดตัวเลขเศษส่วน
                 def draw_frac(n, d):
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
                 
-                # ฟังก์ชันวาดวงกลมเศษส่วน (มีเส้นแบ่งส่วนชัดเจน)
                 def draw_svg_pie(n, d, color="#e74c3c"):
                     if d == 1 or n == d:
                         return f'<svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="{color}" stroke="#2c3e50" stroke-width="2"/></svg>'
@@ -2203,7 +1978,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     svg += '</svg>'
                     return svg
 
-                # ฟังก์ชันวาดแถบสี่เหลี่ยมเศษส่วน
                 def draw_svg_rect(n, d, color="#f39c12"):
                     svg = f'<svg width="120" height="40" viewBox="0 0 120 40">'
                     w = 120 / d
@@ -2214,10 +1988,9 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return svg
 
                 if prob_style == 1:
-                    # แบบที่ 1: แผนภาพวงกลม (ตัวส่วนเท่ากัน) ลบกัน
                     d = random.choice([4, 6, 8, 10, 12])
                     n1 = random.randint(2, d-1)
-                    n2 = random.randint(1, n1-1) # ให้ n2 น้อยกว่า n1 เสมอ จะได้ลบกันไม่ติดลบ
+                    n2 = random.randint(1, n1-1) 
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
@@ -2252,14 +2025,13 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
                 elif prob_style == 2:
-                    # แบบที่ 2: แถบสี่เหลี่ยม (ตัวส่วนไม่เท่ากัน)
                     d1 = random.choice([2, 3, 4])
                     n1 = random.randint(1, d1-1)
                     m = random.choice([2, 3, 4])
                     d2 = d1 * m
                     
-                    n1_new = n1 * m # จำนวนช่องถ้าย่อยเป็นชิ้นเล็ก
-                    n2 = random.randint(1, n1_new - 1) # ตัวลบต้องน้อยกว่าตัวตั้ง
+                    n1_new = n1 * m 
+                    n2 = random.randint(1, n1_new - 1)
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: center; align-items: center; gap: 15px; padding: 25px; background: #faf8f5; border-radius: 12px; border: 2px solid #dcd1c4; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
@@ -2296,14 +2068,13 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
                 else:
-                    # แบบที่ 3: ตารางสมมาตร (ตัวเลขล้วน ตัวส่วนไม่เท่ากัน)
                     d1 = random.choice([3, 4, 5])
                     n1 = random.randint(1, d1-1)
                     m = random.choice([2, 3, 4])
                     d2 = d1 * m
                     
                     n1_new = n1 * m
-                    n2 = random.randint(1, n1_new - 1) # เพื่อให้ A - B ไม่ติดลบ
+                    n2 = random.randint(1, n1_new - 1) 
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: space-around; gap: 15px; margin: 20px 0;">
@@ -2342,18 +2113,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{diff_n} ÷ {gcd_v}", f"{d2} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
-
-
             elif actual_sub_t == "การคูณเศษส่วน":
-                
-                # สุ่มรูปแบบโจทย์ (1: ตารางพื้นที่ซ้อนทับ, 2: เศษส่วนคูณจำนวนเต็ม, 3: ตารางเงื่อนไขสมมาตร)
                 prob_style = random.choice([1, 2, 3])
                 
-                # ฟังก์ชันช่วยวาดตัวเลขเศษส่วน
                 def draw_frac(n, d):
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
                 
-                # ฟังก์ชันวาดตารางพื้นที่ซ้อนทับ (Area Model)
                 def draw_svg_grid(n1, d1, n2, d2):
                     w, h = 120, 120
                     cw, ch = w/d1, h/d2
@@ -2361,19 +2126,18 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     for row in range(d2):
                         for col in range(d1):
                             if col < n1 and row < n2:
-                                fill = "#2ecc71" # พื้นที่ซ้อนทับ (คำตอบ)
+                                fill = "#2ecc71" 
                             elif col < n1:
-                                fill = "#a9dfbf" # แนวตั้งอย่างเดียว
+                                fill = "#a9dfbf" 
                             elif row < n2:
-                                fill = "#f9e79f" # แนวนอนอย่างเดียว
+                                fill = "#f9e79f" 
                             else:
-                                fill = "#ecf0f1" # ไม่ถูกระบาย
+                                fill = "#ecf0f1" 
                             svg += f'<rect x="{col*cw}" y="{row*ch}" width="{cw}" height="{ch}" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += '</svg>'
                     return svg
 
                 if prob_style == 1:
-                    # แบบที่ 1: แผนภาพตารางซ้อนทับ (Visual Math)
                     d1 = random.choice([3, 4, 5])
                     n1 = random.randint(1, d1-1)
                     d2 = random.choice([3, 4, 5])
@@ -2417,7 +2181,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
                 elif prob_style == 2:
-                    # แบบที่ 2: เศษส่วน คูณ จำนวนเต็ม (ตารางสมมาตร)
                     d1 = random.choice([4, 5, 6, 8, 10])
                     n1 = random.randint(1, d1-1)
                     mult_val = random.randint(2, 12)
@@ -2444,7 +2207,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     gcd_v = math.gcd(ans_n_raw, ans_d_raw)
                     ans_n, ans_d = ans_n_raw // gcd_v, ans_d_raw // gcd_v
                     
-                    # ถ้าเศษเกินส่วน ให้ทำเป็นจำนวนคละ
                     if ans_n > ans_d and ans_d != 1:
                         whole = ans_n // ans_d
                         rem = ans_n % ans_d
@@ -2480,7 +2242,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
                 else:
-                    # แบบที่ 3: เศษส่วน คูณ เศษส่วน (ตารางสมมาตร)
                     d1 = random.choice([3, 4, 5, 6])
                     n1 = random.randint(1, d1-1)
                     d2 = random.choice([3, 4, 5, 6])
@@ -2524,18 +2285,12 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         &nbsp;&nbsp;&nbsp;&nbsp;นำแม่ <b>{gcd_v}</b> มาหารทั้งเศษและส่วน: {draw_frac(f"{ans_n_raw} ÷ {gcd_v}", f"{ans_d_raw} ÷ {gcd_v}")} = <b>{ans_text}</b><br><br>"""
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
-
-
             elif actual_sub_t == "การหารเศษส่วน":
-                
-                # สุ่มรูปแบบโจทย์ (1: ภาพจำลองการแบ่งพื้นที่, 2: ตารางสมมาตร A/B, 3: ภาพจำลองแบ่งวงกลม)
                 prob_style = random.choice([1, 2, 3])
                 
-                # ฟังก์ชันช่วยวาดตัวเลขเศษส่วน
                 def draw_frac(n, d):
                     return f"<span style='display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; font-weight:bold; font-size:18px;'><span style='border-bottom:2px solid #2c3e50; padding:0 3px;'>{n}</span><span style='padding:0 3px;'>{d}</span></span>"
                 
-                # ฟังก์ชันวาดภาพพื้นที่ถูกแบ่ง (สี่เหลี่ยม)
                 def draw_svg_div_rect(n, d, m):
                     w, h = 120, 120
                     cw, ch = w/d, h/m
@@ -2543,16 +2298,15 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     for row in range(m):
                         for col in range(d):
                             if col < n and row == 0:
-                                fill = "#2ecc71" # พื้นที่คำตอบ (เขียวเข้ม)
+                                fill = "#2ecc71" 
                             elif col < n:
-                                fill = "#a9dfbf" # พื้นที่ตัวตั้งเดิม (เขียวอ่อน)
+                                fill = "#a9dfbf" 
                             else:
-                                fill = "#ecf0f1" # พื้นที่ว่าง
+                                fill = "#ecf0f1" 
                             svg += f'<rect x="{col*cw}" y="{row*ch}" width="{cw}" height="{ch}" fill="{fill}" stroke="#2c3e50" stroke-width="1.5"/>'
                     svg += '</svg>'
                     return svg
 
-                # ฟังก์ชันวาดภาพวงกลมถูกแบ่ง
                 def draw_svg_circles(w_count, d):
                     svg = "<div style='display:flex; justify-content:center; flex-wrap:wrap; gap:10px;'>"
                     for _ in range(w_count):
@@ -2568,10 +2322,9 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return svg
 
                 if prob_style == 1:
-                    # แบบที่ 1: เศษส่วน หาร จำนวนเต็ม (Visual Area Model)
                     d1 = random.choice([3, 4, 5])
                     n1 = random.randint(1, d1-1)
-                    m = random.choice([2, 3, 4]) # จำนวนเต็มที่นำมาหาร
+                    m = random.choice([2, 3, 4]) 
                     
                     q_html = f"""
                     <div style="display: flex; justify-content: center; align-items: center; padding: 25px; background: #fdfefe; border-radius: 12px; border: 2px dashed #95a5a6; box-shadow: 2px 2px 8px rgba(0,0,0,0.05); margin: 15px 0;">
@@ -2613,7 +2366,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
                 elif prob_style == 2:
-                    # แบบที่ 2: เศษส่วน หาร เศษส่วน (ตารางสมมาตร)
                     d1 = random.choice([3, 4, 5, 7])
                     n1 = random.randint(1, d1-1)
                     d2 = random.choice([3, 4, 5, 8])
@@ -2641,7 +2393,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     gcd_v = math.gcd(ans_n_raw, ans_d_raw)
                     ans_n, ans_d = ans_n_raw // gcd_v, ans_d_raw // gcd_v
                     
-                    # แปลงเป็นจำนวนคละถ้าจำเป็น
                     if ans_n > ans_d and ans_d != 1:
                         w = ans_n // ans_d
                         r = ans_n % ans_d
@@ -2673,7 +2424,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     sol += f"<b>ตอบ: {ans_text}</b></span>"
 
                 else:
-                    # แบบที่ 3: จำนวนเต็ม หาร เศษส่วน (Visual Circles)
                     w_count = random.randint(2, 4)
                     d = random.choice([3, 4, 5, 6])
                     
@@ -2685,7 +2435,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     q = f"ถ้ามีพิซซ่าอยู่ <b>{w_count} ถาด</b> นำมาแบ่งเป็นชิ้นย่อยๆ ชิ้นละ <b>{draw_frac(1, d)}</b> ถาด<br>จะได้พิซซ่าทั้งหมดกี่ชิ้น? (ประโยคสัญลักษณ์: {w_count} ÷ {draw_frac(1, d)})<br>{q_html}"
                     
                     ans_n_raw = w_count * d
-                    ans_d_raw = 1
                     ans_text = str(ans_n_raw)
                     
                     sol = f"""<span style='color:#2c3e50;'>
@@ -2704,13 +2453,9 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;• {w_count} × {d} = <b>{ans_text}</b><br><br>
                     <b>ตอบ: {ans_text} ชิ้น</b></span>"""
 
-
-
             elif actual_sub_t == "การบวกทศนิยม":
-                # สุ่มรูปแบบโจทย์ (1: ตารางร้อย (Visual), 2: กล่องสมมาตร, 3: ป้ายราคาสินค้า)
                 prob_style = random.choice([1, 2, 3])
                 
-                # ฟังก์ชันวาดตารางร้อย (10x10) แสดงทศนิยม 2 ตำแหน่ง
                 def draw_svg_decimal_grid(val, color="#3498db"):
                     squares = round(val * 100)
                     svg = '<svg width="100" height="100" viewBox="0 0 100 100" style="border: 2px solid #2c3e50; background-color: #ecf0f1;">'
@@ -2724,7 +2469,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     return svg
 
                 if prob_style == 1:
-                    # แบบที่ 1: ตารางร้อย (Visual Math)
                     v1 = round(random.uniform(0.10, 0.45), 2)
                     v2 = round(random.uniform(0.10, 0.45), 2)
                     total = round(v1 + v2, 2)
@@ -2767,9 +2511,8 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {total:.2f}</b></span>"""
 
                 elif prob_style == 2:
-                    # แบบที่ 2: กล่องสมมาตร (จำนวนตำแหน่งทศนิยมไม่เท่ากัน เพื่อดักทางเด็ก)
-                    v1 = round(random.uniform(5.1, 25.9), 1)   # 1 ตำแหน่ง
-                    v2 = round(random.uniform(1.11, 9.99), 2)  # 2 ตำแหน่ง
+                    v1 = round(random.uniform(5.1, 25.9), 1)   
+                    v2 = round(random.uniform(1.11, 9.99), 2)  
                     if random.choice([True, False]): 
                         v1, v2 = v2, v1
                     
@@ -2792,7 +2535,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     """
                     q = f"พิจารณาค่าจากกล่องที่กำหนดให้ แล้วหาคำตอบที่ถูกต้องที่สุด<br><span style='font-size:14px; color:#e74c3c;'>(⭐ ระวัง: จำนวนตำแหน่งทศนิยมไม่เท่ากัน)</span><br>{q_html}"
                     
-                    # ปรับ String เพื่อเติม 0 ในเฉลยให้เห็นชัดเจน
                     v1_str = f"{v1:.2f}" if len(str(v1).split('.')[1]) == 1 else str(v1)
                     v2_str = f"{v2:.2f}" if len(str(v2).split('.')[1]) == 1 else str(v2)
                     
@@ -2823,7 +2565,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     <b>ตอบ: {total:.2f}</b></span>"""
 
                 else:
-                    # แบบที่ 3: ป้ายราคาสินค้า
                     items = [("สมุดโน้ต", 15.5, 25.5), ("ปากกาสี", 8.25, 12.75), ("ยางลบ", 5.5, 9.5), ("ไม้บรรทัด", 10.25, 15.5)]
                     item1 = random.choice(items)
                     items.remove(item1)
@@ -2882,8 +2623,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                         </tr>
                     </table><br>
                     <b>ตอบ: คุณแม่ต้องจ่ายเงินทั้งหมด {total:.2f} บาท</b></span>"""
-
-
 
             elif actual_sub_t == "การลบทศนิยม":
                 prob_style = random.choice([1, 2, 3])
@@ -3067,8 +2806,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     </table><br>
                     <b>ตอบ: {item1[0]} แพงกว่าอยู่ {ans:.2f} บาท</b></span>"""
 
-
-
             elif actual_sub_t == "การคูณทศนิยม":
                 prob_style = random.choice([1, 2, 3])
                 
@@ -3238,8 +2975,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;• นำ {ans_raw} ÷ 100 (ใส่ทศนิยม 2 ตำแหน่ง) จะได้ <b>{ans:.2f}</b><br><br>
                     <b>ตอบ: คุณครูต้องจ่ายเงินทั้งหมด {ans:.2f} บาท</b></span>"""
 
-
-
             elif actual_sub_t == "การหารทศนิยม":
                 prob_style = random.choice([1, 2, 3])
                 
@@ -3310,7 +3045,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     else:
                         v1 = v1_raw / 100 
                         v2 = v2_raw / 100 
-                        ans = v1 / v2     
+                        ans = v1 / v2      
                         move_step = 100
                     
                     q_html = f"""
@@ -3391,8 +3126,6 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;💡 <i><b>ทำไมต้องหารด้วย 100 กลับคืน?</b> เพราะตอนตั้งหาร เราแอบคูณ 100 ขยายแค่ <b>"ตัวตั้ง (ยอดเงิน)"</b> ฝ่ายเดียว แต่ "ตัวหาร (จำนวนคน)" ไม่ได้คูณตาม คำตอบที่หารมาได้จึงพองโตเกินจริงไป 100 เท่า! เลยต้องหารด้วย 100 กลับคืนครับ (ซึ่งก็คือการใส่จุดทศนิยม 2 ตำแหน่ง)</i><br>
                     &nbsp;&nbsp;&nbsp;&nbsp;• {int(price_per_person*100)} ÷ 100 = <b>{price_per_person:.2f}</b><br><br>
                     <b>ตอบ: จะต้องจ่ายคนละ {price_per_person:.2f} บาท</b></span>"""
-
-
 
             elif actual_sub_t == "การบวกและการลบทศนิยม":
                 op = random.choice(["+", "-"])
@@ -3554,7 +3287,8 @@ if st.sidebar.button("🚀 สั่งสร้างใบงาน ป.4", ty
         
         full_ebook_html = f"""<!DOCTYPE html><html><head><meta charset="utf-8"><link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet"><style>@page {{ size: A4; margin: 15mm; }} @media screen {{ body {{ font-family: 'Sarabun', sans-serif; background-color: #525659; display: flex; flex-direction: column; align-items: center; padding: 40px 0; margin: 0; }} .a4-wrapper {{ width: 210mm; min-height: 297mm; background: white; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); padding: 15mm; box-sizing: border-box; }} }} @media print {{ body {{ font-family: 'Sarabun', sans-serif; background: transparent; padding: 0; display: block; margin: 0; }} .a4-wrapper {{ width: 100%; min-height: auto; margin: 0; padding: 0; box-shadow: none; page-break-after: always; }} }} .header {{ text-align: center; border-bottom: 2px solid #333; margin-bottom: 10px; padding-bottom: 10px; }} .q-box {{ margin-bottom: {q_margin}; padding: 10px 15px; page-break-inside: avoid; font-size: 20px; line-height: 1.6; }} .workspace {{ height: {ws_height}; border: 2px dashed #bdc3c7; border-radius: 8px; margin: 15px 0; padding: 10px; color: #95a5a6; font-size: 16px; background-color: #fafbfc; }} .ans-line {{ margin-top: 10px; border-bottom: 1px dotted #999; width: 80%; height: 30px; font-weight: bold; font-size: 20px; display: flex; align-items: flex-end; padding-bottom: 5px; }} .sol-text {{ color: #333; font-size: 18px; display: block; margin-top: 15px; padding: 15px; background-color: #f1f8ff; border-left: 4px solid #3498db; border-radius: 4px; line-height: 1.6; }} .page-footer {{ text-align: right; font-size: 14px; color: #95a5a6; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }} </style></head><body>{ebook_body}</body></html>"""
 
-        filename_base = f"BaanTded_P4_P5_{selected_grade}_{int(time.time())}"
+        # ตัด _P5 ออกจากชื่อไฟล์ที่เซฟ
+        filename_base = f"BaanTded_P4_{int(time.time())}"
         st.session_state['ebook_html'] = full_ebook_html
         st.session_state['filename_base'] = filename_base
         

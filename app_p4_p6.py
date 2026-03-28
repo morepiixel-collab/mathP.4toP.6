@@ -1580,46 +1580,57 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
             elif actual_sub_t == "การหาพื้นที่โดยการนับตาราง":
                 unit = random.choice(["ตร.ซม.", "ตร.ม.", "ตารางหน่วย"])
-                
-                # สุ่มรูปแบบของรูปทรง (6 สไตล์ที่แตกต่างกัน)
                 shapes_list = ["L", "T", "U", "Plus", "Stair", "Rectangle"]
                 choice = random.choice(shapes_list)
 
-                # สร้างพิกัด (x, y) เริ่มจากมุม (0,0) และคำนวณพื้นที่
+                calc_steps = ""
+
+                # สร้างพิกัด (x, y) และคำนวณพื้นที่พร้อมสร้าง "คำอธิบายการคำนวณ"
                 if choice == "Rectangle":
                     w, h = random.randint(3, 7), random.randint(3, 6)
                     pts = [(0,0), (w,0), (w,h), (0,h)]
                     area = w * h
+                    calc_steps = f"รูปสี่เหลี่ยมมุมฉากขนาด กว้าง {w} ช่อง × ยาว {h} ช่อง<br>👉 พื้นที่ = {w} × {h} = <b>{area}</b> ช่อง"
+
                 elif choice == "L":
                     t = random.randint(1, 2)
                     h, w = random.randint(4, 7), random.randint(4, 7)
                     pts = [(0,0), (t,0), (t,h-t), (w,h-t), (w,h), (0,h)]
                     area = t*h + (w-t)*t
+                    calc_steps = f"<b>แบ่งรูปเป็น 2 ส่วน (แนวตั้งและแนวนอน):</b><br>👉 ส่วนที่ 1 (แนวตั้ง): กว้าง {t} × ยาว {h} = {t*h} ช่อง<br>👉 ส่วนที่ 2 (แนวนอน): กว้าง {w-t} × ยาว {t} = {(w-t)*t} ช่อง<br>👉 นำพื้นที่มารวมกัน = {t*h} + {(w-t)*t} = <b>{area}</b> ช่อง"
+
                 elif choice == "T":
                     t = random.randint(1, 2)
-                    w = random.choice([5, 7]) # ให้ความกว้างเป็นเลขคี่ เพื่อให้ก้านตัว T อยู่ตรงกลางพอดี
+                    w = random.choice([5, 7]) 
                     h = random.randint(4, 7)
                     stem_w = random.choice([1, 3])
                     margin = (w - stem_w) // 2
                     pts = [(0,0), (w,0), (w,t), (margin+stem_w,t), (margin+stem_w,h), (margin,h), (margin,t), (0,t)]
                     area = w*t + stem_w*(h-t)
+                    calc_steps = f"<b>แบ่งรูปเป็น 2 ส่วน (หัวรูปตัว T และ ก้าน):</b><br>👉 ส่วนหัว (แนวนอน): กว้าง {w} × ยาว {t} = {w*t} ช่อง<br>👉 ส่วนก้าน (แนวตั้ง): กว้าง {stem_w} × ยาว {h-t} = {stem_w*(h-t)} ช่อง<br>👉 นำพื้นที่มารวมกัน = {w*t} + {stem_w*(h-t)} = <b>{area}</b> ช่อง"
+
                 elif choice == "U":
                     t = random.randint(1, 2)
                     w = random.choice([5, 6, 7])
                     h = random.randint(4, 6)
                     pts = [(0,0), (t,0), (t,h-t), (w-t,h-t), (w-t,0), (w,0), (w,h), (0,h)]
                     area = w*h - (w-2*t)*(h-t)
+                    calc_steps = f"<b>เทคนิคขั้นสูง 'พื้นที่รูปใหญ่ - พื้นที่ช่องว่าง':</b><br>👉 พื้นที่สี่เหลี่ยมใหญ่ทั้งหมด (ถ้าระบายเต็ม): กว้าง {w} × ยาว {h} = {w*h} ช่อง<br>👉 พื้นที่ช่องว่างตรงกลาง: กว้าง {w-2*t} × ยาว {h-t} = {(w-2*t)*(h-t)} ช่อง<br>👉 พื้นที่จริง = {w*h} - {(w-2*t)*(h-t)} = <b>{area}</b> ช่อง"
+
                 elif choice == "Plus":
                     t = random.randint(1, 2)
                     arm = random.randint(1, 2)
                     w, h = t + arm*2, t + arm*2
                     pts = [(arm,0), (arm+t,0), (arm+t,arm), (w,arm), (w,arm+t), (arm+t,arm+t), (arm+t,h), (arm,h), (arm,arm+t), (0,arm+t), (0,arm), (arm,arm)]
                     area = t*h + 2*(arm*t)
+                    calc_steps = f"<b>แบ่งรูปเป็น 3 ส่วน (แกนกลาง และ แขน 2 ข้าง):</b><br>👉 แกนกลางแนวตั้ง: กว้าง {t} × ยาว {h} = {t*h} ช่อง<br>👉 แขนซ้าย-ขวา (2 ข้าง): ข้างละ {arm} × {t} = {arm*t} ช่อง ➔ 2 ข้างรวม {arm*t*2} ช่อง<br>👉 นำพื้นที่มารวมกัน = {t*h} + {arm*t*2} = <b>{area}</b> ช่อง"
+
                 elif choice == "Stair":
                     step_w, step_h = random.randint(1, 2), random.randint(1, 2)
-                    # บันได 3 ขั้น
                     pts = [(0, 0), (step_w, 0), (step_w, step_h), (step_w*2, step_h), (step_w*2, step_h*2), (step_w*3, step_h*2), (step_w*3, step_h*3), (0, step_h*3)]
-                    area = (step_w * step_h * 3) + (step_w * step_h * 2) + (step_w * step_h * 1)
+                    col1, col2, col3 = 3*step_h*step_w, 2*step_h*step_w, 1*step_h*step_w
+                    area = col1 + col2 + col3
+                    calc_steps = f"<b>แบ่งรูปบันไดเป็นแท่งแนวตั้ง 3 แท่ง:</b><br>👉 แท่งที่ 1 (ซ้ายสุด): สูง {3*step_h} × กว้าง {step_w} = {col1} ช่อง<br>👉 แท่งที่ 2 (กลาง): สูง {2*step_h} × กว้าง {step_w} = {col2} ช่อง<br>👉 แท่งที่ 3 (ขวาสุด): สูง {step_h} × กว้าง {step_w} = {col3} ช่อง<br>👉 นำพื้นที่มารวมกัน = {col1} + {col2} + {col3} = <b>{area}</b> ช่อง"
 
                 # 🎯 คำนวณเพื่อย้ายรูปทรงไปอยู่ตรง "กึ่งกลาง" ของตารางพอดีเป๊ะ
                 max_x = max(p[0] for p in pts)
@@ -1633,16 +1644,13 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
                 sol = f"""<span style='color:#2c3e50;'>
                 <div style='background-color:#f8f9f9; border-left:4px solid #8e44ad; padding:15px; margin-bottom:15px; border-radius:8px;'>
-                💡 <b>หลักการหาพื้นที่โดยการนับตาราง:</b><br>
-                ให้เราทำการ <b>"นับจำนวนช่องสี่เหลี่ยมเต็มช่อง"</b> ที่ถูกระบายสี<br>
-                โดยอ้างอิงจากสิ่งที่โจทย์กำหนด คือ 1 ช่อง มีพื้นที่ = 1 {unit}
+                💡 <b>เทคนิคการคำนวณพื้นที่บนตาราง (ไม่ต้องนั่งนับ):</b><br>
+                เราสามารถใช้วิธี <b>"แบ่งรูปทรงย่อย"</b> เป็นรูปสี่เหลี่ยมมุมฉากเล็กๆ หลายๆ รูป หรือใช้เทคนิค <b>"สี่เหลี่ยมรูปใหญ่ลบด้วยช่องว่าง"</b> แล้วใช้สูตร (กว้าง × ยาว) เพื่อความรวดเร็วและแม่นยำ!
                 </div>
                 <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
-                👉 <b>ขั้นที่ 1:</b> ค่อยๆ นับจำนวนช่องสี่เหลี่ยมที่ถูกระบายสีทีละช่อง<br>
-                👉 <b>ขั้นที่ 2:</b> เมื่อนับจนครบทุกส่วนของรูป จะได้จำนวนทั้งหมด <b>{area}</b> ช่องพอดี<br>
-                👉 <b>ขั้นที่ 3:</b> นำจำนวนช่องที่นับได้ มาคูณกับพื้นที่ต่อช่อง ➔ {area} × 1 = <b>{area}</b><br><br>
+                {calc_steps}<br>
+                👉 นำจำนวนช่องรวม คูณกับพื้นที่ต่อช่อง ➔ {area} × 1 = <b>{area}</b><br><br>
                 <b>ตอบ: พื้นที่ของรูประบายสีคือ {area} {unit}</b></span>"""
-
 
 
             elif actual_sub_t == "แปลงเศษเกินเป็นจำนวนคละ":

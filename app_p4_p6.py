@@ -1098,6 +1098,50 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
 
+            elif actual_sub_t == "การหาความยาวรอบรูปสี่เหลี่ยมด้านขนานและขนมเปียกปูน":
+                unit = random.choice(["ซม.", "ม.", "วา"])
+                # สุ่มเลือกระหว่าง ด้านขนาน หรือ ขนมเปียกปูน
+                mode = random.choice(["parallelogram", "rhombus"])
+                
+                if mode == "rhombus":
+                    side = random.randint(15, 120)
+                    peri = side * 4
+                    svg = draw_p4_parallelogram_rhombus_svg("rhombus", [side], unit)
+                    q = f"รูปสี่เหลี่ยมที่กำหนดให้เป็น<b>รูปสี่เหลี่ยมขนมเปียกปูน</b> (มีสัญลักษณ์ขีดบอกความยาวเท่ากันทุกด้าน) จงหาความยาวรอบรูปทั้งหมด<br>{svg}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#fef8eb; border-left:4px solid #f39c12; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                    💡 <b>สมบัติของสี่เหลี่ยมขนมเปียกปูน:</b><br>
+                    รูปสี่เหลี่ยมที่มีสัญลักษณ์ 1 ขีดสีแดงเหมือนกันทุกด้านแบบนี้ คือสี่เหลี่ยมขนมเปียกปูน ซึ่งจะมี <b>ด้านทั้ง 4 ด้านยาวเท่ากันเสมอ</b> ครับ
+                    </div>
+                    <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                    👉 <b>ขั้นที่ 1:</b> ระบุความยาวด้านละ {side} {unit}<br>
+                    👉 <b>ขั้นที่ 2:</b> เนื่องจากมี 4 ด้านที่ยาวเท่ากัน สามารถคำนวณโดยใช้การคูณ 4 ➔ {side} × 4<br>
+                    👉 <b>ขั้นที่ 3:</b> หาผลลัพธ์ ➔ {side} × 4 = <b>{peri} {unit}</b><br><br>
+                    <b>ตอบ: ความยาวรอบรูปของรูปสี่เหลี่ยมขนมเปียกปูนคือ {peri} {unit}</b></span>"""
+                
+                else: # parallelogram
+                    base = random.randint(40, 150)
+                    side_slope = random.randint(20, 80)
+                    peri = (base + side_slope) * 2
+                    svg = draw_p4_parallelogram_rhombus_svg("parallelogram", [base, side_slope], unit)
+                    q = f"พิจารณารูป<b>สี่เหลี่ยมด้านขนาน</b>ที่กำหนดให้ (ด้านที่อยู่ตรงข้ามกันมีขนาดเท่ากัน) จงหาความยาวรอบรูปทั้งหมด<br>{svg}"
+                    
+                    sol = f"""<span style='color:#2c3e50;'>
+                    <div style='background-color:#ebf5fb; border-left:4px solid #3498db; padding:15px; margin-bottom:15px; border-radius:8px;'>
+                    💡 <b>สมบัติของสี่เหลี่ยมด้านขนาน:</b><br>
+                    ด้านที่อยู่ตรงข้ามกันจะมีความยาวเท่ากันเสมอ (สังเกตจากสัญลักษณ์ขีดที่มีสีและจำนวนเหมือนกัน)
+                    </div>
+                    <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
+                    👉 <b>ขั้นที่ 1:</b> รวมความยาวด้านคู่ที่ 1 (บน+ล่าง) ➔ {base} + {base} = {base*2} {unit}<br>
+                    👉 <b>ขั้นที่ 2:</b> รวมความยาวด้านคู่ที่ 2 (ซ้าย+ขวา) ➔ {side_slope} + {side_slope} = {side_slope*2} {unit}<br>
+                    👉 <b>ขั้นที่ 3:</b> นำผลรวมทั้งสองคู่มาบวกกัน ➔ {base*2} + {side_slope*2} = <b>{peri} {unit}</b><br>
+                    <i>(หรือใช้สูตร 2 × (กว้าง + ยาว) ➔ 2 × ({base} + {side_slope}) = <b>{peri}</b>)</i><br><br>
+                    <b>ตอบ: ความยาวรอบรูปของรูปสี่เหลี่ยมด้านขนานคือ {peri} {unit}</b></span>"""
+
+
+
+
             elif actual_sub_t == "การหาพื้นที่รูปสี่เหลี่ยมมุมฉาก":
                 is_square = random.choice([True, False])
                 if is_square:

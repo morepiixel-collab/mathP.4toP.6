@@ -74,50 +74,48 @@ def draw_p4_kite_svg(sides, unit="ซม."):
     cx, cy = 225, 125
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
-    # 📐 ไดนามิก: สุ่มสัดส่วนของรูปว่าวให้แต่ละข้อดูไม่ซ้ำกัน
-    half_w = random.randint(60, 100)   # ครึ่งความกว้าง (สุ่มความอ้วน/ผอม)
-    top_h = random.randint(30, 55)     # ความสูงส่วนบน (คู่สั้น)
-    bottom_h = random.randint(70, 110) # ความสูงส่วนล่าง (คู่ยาว)
+    # 📐 ไดนามิก: สุ่มสัดส่วนของรูปว่าวให้แต่ละข้อดูไม่ซ้ำกัน (แต่สมมาตรซ้าย-ขวา 100%)
+    half_w = random.randint(55, 95)    # ครึ่งความกว้าง (แกน X)
+    top_h = random.randint(30, 50)     # ความสูงส่วนบน (แกน Y)
+    bottom_h = random.randint(65, 105) # ความสูงส่วนล่าง (แกน Y)
     
-    # พิกัด 4 มุม (บน, ขวา, ล่าง, ซ้าย) ขยับพิกัด Y ขึ้นนิดหน่อยให้อยู่กึ่งกลางกรอบ
-    offset_y = 10
-    top = (cx, cy - top_h - offset_y)
-    right = (cx + half_w, cy - offset_y)
-    bottom = (cx, cy + bottom_h - offset_y)
-    left = (cx - half_w, cy - offset_y)
+    # พิกัด 4 มุม (บน, ขวา, ล่าง, ซ้าย)
+    top = (cx, cy - top_h)
+    right = (cx + half_w, cy)
+    bottom = (cx, cy + bottom_h)
+    left = (cx - half_w, cy)
     
     pts = f"{top[0]},{top[1]} {right[0]},{right[1]} {bottom[0]},{bottom[1]} {left[0]},{left[1]}"
     
-    # วาดตัวรูป
+    # วาดตัวรูปสี่เหลี่ยมรูปว่าว
     svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
     
-    # ฟังก์ชันช่วยคำนวณองศาให้เส้น "ตั้งฉาก" กับด้านเอียงแบบ 100%
-    def get_tick_angle(p1, p2):
-        dx = p2[0] - p1[0]
-        dy = p2[1] - p1[1]
-        return math.degrees(math.atan2(dy, dx)) + 90
+    # 🎯 ฟังก์ชันคำนวณองศาให้เส้น "ตั้งฉาก" 100%
+    # (ลบ +90 ออกจากของเดิม เพราะเส้นวาดแนวตั้ง การหมุนเท่ากับองศาเส้นขอบจะทำให้มันตั้งฉากพอดี)
+    def get_perpendicular_angle(p1, p2):
+        return math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0]))
 
-    # 🎯 สัญลักษณ์ 1 ขีด สำหรับคู่ประชิดด้านบน (ด้านสั้น)
+    # 🎯 สัญลักษณ์ 1 ขีดตั้งฉาก สำหรับคู่ประชิดด้านบน (ด้านสั้น) สีน้ำเงิน
     for p1, p2 in [(left, top), (top, right)]:
         mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
-        angle = get_tick_angle(p1, p2)
-        svg += f'<line x1="{mx}" y1="{my-7}" x2="{mx}" y2="{my+7}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+        angle = get_perpendicular_angle(p1, p2)
+        svg += f'<line x1="{mx}" y1="{my-8}" x2="{mx}" y2="{my+8}" stroke="#3498db" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
         
-    # 🎯 สัญลักษณ์ 2 ขีด สำหรับคู่ประชิดด้านล่าง (ด้านยาว)
+    # 🎯 สัญลักษณ์ 2 ขีดตั้งฉาก สำหรับคู่ประชิดด้านล่าง (ด้านยาว) สีแดง
     for p1, p2 in [(left, bottom), (right, bottom)]:
         mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
-        angle = get_tick_angle(p1, p2)
-        svg += f'<line x1="{mx-3}" y1="{my-7}" x2="{mx-3}" y2="{my+7}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
-        svg += f'<line x1="{mx+3}" y1="{my-7}" x2="{mx+3}" y2="{my+7}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+        angle = get_perpendicular_angle(p1, p2)
+        svg += f'<line x1="{mx-3}" y1="{my-8}" x2="{mx-3}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+        svg += f'<line x1="{mx+3}" y1="{my-8}" x2="{mx+3}" y2="{my+8}" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
 
-    # 🎯 วางตัวเลขให้เยื้องออกจากเส้นเอียง ไม่ให้ทับซ้อนกัน
-    # ตัวเลขด้านบนขวา
-    mid_tr_x, mid_tr_y = (top[0]+right[0])/2, (top[1]+right[1])/2
-    svg += f'<text x="{mid_tr_x + 15}" y="{mid_tr_y - 10}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[0]} {unit}</text>'
+    # 🎯 วางตัวเลขให้เยื้องออกจากเส้นเอียง (ไม่ทับเส้น)
+    # ตัวเลขด้านสั้น (ขวาบน)
+    mx_top, my_top = (top[0]+right[0])/2, (top[1]+right[1])/2
+    svg += f'<text x="{mx_top + 15}" y="{my_top - 10}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[0]} {unit}</text>'
     
-    # ตัวเลขด้านล่างขวา
-    mid_br_x, mid_br_y = (right[0]+bottom[0])/2, (right[1]+bottom[1])/2
-    svg += f'<text x="{mid_br_x + 15}" y="{mid_br_y + 15}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
+    # ตัวเลขด้านยาว (ขวาล่าง)
+    mx_bot, my_bot = (right[0]+bottom[0])/2, (right[1]+bottom[1])/2
+    svg += f'<text x="{mx_bot + 15}" y="{my_bot + 25}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
 
     svg += '</svg>'
     return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
@@ -1206,25 +1204,26 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
 
 
             elif actual_sub_t == "การหาความยาวรอบรูปสี่เหลี่ยมรูปว่าว":
+                # เพิ่มความหลากหลายของหน่วย
                 unit = random.choice(["ซม.", "ม.", "นิ้ว", "วา"])
                 
-                # สุ่มความยาวด้าน โดยบังคับให้ด้านล่างยาวกว่าด้านบนเสมอ
+                # สุ่มความยาวด้าน โดยบังคับให้ด้านล่างยาวกว่าด้านบนเสมอ เพื่อความสมจริง
                 s1 = random.randint(15, 60)
-                s2 = random.randint(s1 + 10, s1 + 80)
+                s2 = random.randint(s1 + 12, s1 + 80)
                 peri = 2 * (s1 + s2)
                 
                 svg = draw_p4_kite_svg([s1, s2], unit)
-                q = f"รูปสี่เหลี่ยมที่กำหนดให้เป็น<b>รูปสี่เหลี่ยมรูปว่าว</b> (ด้านประชิดยาวเท่ากัน 2 คู่) จงหาความยาวรอบรูปทั้งหมด<br>{svg}"
+                q = f"พิจารณารูป<b>สี่เหลี่ยมรูปว่าว</b>ที่กำหนดให้ (มีด้านประชิดยาวเท่ากัน 2 คู่) จงหาความยาวรอบรูปทั้งหมด<br>{svg}"
                 
                 sol = f"""<span style='color:#2c3e50;'>
                 <div style='background-color:#fef8eb; border-left:4px solid #f39c12; padding:15px; margin-bottom:15px; border-radius:8px;'>
                 💡 <b>สมบัติของสี่เหลี่ยมรูปว่าว:</b><br>
                 ด้านที่อยู่ติดกัน (ประชิดกัน) จะมีความยาวเท่ากัน 2 คู่เสมอ<br>
-                <i>(สังเกตจากสัญลักษณ์ 1 ขีดคู่บน และ 2 ขีดคู่ล่าง)</i>
+                <i>(สังเกตจากสัญลักษณ์ 1 ขีดสีน้ำเงินคู่บน และ 2 ขีดสีแดงคู่ล่างที่ตั้งฉากกับเส้น)</i>
                 </div>
                 <b>วิธีทำอย่างละเอียด Step-by-Step:</b><br>
-                👉 <b>ขั้นที่ 1:</b> คู่ที่ 1 (ด้านบน) มี 2 ด้าน ยาวด้านละ {s1} {unit} ➔ รวมเป็น {s1} + {s1} = {s1*2} {unit}<br>
-                👉 <b>ขั้นที่ 2:</b> คู่ที่ 2 (ด้านล่าง) มี 2 ด้าน ยาวด้านละ {s2} {unit} ➔ รวมเป็น {s2} + {s2} = {s2*2} {unit}<br>
+                👉 <b>ขั้นที่ 1:</b> คู่ที่ 1 (ด้านบน) มีสัญลักษณ์ 1 ขีด 2 ด้าน ยาวด้านละ {s1} {unit} ➔ รวมเป็น {s1} + {s1} = {s1*2} {unit}<br>
+                👉 <b>ขั้นที่ 2:</b> คู่ที่ 2 (ด้านล่าง) มีสัญลักษณ์ 2 ขีด 2 ด้าน ยาวด้านละ {s2} {unit} ➔ รวมเป็น {s2} + {s2} = {s2*2} {unit}<br>
                 👉 <b>ขั้นที่ 3:</b> นำความยาวทั้ง 4 ด้านมารวมกัน ➔ {s1*2} + {s2*2} = <b>{peri} {unit}</b><br>
                 <i>(หรือคำนวณจากสูตร: 2 × (ความยาวด้านสั้น + ความยาวด้านยาว) ➔ 2 × ({s1} + {s2}) = <b>{peri}</b>)</i><br><br>
                 <b>ตอบ: ความยาวรอบรูปของรูปสี่เหลี่ยมรูปว่าวนี้คือ {peri} {unit}</b></span>"""

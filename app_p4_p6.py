@@ -76,12 +76,12 @@ def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, uni
     svg = f'<svg width="{svg_w}" height="{svg_h}">'
     
     if shape_type == "rhombus":
-        # 📐 ขนมเปียกปูน: ใช้สัดส่วน 3-4-5 ให้ด้านเท่ากันเป๊ะ (dx=60, h=80 -> ด้านจะยาว 100 พอดี)
+        # 📐 ขนมเปียกปูน: ใช้สัดส่วน 3-4-5 ให้ด้านเท่ากัน (แต่ไม่แสดงขีดสัญลักษณ์แล้ว)
         v_height = 80
         dx = 60
         v_base = 100
     else:
-        # 📐 ด้านขนาน: สุ่มความกว้างฐาน และความเอียง (เพื่อให้แต่ละข้อหน้าตาไม่ซ้ำกัน)
+        # 📐 ด้านขนาน: สุ่มความกว้างฐาน และความเอียง
         v_height = random.randint(75, 95)
         v_base = random.randint(130, 170)
         dx = random.randint(35, 55)
@@ -103,18 +103,11 @@ def draw_p4_parallelogram_rhombus_area_svg(shape_type, base_val, height_val, uni
     # 🎯 เส้นส่วนสูง (เส้นประสีแดง) ลากจากมุมซ้ายบนลงมาตั้งฉากกับฐาน
     svg += f'<line x1="{tl[0]}" y1="{tl[1]}" x2="{tl[0]}" y2="{bot_y}" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="6,4"/>'
     
-    # 🎯 สัญลักษณ์มุมฉากที่ฐาน (สีแดง)
+    # 🎯 สัญลักษณ์มุมฉากที่ฐาน (สีแดง) ยืนยันว่าเป็นส่วนสูง
     s = 12
     svg += f'<polyline points="{tl[0]},{bot_y-s} {tl[0]+s},{bot_y-s} {tl[0]+s},{bot_y}" fill="none" stroke="#e74c3c" stroke-width="2.5"/>'
 
-    # 🎯 สัญลักษณ์ด้านเท่า (เฉพาะขนมเปียกปูน) เพื่อย้ำให้เด็กรู้ว่าเป็นขนมเปียกปูน
-    if shape_type == "rhombus":
-        sides_to_tick = [(tl, tr, 0), (tr, br, 53), (br, bl, 0), (bl, tl, 53)]
-        for p1, p2, angle in sides_to_tick:
-            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
-            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
-
-    # 🎯 วางตัวเลข (ฐานสีน้ำเงิน, สูงสีแดง)
+    # 🎯 วางตัวเลข (ฐานสีน้ำเงิน, สูงสีแดง) โฟกัสแค่ 2 จุดนี้เท่านั้น
     svg += f'<text x="{cx}" y="{bot_y + 30}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">ฐาน {base_val} {unit}</text>'
     
     # ขยับตัวเลขความสูงให้เยื้องมาทางขวาของเส้นประเล็กน้อย จะได้อ่านง่าย

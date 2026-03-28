@@ -60,6 +60,70 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
             <tr><td style='padding: 5px 10px 0 0; border: none; {border_ans} height: 35px;'>{ans_val}</td><td style='border: none;'></td></tr>
         </table></div>"""
 
+
+# ==========================================
+# ส่วนของ Helpers (ฟังก์ชันวาดรูป SVG)
+# ==========================================
+
+def draw_angle_svg(angle_type, degree):
+    # ... โค้ดเดิมของคุณ ...
+    pass
+
+def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
+    # --- วางฟังก์ชันใหม่ตรงนี้ ---
+    svg_w, svg_h = 450, 250
+    # ... (โค้ดที่ผมให้ไปด้านบน) ...
+    return f'''<div style="...">...</div>'''
+
+def draw_grid_counting_svg(grid_data):
+    # ... ฟังก์ชันอื่นๆ ...
+    pass
+
+
+def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
+    svg_w, svg_h = 450, 250
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+    
+    # กำหนดพิกัดรูปสามเหลี่ยมให้สมมาตร (อยู่กึ่งกลาง)
+    # จุดยอด (Top), ซ้ายล่าง (Left), ขวาล่าง (Right)
+    t, l, r = (225, 60), (130, 190), (320, 190)
+    pts = f"{t[0]},{t[1]} {l[0]},{l[1]} {r[0]},{r[1]}"
+    
+    # วาดตัวรูป
+    svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
+
+    # เพิ่มสัญลักษณ์ "ขีด" บอกด้านที่เท่ากัน (สำหรับข้อสอบแข่งขัน)
+    if triangle_type == "equilateral": # ด้านเท่า (3 ขีด)
+        for p1, p2 in [(t, l), (t, r), (l, r)]:
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx-5}" y1="{my-5}" x2="{mx+5}" y2="{my+5}" stroke="#e74c3c" stroke-width="2"/>'
+    elif triangle_type == "isosceles": # หน้าจั่ว (2 ขีดที่ด้านข้าง)
+        for p1, p2 in [(t, l), (t, r)]:
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx-5}" y1="{my-5}" x2="{mx+5}" y2="{my+5}" stroke="#e74c3c" stroke-width="2"/>'
+
+    # การวางตำแหน่งตัวเลข (ให้ห่างจากเส้นเล็กน้อยเพื่อความสวยงาม)
+    if triangle_type == "equilateral":
+        # ให้เลขด้านเดียว (เด็กต้องรู้เองว่าทุกด้านเท่ากัน)
+        svg += f'<text x="225" y="215" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+    elif triangle_type == "isosceles":
+        # ให้เลขฐาน และเลขด้านข้างหนึ่งด้าน
+        svg += f'<text x="225" y="215" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+        svg += f'<text x="160" y="125" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[1]} {unit}</text>'
+    else: # ด้านไม่เท่า
+        # ให้ครบทุกด้าน
+        svg += f'<text x="225" y="215" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+        svg += f'<text x="160" y="125" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="end" fill="#2980b9">{sides[1]} {unit}</text>'
+        svg += f'<text x="290" y="125" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[2]} {unit}</text>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+        <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            {svg}
+        </div></div>'''
+
+
+
 def generate_decimal_vertical_html(a, b, op, is_key=False):
     str_a, str_b = f"{a:.2f}", f"{b:.2f}"
     ans = a + b if op == '+' else round(a - b, 2)

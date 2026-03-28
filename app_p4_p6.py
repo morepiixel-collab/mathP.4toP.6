@@ -3503,7 +3503,7 @@ def create_page(grade, sub_t, questions, is_key=False, q_margin="20px", ws_heigh
 # ==========================================
 st.sidebar.markdown("## ⚙️ พารามิเตอร์การสร้าง")
 
-selected_grade = st.sidebar.selectbox("📚 เลือกระดับชั้น:", ["ป.4"])
+selected_grade = st.sidebar("📚 เลือกระดับชั้น:", ["ป.4"])
 main_topics_list = list(curriculum_db[selected_grade].keys())
 main_topics_list.append("🌟 โหมดพิเศษ (สุ่มทุกเรื่อง)")
 
@@ -3539,7 +3539,7 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("### 🎨 ตั้งค่าแบรนด์")
 brand_name = st.sidebar.text_input("🏷️ ชื่อแบรนด์ / ผู้สอน:", value="บ้านทีเด็ด")
 
-if st.sidebar.button("🚀 สั่งสร้างใบงาน ป.4-ป.5", type="primary", use_container_width=True):
+if st.sidebar.button("🚀 สั่งสร้างใบงาน ป.4", type="primary", use_container_width=True):
     with st.spinner("กำลังออกแบบรูปภาพและสร้างเฉลยแบบ Step-by-Step..."):
         
         qs = generate_questions_logic(selected_grade, selected_main, selected_sub, num_input, is_challenge)

@@ -65,6 +65,57 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
 # ส่วนของ Helpers (ฟังก์ชันวาดรูป SVG)
 # ==========================================
 
+
+
+def draw_p4_parallelogram_rhombus_svg(shape_type, sides, unit="ซม."):
+    svg_w, svg_h = 450, 250
+    cx, cy = 225, 125
+    svg = f'<svg width="{svg_w}" height="{svg_h}">'
+    
+    # 📐 กำหนดพิกัดรูปทรง (ให้สมมาตรกึ่งกลาง)
+    # จุดซ้ายบน(tl), ขวาบน(tr), ขวาล่าง(br), ซ้ายล่าง(bl)
+    # ด้านขนาน/ขนมเปียกปูนจะเอียงไปทางขวา
+    shift = 40
+    tl, tr = (cx - 100 + shift, cy - 50), (cx + 100 + shift, cy - 50)
+    br, bl = (cx + 100 - shift, cy + 50), (cx - 100 - shift, cy + 50)
+    
+    pts = f"{tl[0]},{tl[1]} {tr[0]},{tr[1]} {br[0]},{br[1]} {bl[0]},{bl[1]}"
+    
+    # วาดตัวรูป
+    svg += f'<polygon points="{pts}" fill="#fcfcfc" stroke="#2c3e50" stroke-width="2.5"/>'
+
+    # 🎯 เพิ่มขีดสัญลักษณ์ด้านเท่า
+    if shape_type == "rhombus": # ขนมเปียกปูน (1 ขีดทุกด้าน)
+        sides_to_tick = [(tl, tr, 0), (tr, br, 70), (br, bl, 0), (bl, tl, 70)]
+        for p1, p2, angle in sides_to_tick:
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" transform="rotate({angle}, {mx}, {my})"/>'
+    else: # ด้านขนาน (คู่ขนานยาวเท่ากัน)
+        # คู่บน-ล่าง (2 ขีด)
+        for p1, p2 in [(tl, tr), (br, bl)]:
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx-2}" y1="{my-6}" x2="{mx-2}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/>'
+            svg += f'<line x1="{mx+2}" y1="{my-6}" x2="{mx+2}" y2="{my+6}" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/>'
+        # คู่ซ้าย-ขวา (1 ขีดเอียง)
+        for p1, p2 in [(tr, br), (bl, tl)]:
+            mx, my = (p1[0]+p2[0])/2, (p1[1]+p2[1])/2
+            svg += f'<line x1="{mx}" y1="{my-6}" x2="{mx}" y2="{my+6}" stroke="#3498db" stroke-width="2" stroke-linecap="round" transform="rotate(70, {mx}, {my})"/>'
+
+    # วางตัวเลขกำกับ
+    if shape_type == "rhombus":
+        svg += f'<text x="{cx}" y="{cy + 85}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+    else:
+        svg += f'<text x="{cx}" y="{cy + 85}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="middle" fill="#2980b9">{sides[0]} {unit}</text>'
+        svg += f'<text x="{cx + 105}" y="{cy}" font-family="Sarabun" font-size="18" font-weight="bold" text-anchor="start" fill="#2980b9">{sides[1]} {unit}</text>'
+
+    svg += '</svg>'
+    return f'''<div style="display:flex; justify-content:center; margin: 20px 0;">
+        <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            {svg}
+        </div></div>'''
+
+
+
 def draw_angle_svg(angle_type, degree):
     # ... โค้ดเดิมของคุณ ...
     pass
@@ -78,6 +129,8 @@ def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
 def draw_grid_counting_svg(grid_data):
     # ... ฟังก์ชันอื่นๆ ...
     pass
+
+
 
 
 import math # อย่าลืม import math ที่บรรทัดบนสุดของไฟล์นะครับ!
@@ -129,6 +182,7 @@ def draw_p4_triangle_perimeter_svg(triangle_type, sides, unit="ซม."):
         <div style="border: 1px solid #bdc3c7; border-radius: 12px; padding: 25px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             {svg}
         </div></div>'''
+
 
 
 

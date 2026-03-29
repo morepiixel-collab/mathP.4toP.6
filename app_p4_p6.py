@@ -1229,7 +1229,7 @@ def generate_questions_logic(grade, main_t, sub_t, num_q, is_challenge=False):
                     &nbsp;&nbsp;&nbsp;&nbsp;พื้นที่สีเทา = ครึ่งหนึ่งของสี่เหลี่ยม ➔ {rect_area} ÷ 2 = <b>{tri_area} ตร.นิ้ว</b><br><br>
                     <b>ตอบ: พื้นที่ส่วนที่เหลือ (สีเทา) คือ {tri_area} ตารางนิ้ว</b></span>"""
 
-else:
+            else:
                 q = f"⚠️ [ระบบอยู่ระหว่างการอัปเดต] ไม่พบเงื่อนไขการสร้างโจทย์สำหรับหัวข้อ: <b>{actual_sub_t}</b>"
                 sol = "กรุณาเลือกหัวข้ออื่น"
 
